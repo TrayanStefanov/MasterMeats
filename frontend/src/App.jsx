@@ -11,7 +11,7 @@ import CoreValuesSection from './sections/CoreValuesSection'
 
 function App() {
   return (
-    <div>
+    <div  className='bg-base-content'>
       <Navbar />
       <HeroSection />
       <CoreValuesSection />
