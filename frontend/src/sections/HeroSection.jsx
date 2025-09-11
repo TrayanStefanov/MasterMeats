@@ -2,16 +2,28 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 const HeroSection = () => {
-
   const { t } = useTranslation();
 
   const letterVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
   const titleLetters = t("home.title").split("");
+
+  const buttonVariants = {
+    hiddenLeft: { opacity: 0, x: -50 },
+    hiddenRight: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+  };
+
+  const scrollToSection = (id) => {
+    const el = document.querySelector(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="relative min-h-[80vh] lg:min-h-screen overflow-hidden flex items-center justify-center">
       {/* Background */}
-      <div className="absolute inset-0 bg-cover bg-center opacity-70" style={{ backgroundImage: "url(/background.png)" }} />
-      <motion.div className="absolute inset-0 bg-neutral/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} />
+      <div className="absolute inset-0 bg-cover bg-center opacity-10"/>
+      <motion.div className="absolute inset-0 bg-primary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} />
 
       {/* Content */}
       <div className="relative z-10 text-center text-neutral-content flex flex-col items-center justify-center h-full p-6 md:p-12 lg:p-20 gap-6">
@@ -49,9 +61,51 @@ const HeroSection = () => {
         >
           {t("home.more")}
         </motion.h3>
+
+        {/* Buttons Desktop */}
+        <div className="hidden lg:flex gap-4 mt-6">
+          <motion.button
+            initial="hiddenLeft"
+            animate="visible"
+            whileHover="hover"
+            variants={buttonVariants}
+            className="btn btn-primary btn-wide rounded-l-lg border border-secondary text-secondary text-xl"
+            onClick={() => scrollToSection("#products")}
+          >
+            {t("home.btnProducts")}
+          </motion.button>
+          <motion.button
+            initial="hiddenRight"
+            animate="visible"
+            whileHover="hover"
+            variants={buttonVariants}
+            className="btn btn-primary btn-wide rounded-r-lg border border-secondary text-secondary text-xl"
+            onClick={() => scrollToSection("#about")}
+          >
+            {t("home.btnAbout")}
+          </motion.button>
+        </div>
+
+        {/* Buttons Mobile */}
+        <div className="flex flex-col lg:hidden w-full mt-6 gap-4">
+          <button
+            onClick={() => scrollToSection("#products")}
+            className="btn btn-primary w-full h-20 sm:h-24 rounded-lg text-2xl sm:text-3xl font-bold shadow-lg"
+            style={{ backgroundImage: "url(/home-projects-btn.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+          >
+            {t("home.btnProducts")}
+          </button>
+          <button
+            onClick={() => scrollToSection("#about")}
+            className="btn btn-primary w-full h-20 sm:h-24 rounded-lg text-2xl sm:text-3xl font-bold shadow-lg"
+            style={{ backgroundImage: "url(/home-services-btn.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+          >
+            {t("home.btnAbout")}
+          </button>
+        </div>
       </div>
     </div>
-      );
+  );
 };
 
-export default HeroSection
+export default HeroSection;
