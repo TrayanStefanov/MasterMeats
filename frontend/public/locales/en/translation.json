@@ -81,14 +81,15 @@
                 "description": "Fresh Bulgarian meat seasoned with red pepper (optionally smoked). Dried for a minimum of 15 days for maximum tenderness.",
                 "price": "50 BGN/kg",
                 "btnBuy": "Buy",
-                "image": "/file3.jpg"
+                "image": "/file3.jpg",
+                "badge": ""
             },
             {
                 "title": "Spicy Pastarma",
                 "description": "Fresh Bulgarian meat seasoned with red pepper, hot chili, savory, and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
                 "price": "60 BGN/kg",
                 "btnBuy": "Buy",
-                "image": "/file1.png",
+                "image": "/file4.png",
                 "badge": "Spicy"
             }
         ]
