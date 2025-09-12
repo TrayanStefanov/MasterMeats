@@ -37,19 +37,23 @@
         "values": {
             "1": {
                 "title": "Quality",
-                "subtitle": "We are committed to providing you with the highest quality products. So we use only bulgarian meat from trusted sources"
+                "subtitle": "We are committed to providing you with the highest quality products. So we use only bulgarian meat from trusted sources",
+                "description" : "Every cut we offer is carefully selected and crafted to ensure you receive nothing but the best."
             },
             "2": {
                 "title": "Taste",
-                "subtitle": "The taste but always be consistent, rich and authentic."
+                "subtitle": "The taste but always be consistent, rich and authentic.",
+                "description" : "Our flavors are authentic, rich, and consistent, leaving a lasting impression in every bite."
             },
             "3": {
                 "title": "Freshness",
-                "subtitle": "If it ain't fresh, it has no room on the table"
+                "subtitle": "If it ain't fresh, it has no room on the table",
+                "description" : "From farm to table, our products maintain optimal freshness and vibrant quality."
             },
             "4": {
                 "title": "Health",
-                "subtitle": "We prioritize the health of our customers and employees."
+                "subtitle": "We prioritize the health of our customers and employees.",
+                "description" : "We prioritize your wellbeing by using natural ingredients and traditional techniques."
             }
         }
     },
