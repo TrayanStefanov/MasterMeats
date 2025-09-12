@@ -20,13 +20,13 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="relative min-h-[80vh] lg:min-h-screen overflow-hidden flex items-center justify-center">
+    <div id="hero" className="relative min-h-[80vh] lg:min-h-screen overflow-hidden flex items-center justify-center">
       {/* Background */}
       <div className="absolute inset-0 bg-cover bg-center opacity-10"/>
       <motion.div className="absolute inset-0 bg-primary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} />
 
       {/* Content */}
-      <div className="relative z-10 text-center text-neutral-content flex flex-col items-center justify-center h-full p-6 md:p-12 lg:p-20 gap-6">
+      <div className="relative z-10 text-center text-accent-content flex flex-col items-center justify-center h-full p-6 md:p-12 lg:p-20 gap-6">
         {/* Title build-up */}
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold max-w-4xl flex flex-wrap justify-center leading-tight mt-32 ">
           {titleLetters.map((letter, index) => (
@@ -69,7 +69,7 @@ const HeroSection = () => {
             animate="visible"
             whileHover="hover"
             variants={buttonVariants}
-            className="btn btn-primary btn-wide rounded-l-lg border border-secondary text-secondary text-xl"
+            className="btn btn-primary btn-wide rounded-r-lg border border-primary-content text-accent-content text-xl hover:border-accent-content hover:text-primary-content"
             onClick={() => scrollToSection("#products")}
           >
             {t("home.btnProducts")}
@@ -79,7 +79,7 @@ const HeroSection = () => {
             animate="visible"
             whileHover="hover"
             variants={buttonVariants}
-            className="btn btn-primary btn-wide rounded-r-lg border border-secondary text-secondary text-xl"
+            className="btn btn-primary btn-wide rounded-r-lg border border-primary-content text-accent-content text-xl hover:border-accent-content hover:text-primary-content"
             onClick={() => scrollToSection("#about")}
           >
             {t("home.btnAbout")}
