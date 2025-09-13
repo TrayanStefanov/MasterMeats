@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 
@@ -5,6 +6,26 @@ import FAQItem from "../components/FAQItem.jsx";
 
 const ContactsFAQSection = () => {
   const { t } = useTranslation();
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // For demo, just log data
+    console.log("Form submitted:", formData);
+    alert("Your inquiry has been sent!");
+    setFormData({ name: "", email: "", subject: "", message: "" });
+  };
 
   // Contacts
   const phone = t("contacts.phone.value");
@@ -35,6 +56,47 @@ const ContactsFAQSection = () => {
               <span>{location}</span>
             </li>
           </ul>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder={t("contacts.form.name")}
+              className="input input-bordered w-full"
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder={t("contacts.form.email")}
+              className="input input-bordered w-full"
+              required
+            />
+            <input
+              type="text"
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+              placeholder={t("contacts.form.subject")}
+              className="input input-bordered w-full"
+            />
+            <textarea
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              placeholder={t("contacts.form.message")}
+              className="textarea textarea-bordered w-full"
+              rows="4"
+              required
+            ></textarea>
+            <button type="submit" className="btn btn-primary w-full">
+              {t("contacts.form.btnSend")}
+            </button>
+          </form>
         </div>
 
         {/* FAQ */}
