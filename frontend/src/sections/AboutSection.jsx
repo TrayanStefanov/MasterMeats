@@ -7,7 +7,7 @@ const AboutSection = () => {
   const intro = t("about.intro", { returnObjects: true });
 
   return (
-    <section id="about" className="bg-base-300 ">
+    <section id="about" className="bg-secondary ">
       <div className="p-8 lg:px-20 lg:w-4/5 mx-auto">
         <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
@@ -22,7 +22,7 @@ const AboutSection = () => {
               {intro.subtitle}
             </h3>
 
-            <div className="space-y-4 text-lg leading-relaxed">
+            <div className="space-y-4 text-xl leading-relaxed">
               {Object.values(intro.paragraph).map((para, idx) => (
                 <p key={idx} className="text-primary">
                   {para}
