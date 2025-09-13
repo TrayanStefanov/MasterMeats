@@ -37,12 +37,12 @@ const ContactsFAQSection = () => {
   const faqs = Object.values(faqsObj);
 
   return (
-    <section id="contacts" className="bg-base-300 text-base-content">
+    <section id="contacts" className="bg-primary text-accent">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 p-8 lg:px-20 lg:w-4/5">
         {/* Contacts */}
         <div>
           <h2 className="text-3xl font-bold mb-6">{t("contacts.title")}</h2>
-          <ul className="space-y-4 mb-8 text-lg ">
+          <ul className="space-y-4 mb-8 text-lg text-accent-content">
             <li className="flex items-center gap-3">
               <FaPhoneAlt className="text-accent" />
               <span>{phone}</span>
@@ -57,14 +57,14 @@ const ContactsFAQSection = () => {
             </li>
           </ul>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4 text-primary" onSubmit={handleSubmit}>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder={t("contacts.form.name")}
-              className="input input-bordered w-full"
+              className="input input-bordered w-full bg-secondary placeholder:text-accent-content"
               required
             />
             <input
@@ -73,7 +73,7 @@ const ContactsFAQSection = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder={t("contacts.form.email")}
-              className="input input-bordered w-full"
+              className="input input-bordered w-full bg-secondary placeholder:text-accent-content"
               required
             />
             <input
@@ -82,18 +82,18 @@ const ContactsFAQSection = () => {
               value={formData.subject}
               onChange={handleChange}
               placeholder={t("contacts.form.subject")}
-              className="input input-bordered w-full"
+              className="input input-bordered w-full bg-secondary placeholder:text-accent-content"
             />
             <textarea
               name="message"
               value={formData.message}
               onChange={handleChange}
               placeholder={t("contacts.form.message")}
-              className="textarea textarea-bordered w-full"
+              className="textarea textarea-bordered w-full bg-secondary placeholder:text-accent-content"
               rows="4"
               required
             ></textarea>
-            <button type="submit" className="btn btn-primary w-full">
+            <button type="submit" className="btn btn-secondary text-primary w-full">
               {t("contacts.form.btnSend")}
             </button>
           </form>
