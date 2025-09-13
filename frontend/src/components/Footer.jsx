@@ -26,15 +26,15 @@ const Footer = () => {
           className="flex flex-col gap-2 md:gap-3 text-center md:text-left"
           variants={fadeUp}
         >
-          <h2 className="text-lg md:text-xl font-bold">{t("navbar.logo")}</h2>
-          <p className="text-xs md:text-sm">{t("footer.slogan")}</p>
-          <p className="text-xs md:text-sm">
+          <h2 className="">{t("navbar.logo")}</h2>
+          <p className="text-sm md:text-lg">{t("footer.slogan")}</p>
+          <p className="text-sm md:text-lg">
             {t("footer.phone.note")}{" "}
             <a href={`tel:${t("footer.phone.value")}`} className="underline">
               {t("footer.phone.value")}
             </a>
           </p>
-          <p className="text-xs md:text-sm">
+          <p className="text-sm md:text-lg">
             {t("footer.email.note")}{" "}
             <a
               href={`mailto:${t("footer.email.value1")}@${t("footer.email.value2")}.com`}
@@ -50,7 +50,6 @@ const Footer = () => {
           className="flex flex-col items-center gap-2 md:gap-3"
           variants={fadeUp}
         >
-          <h3 className="text-md md:text-lg font-bold">{t("footer.social")}</h3>
           <div className="flex gap-3 md:gap-4 mt-1 md:mt-2">
             {[t("footer.social-links.linkedin"), "#", "#"].map((link, i) => (
               <motion.a
@@ -62,7 +61,7 @@ const Footer = () => {
                 transition={{ type: "spring", stiffness: 300 }}
                 className="transition-colors"
               >
-                {i === 0 ? <FaLinkedinIn size={18} /> : i === 1 ? <FaFacebookF size={18} /> : <FaTwitter size={18} />}
+                {i === 0 ? <FaLinkedinIn size={30} /> : i === 1 ? <FaFacebookF size={30} /> : <FaTwitter size={30} />}
               </motion.a>
             ))}
           </div>
@@ -70,7 +69,7 @@ const Footer = () => {
 
         {/* Right: Quick Nav */}
         <motion.div
-          className="flex flex-col items-center md:items-end gap-1 md:gap-2 text-xs md:text-sm font-bold"
+          className="flex flex-col items-center md:items-end gap-1 md:gap-2 text-sm md:text-lg font-bold"
           variants={fadeUp}
         >
           {["#hero", "#products", "#about", "#contacts"].map((href, i) => (
@@ -89,7 +88,7 @@ const Footer = () => {
 
       {/* Bottom */}
       <motion.div
-        className="text-center text-sm border-t border-secondary pt-4"
+        className="text-center text-sm md:text-lg border-t border-secondary pt-4"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
