@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaChevronRight } from "react-icons/fa";
+
 
 const FAQItem = ({ question, answer, idx }) => {
   const [open, setOpen] = useState(false);
@@ -15,12 +17,12 @@ const FAQItem = ({ question, answer, idx }) => {
         onClick={() => setOpen((prev) => !prev)}
         className="flex justify-between items-center w-full text-left"
       >
-        <span className="font-semibold">{question}</span>
+        <span className="font-semibold text-2xl">{question}</span>
         <motion.span
           animate={{ rotate: open ? 90 : 0 }}
-          className="ml-2 text-lg"
+          className="ml-2 text-2xl text-accent"
         >
-          ▶
+          <FaChevronRight />
         </motion.span>
       </button>
       <AnimatePresence>
@@ -30,7 +32,7 @@ const FAQItem = ({ question, answer, idx }) => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="mt-2 text-sm text-neutral-content"
+            className="mt-2 text-xl text-neutral-content"
           >
             {answer}
           </motion.p>
