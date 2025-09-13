@@ -5,16 +5,23 @@ import CoreValueCard from "../components/CoreValueCard.jsx";
 
 const CoreValuesSection = () => {
   const { t } = useTranslation();
-  const values = t("coreValues.values", { returnObjects: true });
+  const rawValues = t("coreValues.values", { returnObjects: true });
+  const values = Array.isArray(rawValues) ? rawValues : Object.values(rawValues);
 
   const [selected, setSelected] = useState(null);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [isDesktop, setIsDesktop] = useState(null);
 
-  // Handle screen resize to update desktop/mobile detection
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const handleChange = (e) => setIsDesktop(e.matches);
+
+    setIsDesktop(mq.matches);
+    mq.addEventListener("change", handleChange);
+
+  return () => {
+    mq.removeEventListener("change", handleChange);
+  };
   }, []);
 
   return (
@@ -26,35 +33,40 @@ const CoreValuesSection = () => {
 
       {/* Grid of Values */}
       <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-        {Object.values(values).map((value) => (
+        {values.map((value, idx) => (
           <CoreValueCard
-            key={value.title}
+            key={value.title ?? idx}
             value={value}
-            isDesktop={isDesktop}
-            onSelect={() =>
-              setSelected((prev) => (prev?.title === value.title ? null : value))
-            }
+            index={idx}
+            isDesktop={Boolean(isDesktop)}
+            isSelected={selected === idx}
+            onSelect={(i) => setSelected((prev) => (prev === i ? null : i))}
           />
         ))}
       </div>
 
-      {/* Expanded Details Section */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            className="container mx-auto mt-10 p-6 rounded-2xl border-2 border-accent-content shadow-md text-center"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.55 } }}
-            exit={{ opacity: 0, y: -20, transition: { duration: 0.45 } }}
-          >
-            <h3 className="text-2xl font-bold mb-2">{selected.title}</h3>
-            <p className="font-semibold text-secondary mb-2 italic">
-              {selected.subtitle}
-            </p>
-            <p className="text-sm text-primary-content">{selected.description}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Desktop-only expanded section with AnimatePresence */}
+      {isDesktop && (
+        <AnimatePresence>
+          {selected !== null && (
+            <motion.div
+              key={values[selected].title}
+              className="container mx-auto mt-10 p-6 rounded-2xl border-2 border-accent-content shadow-md text-center"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.55 } }}
+              exit={{ opacity: 0, y: -20, transition: { duration: 0.45 } }}
+            >
+              <h3 className="text-2xl font-bold mb-2">{values[selected].title}</h3>
+              <p className="font-semibold text-secondary mb-2 italic">
+                {values[selected].subtitle}
+              </p>
+              <p className="text-sm text-primary-content">
+                {values[selected].description}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </section>
   );
 };
