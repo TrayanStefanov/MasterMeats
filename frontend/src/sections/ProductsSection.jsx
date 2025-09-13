@@ -7,12 +7,12 @@ const ProductsSection = () => {
   const products = t("products.product", { returnObjects: true });
 
   return (
-    <section id="products" className="py-20 bg-primary">
-      <div className="container mx-auto text-center mb-16">
+    <section id="products" className="py-5 bg-primary">
+      <div className="container mx-auto text-center my-10">
         <h2 className="text-4xl font-bold text-accent-content">{title}</h2>
       </div>
 
-      <div className="container mx-auto flex flex-col gap-16">
+      <div className="container mx-auto flex flex-col">
         {products.map((product, idx) => (
           <ProductCard
             key={idx}
