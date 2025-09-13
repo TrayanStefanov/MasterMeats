@@ -20,7 +20,7 @@ const HeroSection = () => {
   };
 
   return (
-    <div id="hero" className="relative min-h-[80vh] lg:min-h-screen overflow-hidden flex items-center justify-center">
+    <div id="hero" className="relative min-h-[80vh] lg:min-h-screen overflow-hidden flex items-center justify-center bg-base-100">
       {/* Background */}
       <div className="absolute inset-0 bg-cover bg-center opacity-10"/>
       <motion.div className="absolute inset-0 bg-primary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} />
