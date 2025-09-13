@@ -37,12 +37,12 @@ const ContactsFAQSection = () => {
   const faqs = Object.values(faqsObj);
 
   return (
-    <section id="contacts" className="py-20 bg-base-200 text-base-content">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <section id="contacts" className="bg-base-300 text-base-content">
+      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 p-8 lg:px-20 lg:w-4/5">
         {/* Contacts */}
         <div>
           <h2 className="text-3xl font-bold mb-6">{t("contacts.title")}</h2>
-          <ul className="space-y-4 mb-8">
+          <ul className="space-y-4 mb-8 text-lg ">
             <li className="flex items-center gap-3">
               <FaPhoneAlt className="text-accent" />
               <span>{phone}</span>
