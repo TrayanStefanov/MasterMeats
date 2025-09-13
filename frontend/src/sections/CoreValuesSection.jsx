@@ -13,7 +13,7 @@ const CoreValuesSection = () => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   return (
-    <section id="core-values" className="py-20 text-accent-content">
+    <section id="core-values" className="py-20 bg-base-300 text-accent">
       {/* Section Title */}
       <div className="container mx-auto text-center mb-12">
         <h2 className="text-4xl font-bold">{t("coreValues.title")}</h2>
@@ -39,16 +39,16 @@ const CoreValuesSection = () => {
           {selected !== null && (
             <motion.div
               key={values[selected].title}
-              className="container mx-auto mt-10 p-6 rounded-2xl border-2 border-accent-content shadow-md text-center"
+              className="container mx-auto mt-10 p-6 shadow-md shadow-accent text-primary text-center text-2xl"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0, transition: { duration: 0.55 } }}
               exit={{ opacity: 0, y: -20, transition: { duration: 0.45 } }}
             >
-              <h3 className="text-2xl font-bold mb-2">{values[selected].title}</h3>
-              <p className="font-semibold text-secondary mb-2 italic">
+              <h3 className="font-bold text-accent mb-2">{values[selected].title}</h3>
+              <p className="font-semibold mb-2 italic text-xl">
                 {values[selected].subtitle}
               </p>
-              <p className="text-sm text-primary-content">
+              <p className="text-xl">
                 {values[selected].description}
               </p>
             </motion.div>
