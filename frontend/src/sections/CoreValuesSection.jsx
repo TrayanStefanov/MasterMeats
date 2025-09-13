@@ -13,7 +13,7 @@ const CoreValuesSection = () => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   return (
-    <section id="core-values" className="py-20 bg-base-300 text-accent">
+    <section id="core-values" className="py-20 bg-secondary text-accent">
       {/* Section Title */}
       <div className="container mx-auto text-center mb-12">
         <h2 className="text-4xl font-bold">{t("coreValues.title")}</h2>
