@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const ProductCard = ({ product, reverse = false }) => (
   <motion.div
-    className={`flex flex-col md:flex-row h-[50vh] w-full overflow-hidden relative outline outline-2 outline-accent ${
+    className={`flex flex-col md:flex-row h-[50vh] w-full overflow-hidden relative outline outline-2 outline-accent my-5 ${
       reverse ? "md:flex-row-reverse" : ""
     }`}
     whileHover={{ scale: 1.01 }}
@@ -23,9 +23,9 @@ const ProductCard = ({ product, reverse = false }) => (
     </div>
 
     {/* Content */}
-    <div className="flex-1 flex flex-col text-accent-content justify-between p-6 md:p-12">
+    <div className="flex-1 flex flex-col bg-secondary text-accent justify-between p-6 md:p-12">
       <h3 className="text-3xl font-semibold">{product.title}</h3>
-      <p className="text-base text-secondary my-auto">{product.description}</p>
+      <p className="text-2xl text-primary my-auto">{product.description}</p>
       <div className="flex items-center justify-end gap-2">
         <span className="text-xl font-bold">{product.price}</span>
         <button className="btn btn-accent rounded-none">{product.btnBuy}</button>
