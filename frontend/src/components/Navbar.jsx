@@ -67,6 +67,13 @@ const Navbar = () => {
               >
                 {link.label}
               </a>
+              {activeSection === link.href && (
+                <motion.div
+                  layoutId="underline"
+                  className="absolute left-0 bottom-0 h-[2px] bg-accent w-full"
+                  transition={{ duration: 0.3 }}
+                />
+              )}
             </motion.li>
           ))}
         </ul>
