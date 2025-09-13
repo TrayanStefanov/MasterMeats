@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
 
-const ProductCard = ({ product }) => (
+const ProductCard = ({ product, reverse = false }) => (
   <motion.div
-    className="flex flex-col md:flex-row h-[50vh] w-full overflow-hidden"
+    className={`flex flex-col md:flex-row h-[50vh] w-full overflow-hidden relative outline outline-2 outline-accent ${
+      reverse ? "md:flex-row-reverse" : ""
+    }`}
     whileHover={{ scale: 1.01 }}
     transition={{ duration: 0.3 }}
   >
     {/* Image */}
-    <div className="flex-1 h-64 md:h-full">
+    <div className="flex-1 h-64 md:h-full relative">
       <img
         src={product.image}
         alt={product.title}
@@ -21,12 +23,12 @@ const ProductCard = ({ product }) => (
     </div>
 
     {/* Content */}
-    <div className="flex-1 flex flex-col justify-center p-6 md:p-12">
-      <h3 className="text-3xl font-semibold mb-4">{product.title}</h3>
-      <p className="text-base text-neutral-content mb-6">{product.description}</p>
-      <div className="flex items-center justify-between">
+    <div className="flex-1 flex flex-col text-accent-content justify-between p-6 md:p-12">
+      <h3 className="text-3xl font-semibold">{product.title}</h3>
+      <p className="text-base text-secondary my-auto">{product.description}</p>
+      <div className="flex items-center justify-end gap-2">
         <span className="text-xl font-bold">{product.price}</span>
-        <button className="btn btn-primary">{product.btnBuy}</button>
+        <button className="btn btn-accent rounded-none">{product.btnBuy}</button>
       </div>
     </div>
   </motion.div>
