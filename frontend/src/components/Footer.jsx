@@ -13,7 +13,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-primary text-primary-content pb-10">
+    <footer className="bg-primary text-primary-content border-t border-secondary  pb-10">
       <motion.div
         className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-6 md:py-10"
         initial="hidden"
@@ -88,7 +88,7 @@ const Footer = () => {
 
       {/* Bottom */}
       <motion.div
-        className="text-center text-sm md:text-lg border-t border-secondary pt-4"
+        className="text-center text-sm md:text-lg pt-4 border-t border-secondary"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
