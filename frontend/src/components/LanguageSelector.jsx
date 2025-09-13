@@ -44,7 +44,6 @@ const LanguageSelector = () => {
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-1 py-1 rounded-full text-secondary font-bold cursor-pointer hover:text-accent"
         >
-          <span>{flags[language]}</span>
           <span>{languages.find((l) => l.code === language)?.label}</span>
           <span className="ml-1 text-lg">▾</span>
         </button>
@@ -66,7 +65,6 @@ const LanguageSelector = () => {
                   language === lang.code ? "font-bold text-accent" : "text-secondary"
                 }`}
               >
-                <span>{flags[lang.code]}</span>
                 <span>{lang.label}</span>
               </motion.li>
             ))}
