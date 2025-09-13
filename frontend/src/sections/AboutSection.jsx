@@ -39,7 +39,7 @@ const AboutSection = () => {
         >
           <div className="relative w-full max-w-md">
             <img
-              src="/founder.jpg"
+              src="/about.jpg"
               alt={intro.title}
               className="rounded-2xl shadow-xl object-cover"
             />
