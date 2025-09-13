@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import CoreValueCard from "../components/CoreValueCard.jsx";
+import { useMediaQuery } from "../hooks/useMediaQuery.jsx";
 
 const CoreValuesSection = () => {
   const { t } = useTranslation();
@@ -9,20 +10,7 @@ const CoreValuesSection = () => {
   const values = Array.isArray(rawValues) ? rawValues : Object.values(rawValues);
 
   const [selected, setSelected] = useState(null);
-  const [isDesktop, setIsDesktop] = useState(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const handleChange = (e) => setIsDesktop(e.matches);
-
-    setIsDesktop(mq.matches);
-    mq.addEventListener("change", handleChange);
-
-  return () => {
-    mq.removeEventListener("change", handleChange);
-  };
-  }, []);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   return (
     <section id="core-values" className="py-20 text-accent-content">
