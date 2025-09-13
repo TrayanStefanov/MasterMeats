@@ -23,8 +23,14 @@
         }
     },
     "language": {
-        "bg": "Bulgarian",
-        "en": "English"
+        "bg": {
+            "label": "Bulgarian",
+            "code": "bg"
+        },
+        "en": {
+            "label": "English",
+            "code": "en"
+        }
     },
     "home": {
         "title": "Master Meats - An authentic taste in arms reach!",
@@ -140,8 +146,7 @@
         "questions": {
             "1": {
                 "question": "How can I get in touch with your company?",
-                "answerpart1": "You can reach us by phone at",
-                "answerpart2": ", or by email at "
+                "answer": "You can reach us by phone or by email."
             },
             "2": {
                 "question": "Do you deliver?",
