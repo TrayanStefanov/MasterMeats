@@ -5,3 +5,27 @@
 html {
   scroll-behavior: smooth;
 }
+
+.font-heading{
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.font-text{
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.font-emphasis-heading{
+  font-family: "Marck Script", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-emphasis-text{
+  font-family: "Great Vibes", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
