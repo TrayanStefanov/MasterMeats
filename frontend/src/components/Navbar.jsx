@@ -42,7 +42,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar h-24 bg-primary text-primary-content shadow-md shadow-primary-content sticky top-0 z-50 backdrop-blur-lg opacity-90">
-      <div className="w-4/5 mx-auto flex items-center justify-between">
+      <div className="w-4/5 mx-auto flex items-center justify-between font-emphasis-heading">
         {/* Logo placeholder */}
         <motion.div
           animate={{ rotate: [5, -5, 5] }}
