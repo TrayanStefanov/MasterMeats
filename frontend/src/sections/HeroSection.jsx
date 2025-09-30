@@ -20,7 +20,7 @@ const HeroSection = () => {
   };
 
   return (
-    <div id="hero" className="relative min-h-[80vh] lg:min-h-screen overflow-hidden flex items-center justify-center bg-base-100">
+    <div id="hero" className="relative min-h-[80vh] lg:min-h-[91vh] overflow-hidden flex items-center justify-center bg-base-100">
       {/* Background */}
       <div className="absolute inset-0 bg-cover bg-center opacity-100" style={{ backgroundImage: "url(/bg-2.jpg)" }} />
       <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} />
@@ -28,7 +28,7 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 text-center text-secondary flex flex-col items-center justify-between font-emphasis-heading min-h-[80vh] p-6 md:p-12 lg:p-20 gap-6">
         {/* Title build-up */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl max-w-4xl flex flex-wrap justify-center leading-tight">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl max-w-4xl flex flex-wrap justify-center leading-tight mt-32 lg:mt-0">
           {titleLetters.map((letter, index) => (
             <motion.span
               key={index}
@@ -43,10 +43,10 @@ const HeroSection = () => {
         </h1>
 
         {/* Subtitle */}
-        <div className="justify-items-center">
+        <div className="justify-items-center mb-16 lg:mb-0">
 
           <motion.h2
-            className="text-2xl sm:text-3xl lg:text-4xl max-w-4xl leading-snug mb-12"
+            className="text-2xl sm:text-3xl lg:text-4xl max-w-4xl leading-snug lg:mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.5, duration: 0.8 }}
@@ -65,13 +65,13 @@ const HeroSection = () => {
           </motion.h3> */}
 
           {/* Buttons Desktop */}
-          <div className="hidden lg:flex gap-4 mt-6">
+          <div className="flex flex-col lg:flex-row gap-4 mt-6">
             <motion.button
               initial="hiddenLeft"
               animate="visible"
               whileHover="hover"
               variants={buttonVariants}
-              className="btn btn-primary btn-wide rounded-r-lg border border-primary-content text-accent-content text-xl hover:border-accent-content hover:text-primary-content"
+              className="btn btn-primary w-80 lg:btn-wide rounded-lg border border-primary-content text-accent-content text-xl hover:border-accent-content hover:text-primary-content"
               onClick={() => scrollToSection("#products")}
             >
               {t("home.btnProducts")}
@@ -81,7 +81,7 @@ const HeroSection = () => {
               animate="visible"
               whileHover="hover"
               variants={buttonVariants}
-              className="btn btn-primary btn-wide rounded-r-lg border border-primary-content text-accent-content text-xl hover:border-accent-content hover:text-primary-content"
+              className="btn btn-primary w-80 lg:btn-wide rounded-lg border border-primary-content text-accent-content text-xl hover:border-accent-content hover:text-primary-content"
               onClick={() => scrollToSection("#about")}
             >
               {t("home.btnAbout")}
@@ -89,10 +89,10 @@ const HeroSection = () => {
           </div>
 
           {/* Buttons Mobile */}
-          <div className="flex flex-col lg:hidden w-full mt-6 gap-4">
+          {/* <div className="flex flex-col lg:hidden w-full mt-6 gap-4">
             <button
               onClick={() => scrollToSection("#products")}
-              className="btn btn-primary w-full h-20 sm:h-24 rounded-lg text-2xl sm:text-3xl font-bold shadow-lg"
+              className="btn btn-primary btn-wide rounded-lg border border-primary-content text-accent-content text-xl hover:border-accent-content hover:text-primary-content"
               style={{ backgroundImage: "url(/home-projects-btn.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
             >
               {t("home.btnProducts")}
@@ -104,7 +104,7 @@ const HeroSection = () => {
             >
               {t("home.btnAbout")}
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
