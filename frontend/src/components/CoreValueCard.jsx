@@ -12,7 +12,7 @@ const CoreValueCard = ({ value, index, isDesktop, isSelected, onSelect }) => {
     >
       <div className="flex flex-col items-center gap-3">
         {value.Icon && <value.Icon className="text-5xl text-accent" />}
-        <h3 className="text-2xl font-bold">{value.value}</h3>
+        <h3 className="text-2xl font-bold">{value.title}</h3>
       </div>
 
       {!isDesktop && (
