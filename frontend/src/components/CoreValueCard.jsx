@@ -1,18 +1,26 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const CoreValueCard = ({ value, index, isDesktop, isSelected, onSelect }) => {
+const CoreValueCard = ({
+  value,
+  index,
+  isDesktop,
+  isSelected,
+  onSelect,
+  onHover,
+  onHoverEnd,
+}) => {
   return (
     <motion.div
-      className="group relative p-6 shadow-lg shadow-accent/30 rounded-2xl cursor-pointer overflow-hidden bg-white text-primary transition-transform duration-200 hover:shadow-xl"
-      onClick={() => !isDesktop && onSelect(index)}        // mobile toggle
-      onMouseEnter={() => isDesktop && onSelect(index)}    // desktop hover
-      onMouseLeave={() => isDesktop && onSelect(null)}     // desktop leave
+      className="group relative p-6 cursor-pointer overflow-hidden transition-transform duration-200 hover:shadow-xl bg-white/90 rounded-2xl"
+      onClick={() => onSelect(index)}
+      onMouseEnter={() => isDesktop && onHover(index)}
+      onMouseLeave={() => isDesktop && onHoverEnd()}
       whileHover={isDesktop ? { scale: 1.03 } : {}}
     >
-      <div className="flex flex-col items-center gap-3">
-        {value.Icon && <value.Icon className="text-5xl text-accent" />}
-        <h3 className="text-2xl font-bold">{value.title}</h3>
+      <div className="flex flex-col items-center gap-3 text-accent">
+        {value.Icon && <value.Icon className="text-5xl" />}
+        <h3 className="text-2xl font-serif font-bold">{value.title}</h3>
       </div>
 
       {!isDesktop && (
@@ -26,13 +34,8 @@ const CoreValueCard = ({ value, index, isDesktop, isSelected, onSelect }) => {
               transition={{ duration: 0.3 }}
             >
               <div>
-                <h4 className="text-xl font-semibold text-accent mb-2">
-                  {value.title}
-                </h4>
-                <p className="italic mb-2">{value.subtitle}</p>
-                <p>{value.description}</p>
+                <p className="text-base">{value.description}</p>
               </div>
-
               {value.image && (
                 <div className="w-full flex justify-center">
                   <img
