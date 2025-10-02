@@ -84,7 +84,7 @@ const CoreValuesSection = () => {
               animate={{ opacity: 1, y: 0, transition: { duration: 0.55 } }}
               exit={{ opacity: 0, y: -20, transition: { duration: 0.45 } }}
             >
-              <div className="relative z-10 p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-primary">
+              <div className="relative z-10 p-8 px-32 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-primary">
                 {/* Text */}
                 <motion.div
                   key="text"
@@ -103,7 +103,7 @@ const CoreValuesSection = () => {
                 {values[effectiveIndex].image && (
                   <motion.div
                     key="image"
-                    className="flex justify-center"
+                    className="flex justify-end"
                     initial={{ opacity: 0, x: 40 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
