@@ -4,12 +4,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import CoreValueCard from "../components/CoreValueCard.jsx";
 import { useMediaQuery } from "../hooks/useMediaQuery.jsx";
 
-import { GiRibbonMedal, GiKnifeFork, GiLindenLeaf, GiHeartPlus } from "react-icons/gi";
+import {
+  GiRibbonMedal,
+  GiKnifeFork,
+  GiLindenLeaf,
+  GiHeartPlus,
+} from "react-icons/gi";
 
 const CoreValuesSection = () => {
   const { t } = useTranslation();
   const rawValues = t("coreValues.values", { returnObjects: true });
-  const values = Array.isArray(rawValues) ? rawValues : Object.values(rawValues);
+  const values = Array.isArray(rawValues)
+    ? rawValues
+    : Object.values(rawValues);
 
   const [selected, setSelected] = useState(null);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -77,21 +84,12 @@ const CoreValuesSection = () => {
               exit={{ opacity: 0, y: 150 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-10 rounded-t-3xl shadow-2xl border-t border-accent/30 overflow-hidden">
-                
-                <motion.div
-                  className="absolute inset-0 z-0 opacity-0"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.9 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <img
-                    src="/parchment-overlay.jpg"
-                    alt="Parchment texture"
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
+              <div
+                className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center 
+                     p-10 rounded-t-3xl border-t-0
+                     bg-white/20 backdrop-blur-lg shadow-2xl overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-white/10 to-transparent pointer-events-none rounded-t-3xl" />
 
                 <motion.div
                   key="text"
