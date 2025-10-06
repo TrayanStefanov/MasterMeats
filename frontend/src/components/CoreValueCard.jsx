@@ -34,7 +34,7 @@ const CoreValueCard = ({
               transition={{ duration: 0.3 }}
             >
               <div>
-                <p className="text-base">{value.description}</p>
+                <p className="text-accent">{value.description}</p>
               </div>
               {value.image && (
                 <div className="w-full flex justify-center">
