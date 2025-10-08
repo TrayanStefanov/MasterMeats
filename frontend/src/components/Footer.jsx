@@ -37,7 +37,9 @@ const Footer = () => {
           <p className="text-sm md:text-lg">
             {t("footer.email.note")}{" "}
             <a
-              href={`mailto:${t("footer.email.value1")}@${t("footer.email.value2")}.com`}
+              href={`mailto:${t("footer.email.value1")}@${t(
+                "footer.email.value2"
+              )}.com`}
               className="underline"
             >
               {t("footer.email.value1")}@{t("footer.email.value2")}.com
@@ -45,9 +47,33 @@ const Footer = () => {
           </p>
         </motion.div>
 
-        {/* Center: Socials */}
+        {/* Center: Quick Nav */}
         <motion.div
-          className="flex flex-col items-center gap-2 md:gap-3"
+          className="flex flex-col items-center gap-1 md:gap-2 text-sm md:text-lg font-bold"
+          variants={fadeUp}
+        >
+          {["#hero", "#products", "#about", "#contacts"].map((href, i) => (
+            <motion.a
+              key={i}
+              href={href}
+              whileHover={{ x: 5, color: "#FBBF24" }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="hover:underline"
+            >
+              {i === 0
+                ? t("navbar.home")
+                : i === 1
+                ? t("navbar.products")
+                : i === 2
+                ? t("navbar.about")
+                : t("navbar.contacts")}
+            </motion.a>
+          ))}
+        </motion.div>
+
+        {/* Right: Socials */}
+        <motion.div
+          className="flex flex-col items-center justify-center gap-2 md:gap-3"
           variants={fadeUp}
         >
           <div className="flex gap-3 md:gap-4 mt-1 md:mt-2">
@@ -59,33 +85,20 @@ const Footer = () => {
                 rel="noreferrer"
                 whileHover={{ scale: 1.2, color: "#FBBF24" }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="transition-colors"
+                className="text-secondary"
               >
-                {i === 0 ? <FaLinkedinIn size={30} /> : i === 1 ? <FaFacebookF size={30} /> : <FaTwitter size={30} />}
+                {i === 0 ? (
+                  <FaLinkedinIn className="text-secondary" size={40} />
+                ) : i === 1 ? (
+                  <FaFacebookF className="text-secondary" size={40} />
+                ) : (
+                  <FaTwitter className="text-secondary" size={40} />
+                )}
               </motion.a>
             ))}
           </div>
         </motion.div>
-
-        {/* Right: Quick Nav */}
-        <motion.div
-          className="flex flex-col items-center md:items-end gap-1 md:gap-2 text-sm md:text-lg font-bold"
-          variants={fadeUp}
-        >
-          {["#hero", "#products", "#about", "#contacts"].map((href, i) => (
-            <motion.a
-              key={i}
-              href={href}
-              whileHover={{ x: 5, color: "#FBBF24" }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="hover:underline"
-            >
-              {i === 0 ? t("navbar.home") : i === 1 ? t("navbar.products") : i === 2 ? t("navbar.about") : t("navbar.contacts")}
-            </motion.a>
-          ))}
-        </motion.div>
       </motion.div>
-
       {/* Bottom */}
       <motion.div
         className="text-center text-sm md:text-lg pt-4 border-t border-secondary"
@@ -94,7 +107,8 @@ const Footer = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        © 2025 <span className="font-bold">Trayan Stefanov</span>. All rights reserved.
+        © 2025 <span className="font-bold">Trayan Stefanov</span>. All rights
+        reserved.
       </motion.div>
     </footer>
   );
