@@ -39,8 +39,7 @@
         "btnProducts": "Our Selection"
     },
     "coreValues": {
-        "title": "Our Selection, Made Especially for You!",
-        "subtitle": "Crafted with care and a focus on:",
+        "title": "Crafted with care and a focus on:",
         "values": {
             "1": {
                 "title": "Quality",
@@ -69,7 +68,7 @@
         }
     },
     "products": {
-        "title": "Our Selection",
+        "title": "Our Selection, Made Especially for You!",
         "product": [
             {
                 "title": "Elena Fillet Mix",
@@ -107,8 +106,39 @@
     },
     "about": {
         "intro": {
-            "title": "About Us",
+            "title": "Why Us",
             "subtitle": "Meat lovers. We appreciate true flavor!",
+            "tiles": {
+                "hexa": {
+                    "title": "Craftsmanship",
+                    "image": "/tile_hexa.png",
+                    "text": [
+                        "We believe in making our delicacies so tasty that they simply can’t be resisted.",
+                        "Each fillet is hand-prepared with care, using Bulgarian meat and authentic local spices, perfectly fused together.",
+                        "The result — a product that carries the soul of Bulgarian taste, created with patience and pride."
+                    ]
+                },
+                "badge": {
+                    "1": {
+                        "image": "/tile_badge.png",
+                        "text": "From farm to table — always fresh, always real. We never compromise freshness because it defines our quality."
+                    },
+                    "2": {
+                        "image": "/tile_badge.png",
+                        "text": "Inspired by Bulgarian tradition, we keep alive the old recipes that once filled every home with warmth and flavor."
+                    }
+                },
+                "triangle": {
+                    "1": {
+                        "title": "Quality",
+                        "image": "/tile_triangle.png"
+                    },
+                    "2": {
+                        "title": "Tradition",
+                        "image": "/tile_triangle.png"
+                    }
+                }
+            },
             "paragraph": {
                 "1": "We are people who love tradition. People who believe that good food is not just about taste — it’s a memory, an emotion, a connection to something deeper.",
                 "2": "It all started with disappointment — yet another “mezze” that looked good but had no soul. And then we said to ourselves: enough. If we want something real, we’ll make it ourselves. From the heart, the way it used to be made. No compromises.",
