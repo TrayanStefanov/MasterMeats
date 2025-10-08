@@ -25,10 +25,10 @@ const CoreValuesSection = () => {
   return (
     <section
       id="core-values"
-      className="relative min-h-[700px] flex flex-col justify-center items-center text-white bg-primary-content/60 bg-cover bg-center overflow-hidden"
+      className="relative min-h-[700px] flex flex-col justify-center items-center text-white overflow-hidden"
     >
       <motion.div
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0"
         animate={{ opacity: selected !== null ? 0.6 : 0.3 }}
         transition={{ duration: 0.4 }}
       />
@@ -43,9 +43,6 @@ const CoreValuesSection = () => {
           <h2 className="text-4xl font-emphasis-heading font-bold mb-2 text-accent">
             {t("coreValues.title")}
           </h2>
-          <h3 className="text-2xl italic font-light font-emphasis-text">
-            {t("coreValues.subtitle")}
-          </h3>
         </div>
 
         <motion.div
@@ -86,17 +83,17 @@ const CoreValuesSection = () => {
             >
               <div
                 className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center 
-                     p-10 rounded-t-3xl border-t-0
-                     bg-white/20 backdrop-blur-lg shadow-2xl overflow-hidden"
+                     p-10 rounded-3xl border-t-0
+                     bg-white/20 backdrop-blur-lg overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-white/10 to-transparent pointer-events-none rounded-t-3xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-white/10 to-transparent pointer-events-none rounded-3xl" />
 
                 <motion.div
                   key="text"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.1 }}
-                  className="relative z-10 text-primary"
+                  className="relative h-full flex flex-col justify-between z-10 text-primary p-8"
                 >
                   <h3 className="font-serif font-bold text-3xl text-accent mb-2">
                     {values[selected].title}
