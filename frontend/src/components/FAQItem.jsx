@@ -17,7 +17,7 @@ const FAQItem = ({ question, answer, idx }) => {
         onClick={() => setOpen((prev) => !prev)}
         className="flex justify-between items-center w-full text-left"
       >
-        <span className="font-semibold text-accent-content text-2xl">{question}</span>
+        <span className="font-semibold text-accent text-2xl">{question}</span>
         <motion.span
           animate={{ rotate: open ? 90 : 0 }}
           className="ml-2 text-2xl text-accent"
@@ -32,7 +32,7 @@ const FAQItem = ({ question, answer, idx }) => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="mt-2 text-xl text-secondary"
+            className="mt-2 text-xl text-primary px-2"
           >
             {answer}
           </motion.p>
