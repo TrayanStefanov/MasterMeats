@@ -7,17 +7,20 @@ const ProductsSection = () => {
   const products = t("products.product", { returnObjects: true });
 
   return (
-    <section id="products" className="py-5 bg-primary">
-      <div className="container mx-auto text-center my-10">
-        <h2 className="text-4xl font-bold text-accent-content">{title}</h2>
+    <section id="products" className="py-4">
+      <div className="container mx-auto text-center mb-16">
+        <h2 className="text-5xl font-serif font-bold text-accent my-2">
+          {title}
+        </h2>
+        <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full"></div>
       </div>
 
-      <div className="container mx-auto flex flex-col">
+      <div className="container mx-auto flex flex-col gap-6">
         {products.map((product, idx) => (
           <ProductCard
             key={idx}
             product={product}
-            reverse={idx % 2 === 1} // Alternate left/right
+            reverse={idx % 2 === 1}
           />
         ))}
       </div>
