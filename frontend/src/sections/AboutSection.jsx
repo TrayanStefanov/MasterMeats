@@ -2,51 +2,113 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
+const TriangleTile = ({ image, title }) => (
+  <motion.div
+    className="relative flex flex-col items-center text-center"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6 }}
+    whileHover={{ scale: 1.05 }}
+  >
+    <img
+      src={image}
+      alt={title}
+      className="w-full h-[12vh] object-contain drop-shadow-md"
+    />
+    <span className="absolute mb-[15%] inset-0 flex items-center justify-center text-2xl font-bold text-primary drop-shadow-sm px-4">
+      {title}
+    </span>
+  </motion.div>
+);
+
+const BadgeTile = ({ image, text }) => (
+  <motion.div
+    className="relative flex flex-col items-center text-center"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6 }}
+    whileHover={{ scale: 1.05 }}
+  >
+    <img
+      src={image}
+      alt="badge accent"
+      className="w-full h-[20vh] object-contain drop-shadow-md"
+    />
+    <p className="absolute inset-0 flex items-center justify-center text-sm text-primary font-medium px-6 leading-snug">
+      {text}
+    </p>
+  </motion.div>
+);
+
+const HexaTextTile = ({ image, title, paragraphs }) => (
+  <motion.div
+    className="relative w-full h-[60vh] flex items-center justify-center"
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.8 }}
+  >
+    <img
+      src={image}
+      alt={title}
+      className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+    />
+    <div className="relative z-10 text-center px-10 py-6 max-w-[70%] text-primary">
+      <h3 className="text-3xl font-bold text-accent mb-4">{title}</h3>
+      <div className="text-base leading-relaxed space-y-4">
+        {paragraphs.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+      </div>
+    </div>
+  </motion.div>
+);
+
 const AboutSection = () => {
   const { t } = useTranslation();
   const intro = t("about.intro", { returnObjects: true });
+  const tiles = intro.tiles;
 
   return (
-    <section id="about" className="bg-secondary ">
-      <div className="p-8 lg:px-20 lg:w-4/5 mx-auto">
-        <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            className="space-y-6"
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-4xl font-bold mb-2 text-accent ">{intro.title}</h2>
-            <h3 className="text-2xl font-semibold text-accent-content mb-6">
-              {intro.subtitle}
-            </h3>
+    <section id="about" className="relative w-full content-center max-h-[80vh] py-12 overflow-hidden">
+      <h2 className="text-5xl font-serif font-bold place-self-center text-accent  ">
+          {intro.title}
+        </h2>
+        <div className="w-1/4 h-[3px] bg-accent mx-auto rounded-full"></div>
+      <div className="max-w-7xl mx-auto px-4 xl:px-8 grid grid-cols-[1fr_2fr_1fr] items-center pt-12">
+        {/* Left Column */}
+        <div className="flex flex-col items-center justify-center gap-8">
+          <TriangleTile
+            image={tiles.triangle["1"].image}
+            title={tiles.triangle["1"].title}
+          />
+          <BadgeTile
+            image={tiles.badge["1"].image}
+            text={tiles.badge["1"].text}
+          />
+        </div>
 
-            <div className="space-y-4 text-xl leading-relaxed">
-              {Object.values(intro.paragraph).map((para, idx) => (
-                <p key={idx} className="text-primary">
-                  {para}
-                </p>
-              ))}
-            </div>
-          </motion.div>
+        {/* Center Column */}
+        <div className="flex flex-col items-center justify-center">
+          <HexaTextTile
+            image={tiles.hexa.image}
+            title={tiles.hexa.title}
+            paragraphs={tiles.hexa.text}
+          />
+        </div>
 
-          <motion.div
-            className="relative flex justify-center"
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <div className="relative w-full max-w-md">
-              <img
-                src="/about.jpg"
-                alt={intro.title}
-                className="shadow-xl object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            </div>
-          </motion.div>
+        {/* Right Column */}
+        <div className="flex flex-col items-center justify-center gap-8">
+          <TriangleTile
+            image={tiles.triangle["2"].image}
+            title={tiles.triangle["2"].title}
+          />
+          <BadgeTile
+            image={tiles.badge["2"].image}
+            text={tiles.badge["2"].text}
+          />
         </div>
       </div>
     </section>
