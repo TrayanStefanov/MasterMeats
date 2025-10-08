@@ -12,7 +12,7 @@ const CoreValueCard = ({
 }) => {
   return (
     <motion.div
-      className="group relative p-6 cursor-pointer overflow-hidden transition-transform duration-200 hover:shadow-xl bg-white/90 rounded-2xl"
+      className="group relative p-6 cursor-pointer overflow-hidden transition-transform duration-200 hover:shadow-xl border-4 border-accent rounded-2xl"
       onClick={() => onSelect(index)}
       onMouseEnter={() => isDesktop && onHover(index)}
       onMouseLeave={() => isDesktop && onHoverEnd()}
@@ -37,7 +37,7 @@ const CoreValueCard = ({
                 <p className="text-accent">{value.description}</p>
               </div>
               {value.image && (
-                <div className="w-full flex justify-center">
+                <div className="w-full flex justify-end">
                   <img
                     src={value.image}
                     alt={value.title}
