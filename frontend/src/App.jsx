@@ -28,7 +28,7 @@ function App() {
                 <ReviewsSection />
                 <ContactsFAQSection />
               </div>
-                <LoginModal isOpen={showLogin} onClose={() => setShowLogin("false")} />
+                <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
             </div>
       <Footer />
     </div>
