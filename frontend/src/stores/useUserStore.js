@@ -54,5 +54,20 @@ export const useUserStore = create((set, get) => ({
 			console.log(error.message);
 			set({ checkingAuth: false, user: null });
 		}
+	},
+
+	refreshToken: async () => {
+		// Prevent multiple simultaneous refresh attempts
+		if (get().checkingAuth) return;
+
+		set({ checkingAuth: true });
+		try {
+			const response = await axios.post("/auth/refresh-token");
+			set({ checkingAuth: false });
+			return response.data;
+		} catch (error) {
+			set({ user: null, checkingAuth: false });
+			throw error;
+		}
 	}
 }));
