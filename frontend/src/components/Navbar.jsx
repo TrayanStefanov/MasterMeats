@@ -43,19 +43,13 @@ const Navbar = () => {
   return (
     <nav className="navbar h-24 bg-primary text-primary-content shadow-md shadow-primary-content sticky top-0 z-50 backdrop-blur-lg opacity-90">
       <div className="w-4/5 mx-auto flex items-center justify-between font-emphasis-heading">
-        {/* Logo placeholder */}
-        <motion.div
-          animate={{ rotate: [5, -5, 5] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="w-28 h-12 bg-contain bg-no-repeat bg-center"
-        >
-          {/* <img
+        <div className="w-40 h-28 bg-contain bg-no-repeat bg-center">
+          <img
             src="/logo_en.png"
             alt="Logo"
             className="w-full h-full object-contain"
-          /> */}
-          <FaBars className="w-12 h-12" />
-        </motion.div>
+          />
+        </div>
 
         {/* Desktop Nav Links */}
         <ul className="hidden md:flex ml-auto gap-6 font-bold text-xl">
