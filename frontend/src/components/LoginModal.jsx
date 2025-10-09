@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import {
   IoLogInOutline,
   IoMailOutline,
   IoLockClosedOutline,
   IoEye,
   IoEyeOff,
+  IoClose,
+  IoArrowRedoOutline,
 } from "react-icons/io5";
+import { LuLoader } from "react-icons/lu";
+
+import { useUserStore } from "../stores/useUserStore";
 
 const LoginModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -16,14 +21,23 @@ const LoginModal = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const { login, loading, error } = useUserStore();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(email, password);
+    login(email, password);
   };
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-primary/90 rounded-2xl p-8 w-[90%] max-w-md text-primary-content shadow-lg">
+        <button
+          onClick={onClose}
+          aria-label="Close login modal"
+          className="absolute top-4 right-4 text-primary-content/70 hover:text-accent transition"
+        >
+          <IoClose className="w-6 h-6" />
+        </button>
         <h2 className="text-4xl font-bold text-accent text-center mb-2">
           Welcome Back
         </h2>
@@ -80,14 +94,30 @@ const LoginModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
+          {error && (
+            <p className="text-red-400 text-sm text-center mt-2">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
             className="w-full flex justify-center items-center gap-2 py-2 rounded-md bg-accent 
                        text-primary font-semibold hover:bg-accent/80 focus:ring-2 focus:ring-accent/50 
                        transition-all shadow-md shadow-accent/20 disabled:opacity-50"
+            disabled={loading}
           >
-            <IoLogInOutline className="w-5 h-5" />
-            Login
+            {loading ? (
+              <>
+                <LuLoader className="w-5 h-5 animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              <>
+                <IoLogInOutline className="w-5 h-5" />
+                Login
+              </>
+            )}
           </button>
         </form>
 
@@ -98,7 +128,7 @@ const LoginModal = ({ isOpen, onClose }) => {
               to="/signup"
               className="text-accent hover:text-accent/80 transition-colors font-medium"
             >
-              Sign up
+              Sign up <IoArrowRedoOutline className="inline w-4 h-4 ml-1" />
             </Link>
           </p>
         </div>
