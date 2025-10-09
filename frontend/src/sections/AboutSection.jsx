@@ -44,7 +44,7 @@ const BadgeTile = ({ image, text }) => (
 
 const HexaTextTile = ({ image, title, paragraphs }) => (
   <motion.div
-    className="relative w-full h-[60vh] flex items-center justify-center"
+    className="relative w-full h-[60vh] flex flex-col items-center justify-center"
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -55,9 +55,9 @@ const HexaTextTile = ({ image, title, paragraphs }) => (
       alt={title}
       className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
     />
-    <div className="relative z-10 text-center px-10 py-6 max-w-[70%] text-primary">
-      <h3 className="text-3xl font-bold text-accent mb-4">{title}</h3>
-      <div className="text-base leading-relaxed space-y-4">
+      <h3 className="text-3xl font-bold text-accent">{title}</h3>
+      <div className="relative z-10 text-center px-12 py-6 max-w-[70%] text-primary">
+      <div className="text-base leading-relaxed space-y-4 my-8">
         {paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
