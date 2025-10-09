@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaBars, FaShoppingBasket } from "react-icons/fa";
+import { FaBars, FaShoppingBasket, FaUser } from "react-icons/fa";
 import LanguageSelector from "./LanguageSelector.jsx";
 import MobileMenu from "./MobileMenu.jsx";
 import { useTranslation } from "react-i18next";
 
-const Navbar = () => {
+const Navbar = ({onLoginClick}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#hero");
   const { t } = useTranslation();
@@ -79,13 +79,26 @@ const Navbar = () => {
         </ul>
 
         {/* Right Icons */}
-        <div className="flex items-center gap-1 lg:gap-4 ml-4">
+        <div className="flex items-center gap-1 lg:gap-4 mx-4">
           <button
             className="btn btn-ghost btn-circle"
             aria-label="Shopping Basket"
           >
             <FaShoppingBasket className="w-6 h-6" />
           </button>
+
+          <button
+            className="btn btn-ghost btn-circle me-4"
+            aria-label="Account"
+            onClick={onLoginClick}
+          >
+            <div className="flex gap-2">
+              
+            <FaUser className="w-5 h-5 self-center" />
+            <span className="hidden lg:inline font-bold text-xl">Login</span>
+            </div>
+          </button>
+
           <LanguageSelector />
 
           {/* Mobile Menu Toggle */}
