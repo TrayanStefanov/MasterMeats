@@ -27,14 +27,14 @@ const ProductCard = ({ product, reverse = false }) => (
     </div>
 
     {/* Text section */}
-    <div className="flex-1 backdrop-blur-md text-white p-8 flex flex-col justify-between relative z-10">
-      <h3 className="text-4xl font-serif font-bold mb-4 indent-4">
+    <div className="flex-1 backdrop-blur-md text-white p-4 lg:p-8 flex flex-col justify-between relative z-10">
+      <h3 className="text-2xl lg:text-4xl font-serif font-bold mx-4 lg:mx-8 mb-4 indent-4">
         {product.title}
       </h3>
-      <p className="text-lg leading-relaxed mx-8">
+      <p className="text-lg leading-relaxed mb-6 lg:mb-0 mx-4 lg:mx-8">
         {product.description}
       </p>
-      <div className="flex items-center justify-end gap-4">
+      <div className="flex items-center justify-between lg:justify-end gap-4">
         <span className="text-2xl font-bold">
           {product.price}
         </span>
