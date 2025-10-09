@@ -1,0 +1,88 @@
+import { useState } from "react";
+import { createPortal } from "react-dom"; 
+import { Link } from "react-router";
+
+const LoginModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  const [email, setEmail] = useState(""); 
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(email, password);
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div
+        className="bg-primary/90 rounded-2xl p-8 w-[90%] max-w-md text-primary-content shadow-lg"
+      >
+        <h2 className="text-4xl font-bold text-accent text-center mb-2">
+          Welcome Back
+        </h2>
+        <p className="text-center text-primary-content/80 mb-8 text-sm">
+          Sign in to your account
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="Email"
+              className="w-full px-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
+                         border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Password"
+              className="w-full px-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
+                         border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full flex justify-center items-center gap-2 py-2 rounded-md bg-accent 
+                       text-primary font-semibold hover:bg-accent/80 focus:ring-2 focus:ring-accent/50 
+                       transition-all shadow-md shadow-accent/20 disabled:opacity-50"
+          >
+            Login
+          </button>
+        </form>
+
+        <div className="mt-8 text-center text-sm">
+          <p className="text-primary-content/80">
+            Don’t have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-accent hover:text-accent/80 transition-colors font-medium"
+            >
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+export default LoginModal;
