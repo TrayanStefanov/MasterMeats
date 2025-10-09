@@ -73,12 +73,12 @@ const LanguageSelector = () => {
       </div>
 
       {/* Mobile Language*/}
-      <div className="flex md:hidden items-center gap-4">
+      <div className="flex md:hidden items-center gap-1 lg:gap-4">
         {languages.map((lang, idx) => (
           <React.Fragment key={lang.code}>
             <button
               onClick={() => handleChange(lang.code)}
-              className={`flex items-center text-lg font-bold transition-colors ${
+              className={`flex items-center text-sm lg:text-lg font-bold transition-colors ${
                 language === lang.code
                   ? "text-accent"
                   : "text-secondary hover:text-accent-content"
