@@ -1,12 +1,20 @@
 import { useState } from "react";
-import { createPortal } from "react-dom"; 
+import { createPortal } from "react-dom";
 import { Link } from "react-router";
+import {
+  IoLogInOutline,
+  IoMailOutline,
+  IoLockClosedOutline,
+  IoEye,
+  IoEyeOff,
+} from "react-icons/io5";
 
 const LoginModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const [email, setEmail] = useState(""); 
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,9 +23,7 @@ const LoginModal = ({ isOpen, onClose }) => {
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div
-        className="bg-primary/90 rounded-2xl p-8 w-[90%] max-w-md text-primary-content shadow-lg"
-      >
+      <div className="bg-primary/90 rounded-2xl p-8 w-[90%] max-w-md text-primary-content shadow-lg">
         <h2 className="text-4xl font-bold text-accent text-center mb-2">
           Welcome Back
         </h2>
@@ -30,32 +36,48 @@ const LoginModal = ({ isOpen, onClose }) => {
             <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email Address
             </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="Email"
-              className="w-full px-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
-                         border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
-            />
+            <div className="relative">
+              <IoMailOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="Email"
+                className="w-full pl-10 pr-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
+              border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
+              />
+            </div>
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mb-1"
+            >
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Password"
-              className="w-full px-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
-                         border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
-            />
+            <div className="relative">
+              <IoLockClosedOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Password"
+                className="w-full pl-10 px-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
+              border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2.5 text-accent/70 hover:text-accent transition"
+              >
+                {showPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button
@@ -64,6 +86,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                        text-primary font-semibold hover:bg-accent/80 focus:ring-2 focus:ring-accent/50 
                        transition-all shadow-md shadow-accent/20 disabled:opacity-50"
           >
+            <IoLogInOutline className="w-5 h-5" />
             Login
           </button>
         </form>
