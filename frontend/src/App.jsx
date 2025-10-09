@@ -1,4 +1,4 @@
-import React from "react";
+import {React, useState} from "react";
 import { Navigate, Route, Routes } from "react-router";
 
 import Navbar from "./components/Navbar";
@@ -9,16 +9,15 @@ import ProductsSection from "./sections/ProductsSection";
 import AboutSection from "./sections/AboutSection";
 import ContactsFAQSection from "./sections/ContactsFAQSection";
 import CoreValuesSection from "./sections/CoreValuesSection";
-import LoginPage from "./components/LoginPage";
+import LoginModal from "./components/LoginModal";
 
 function App() {
+
+  const [showLogin, setShowLogin] = useState("");
+
   return (
     <div>
-      <Navbar />
-      <Routes>
-        <Route
-          path="/"
-          element={
+      <Navbar onLoginClick={() => setShowLogin(true)} />
             <div className="relative min-h-screen overflow-x-hidden">
               <div className="fixed inset-0 bg-gradient-to-b from-secondary/80 via-secondary/30  to-secondary/80" />
               <div className="relative z-10">
@@ -29,12 +28,8 @@ function App() {
                 <ReviewsSection />
                 <ContactsFAQSection />
               </div>
+                <LoginModal isOpen={showLogin} onClose={() => setShowLogin("false")} />
             </div>
-          }
-        />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
       <Footer />
     </div>
   );
