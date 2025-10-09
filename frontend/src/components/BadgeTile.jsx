@@ -13,9 +13,9 @@ const BadgeTile = ({ image, text }) => (
     <img
       src={image}
       alt="badge accent"
-      className="w-full h-[40vh] lg:h-[20vh] object-contain drop-shadow-md"
+      className="w-full h-[30vh] lg:h-[20vh] object-contain drop-shadow-md"
     />
-    <p className="absolute inset-0 flex items-center justify-center text-xs lg:text-sm text-primary font-medium px-3 lg:px-6 leading-snug">
+    <p className="absolute inset-0 flex items-center justify-center text-xs lg:text-sm text-primary font-medium mx-4 lg:mx-6 leading-snug">
       {text}
     </p>
   </motion.div>
