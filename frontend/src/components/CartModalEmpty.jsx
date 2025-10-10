@@ -1,6 +1,6 @@
 import { FaShoppingBasket } from "react-icons/fa";
 
-const EmptyCartUI = ({ onClose }) => {
+const CartModalEmpty = ({ onClose }) => {
   const handleStartShopping = () => {
   const productsSection = document.querySelector("#products");
   if (productsSection) {
@@ -36,4 +36,4 @@ const EmptyCartUI = ({ onClose }) => {
   );
 };
 
-export default EmptyCartUI;
+export default CartModalEmpty;
