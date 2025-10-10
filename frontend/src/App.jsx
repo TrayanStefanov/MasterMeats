@@ -9,27 +9,23 @@ import AboutSection from "./sections/AboutSection";
 import ContactsFAQSection from "./sections/ContactsFAQSection";
 import CoreValuesSection from "./sections/CoreValuesSection";
 
-import LoginModal from "./components/LoginModal";
-import SignUpModal from "./components/SignUpModal";
+import AuthModal from "./components/AuthModal";
 
 import { useUserStore } from "./stores/useUserStore";
 
 function App() {
-  const [authModal, setAuthModal] = useState(null);
+  const [authModalOpen, setAuthModalOpen] = useState(null);
   const { user } = useUserStore();
 
-  const openLoginModal = () => {
-    if (!user) setAuthModal("login");
-  };
-  const openSignUpModal = () => {
-    if (!user) setAuthModal("signup");
+  const openAuthModal = () => {
+    if (!user) setAuthModalOpen("login");
   };
 
-  const closeAllModals = () => setAuthModal(null);
+  const closeAuthModal = () => setAuthModalOpen(false);
 
   return (
     <div>
-      <Navbar onLoginClick={openLoginModal} />
+      <Navbar onLoginClick={openAuthModal} />
       <div className="relative min-h-screen overflow-x-hidden">
         <div className="fixed inset-0 bg-gradient-to-b from-secondary/80 via-secondary/30  to-secondary/80" />
         <div className="relative z-10">
@@ -40,17 +36,9 @@ function App() {
           <ReviewsSection />
           <ContactsFAQSection />
         </div>
-        <LoginModal
-          isOpen={authModal === "login"}
-          onClose={closeAllModals}
-          openSignUpModal={openSignUpModal}
-          onLoginSuccess={closeAllModals}
-        />
-
-        <SignUpModal
-          isOpen={authModal === "signup"}
-          onClose={closeAllModals}
-          openLoginModal={openLoginModal}
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={closeAuthModal}
         />
       </div>
       <Footer />

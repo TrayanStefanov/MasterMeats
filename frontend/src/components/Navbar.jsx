@@ -97,9 +97,14 @@ const Navbar = ({onLoginClick}) => {
             onClick={onLoginClick}
           >
             <div className="flex gap-2">
-              
-            {user ? <span>Hi, {user.name}</span> : <FaUser className="w-5 h-5 self-center" />}
-            <span className="hidden lg:inline font-bold text-xl">Login</span>
+              {user ? (
+                <span>Hi, {user.name}</span>
+              ) : (
+                <FaUser className="w-5 h-5 self-center" />
+              )}
+              {!user && (
+                <span className="hidden lg:inline font-bold text-xl">Login</span>
+              )}
             </div>
           </button>
 
