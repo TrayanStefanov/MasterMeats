@@ -26,11 +26,13 @@ export const useCartStore = create((set, get) => ({
     },
     clearCartFrontendOnly: () => {
         set({ cart: [], coupon: null, total: 0, subtotal: 0 });
+        toast.success("Cart cleared locally");
     },
     clearCart: async () => {
         try {
             await axios.delete("/cart");
             set({ cart: [], coupon: null, total: 0, subtotal: 0 });
+            toast.success("Cart cleared");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to clear cart");
         }
@@ -68,6 +70,7 @@ export const useCartStore = create((set, get) => ({
                 cart: prev.cart.filter((item) => item._id !== productId),
             }));
             get().calculateTotals();
+            toast.success("Removed from cart");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to remove item");
         }
