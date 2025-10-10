@@ -12,25 +12,20 @@ import CoreValuesSection from "./sections/CoreValuesSection";
 import LoginModal from "./components/LoginModal";
 import SignUpModal from "./components/SignUpModal";
 
+import { useUserStore } from "./stores/useUserStore";
+
 function App() {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false);
+  const [authModal, setAuthModal] = useState(null);
+  const { user } = useUserStore();
 
-  // helper functions
   const openLoginModal = () => {
-    setShowSignUp(false);
-    setShowLogin(true);
+    if (!user) setAuthModal("login");
   };
-
   const openSignUpModal = () => {
-    setShowLogin(false);
-    setShowSignUp(true);
+    if (!user) setAuthModal("signup");
   };
 
-  const closeAllModals = () => {
-    setShowLogin(false);
-    setShowSignUp(false);
-  };
+  const closeAllModals = () => setAuthModal(null);
 
   return (
     <div>
@@ -46,12 +41,14 @@ function App() {
           <ContactsFAQSection />
         </div>
         <LoginModal
-          isOpen={showLogin}
+          isOpen={authModal === "login"}
           onClose={closeAllModals}
           openSignUpModal={openSignUpModal}
+          onLoginSuccess={closeAllModals}
         />
+
         <SignUpModal
-          isOpen={showSignUp}
+          isOpen={authModal === "signup"}
           onClose={closeAllModals}
           openLoginModal={openLoginModal}
         />
