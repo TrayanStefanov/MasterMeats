@@ -13,7 +13,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-primary text-primary-content border-t border-secondary  pb-10">
+    <footer className="sticky bg-primary text-primary-content border-t border-secondary pb-10">
       <motion.div
         className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-6 md:py-10"
         initial="hidden"
