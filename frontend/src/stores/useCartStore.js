@@ -56,5 +56,35 @@ export const useCartStore = create((set, get) => ({
 		} catch (error) {
 			toast.error(error.response?.data?.message || "Failed to remove item");
 		}
-	}
+	},
+    updateQuantity: async (productId, quantity) => {
+		if (quantity === 0) {
+			get().removeFromCart(productId);
+			return;
+		}
+
+		try {
+			await axios.put(`/cart/${productId}`, { quantity });
+			set((prevState) => ({
+				cart: prevState.cart.map((item) =>
+					item._id === productId ? { ...item, quantity } : item
+				),
+			}));
+			get().calculateTotals();
+		} catch (error) {
+			toast.error(error.response?.data?.message || "Failed to update quantity");
+		}
+	},
+	calculateTotals: () => {
+		const { cart, coupon } = get();
+		const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+		let total = subtotal;
+
+		if (coupon) {
+			const discount = subtotal * (coupon.discountPercentage / 100);
+			total = subtotal - discount;
+		}
+
+		set({ subtotal, total });
+	},
 }));
