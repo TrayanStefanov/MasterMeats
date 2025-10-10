@@ -1,18 +1,24 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaShoppingBasket, FaUser } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import LanguageSelector from "./LanguageSelector.jsx";
 import MobileMenu from "./MobileMenu.jsx";
-import { useTranslation } from "react-i18next";
+
 import { useUserStore } from "../stores/useUserStore";
+import { useCartStore } from "../stores/useCartStore";
+
 
 const Navbar = ({ onLoginClick, onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#hero");
   const { t } = useTranslation();
 
+  const { getCartCount } = useCartStore();
   const { user, logout } = useUserStore();
 
+  const totalItems = getCartCount();
   const navLinks = [
     { href: "#hero", label: t("navbar.home") },
     { href: "#products", label: t("navbar.products") },
@@ -90,6 +96,11 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
             aria-label="Shopping Basket"
           >
             <FaShoppingBasket className="w-6 h-6" />
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 rounded-full bg-accent text-primary text-xs w-5 h-5 flex items-center justify-center font-bold">
+                {totalItems}
+              </span>
+            )}
           </button>
 
           {user ? (
