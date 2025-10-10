@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaBars, FaShoppingBasket, FaUser } from "react-icons/fa";
+import { FaShoppingBasket, FaUser } from "react-icons/fa";
 import LanguageSelector from "./LanguageSelector.jsx";
 import MobileMenu from "./MobileMenu.jsx";
 import { useTranslation } from "react-i18next";
-
 import { useUserStore } from "../stores/useUserStore";
 
-const Navbar = ({onLoginClick}) => {
+const Navbar = ({ onLoginClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#hero");
   const { t } = useTranslation();
 
-  const { user } = useUserStore();
+  const { user, logout } = useUserStore();
 
   const navLinks = [
     { href: "#hero", label: t("navbar.home") },
@@ -45,7 +44,7 @@ const Navbar = ({onLoginClick}) => {
   };
 
   return (
-    <nav className="navbar h-24 bg-primary text-primary-content shadow-md shadow-primary-content sticky top-0 z-50 backdrop-blur-lg opacity-90">
+    <nav className="navbar h-24 bg-primary text-primary-content shadow-md sticky top-0 z-50 backdrop-blur-lg opacity-90">
       <div className="w-full lg:w-4/5 mx-auto flex items-center justify-between font-emphasis-heading">
         <div className="w-28 h-14 lg:w-40 lg:h-28 bg-contain bg-no-repeat bg-center">
           <img
@@ -67,7 +66,7 @@ const Navbar = ({onLoginClick}) => {
               <a
                 href={link.href}
                 className={`transition-colors ${activeSection === link.href ? "text-accent" : ""
-                  }`}
+                }`}
               >
                 {link.label}
               </a>
@@ -84,32 +83,36 @@ const Navbar = ({onLoginClick}) => {
 
         {/* Right Icons */}
         <div className="flex items-center gap-1 lg:gap-4 mx-4">
-          <button
-            className="btn btn-ghost btn-circle"
+          <button 
+          className="btn btn-ghost btn-circle"
             aria-label="Shopping Basket"
           >
             <FaShoppingBasket className="w-6 h-6" />
           </button>
 
-          <button
-            className="btn btn-ghost btn-circle me-4"
-            aria-label="Account"
-            onClick={onLoginClick}
-          >
-            <div className="flex gap-2">
-              {user ? (
-                <span>Hi, {user.name}</span>
-              ) : (
-                <FaUser className="w-5 h-5 self-center" />
-              )}
-              {!user && (
-                <span className="hidden lg:inline font-bold text-xl">Login</span>
-              )}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="hidden md:inline font-medium">
+                Hi, {user.name}
+              </span>
+              <button
+                onClick={logout}
+                className="text-accent hover:text-accent/80 font-medium text-sm"
+              >
+                Logout
+              </button>
             </div>
-          </button>
+          ) : (
+            <button
+              className="btn btn-ghost btn-circle me-4 flex items-center gap-2"
+              onClick={onLoginClick}
+            >
+              <FaUser className="w-5 h-5" />
+              <span className="hidden lg:inline font-bold text-xl">Login</span>
+            </button>
+          )}
 
           <LanguageSelector />
-
           {/* Mobile Menu Toggle */}
           <button
             className="btn btn-ghost md:hidden"
