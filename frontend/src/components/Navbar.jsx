@@ -91,24 +91,27 @@ const Navbar = ({ onLoginClick }) => {
           </button>
 
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-row items-end gap-3 me-4">
               <span className="hidden md:inline font-medium">
                 Hi, {user.name}
               </span>
               <button
                 onClick={logout}
-                className="text-accent hover:text-accent/80 font-medium text-sm"
+                className="text-accent hover:text-accent/80 font-bold text-xl"
               >
                 Logout
               </button>
             </div>
           ) : (
             <button
-              className="btn btn-ghost btn-circle me-4 flex items-center gap-2"
+              className="btn btn-ghost btn-circle mx-4"
               onClick={onLoginClick}
             >
+              <div className="flex flex-row me-4 items-center gap-1">
+
               <FaUser className="w-5 h-5" />
               <span className="hidden lg:inline font-bold text-xl">Login</span>
+              </div>
             </button>
           )}
 
