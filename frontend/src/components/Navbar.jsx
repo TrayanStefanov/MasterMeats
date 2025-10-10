@@ -6,7 +6,7 @@ import MobileMenu from "./MobileMenu.jsx";
 import { useTranslation } from "react-i18next";
 import { useUserStore } from "../stores/useUserStore";
 
-const Navbar = ({ onLoginClick }) => {
+const Navbar = ({ onLoginClick, onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#hero");
   const { t } = useTranslation();
@@ -65,7 +65,8 @@ const Navbar = ({ onLoginClick }) => {
             >
               <a
                 href={link.href}
-                className={`transition-colors ${activeSection === link.href ? "text-accent" : ""
+                className={`transition-colors ${
+                  activeSection === link.href ? "text-accent" : ""
                 }`}
               >
                 {link.label}
@@ -83,8 +84,9 @@ const Navbar = ({ onLoginClick }) => {
 
         {/* Right Icons */}
         <div className="flex items-center gap-1 lg:gap-4 mx-4">
-          <button 
-          className="btn btn-ghost btn-circle"
+          <button
+            onClick={onCartClick}
+            className="btn btn-ghost btn-circle"
             aria-label="Shopping Basket"
           >
             <FaShoppingBasket className="w-6 h-6" />
@@ -108,9 +110,10 @@ const Navbar = ({ onLoginClick }) => {
               onClick={onLoginClick}
             >
               <div className="flex flex-row me-4 items-center gap-1">
-
-              <FaUser className="w-5 h-5" />
-              <span className="hidden lg:inline font-bold text-xl">Login</span>
+                <FaUser className="w-5 h-5" />
+                <span className="hidden lg:inline font-bold text-xl">
+                  Login
+                </span>
               </div>
             </button>
           )}
