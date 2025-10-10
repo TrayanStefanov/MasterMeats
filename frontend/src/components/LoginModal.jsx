@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
@@ -14,30 +14,43 @@ import { LuLoader } from "react-icons/lu";
 
 import { useUserStore } from "../stores/useUserStore";
 
-const LoginModal = ({ isOpen, onClose, openSignUpModal }) => {
-  if (!isOpen) return null;
+const LoginModal = ({ isOpen, onClose, openSignUpModal, onLoginSuccess }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login, loading, error } = useUserStore();
+  const { login, loading, error, user } = useUserStore();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (user) {
+      onLoginSuccess();
+    }
+  }, [user]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(email, password);
+    try {
+      await login(email, password);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
 
   return createPortal(
+    <div
+    className={`fixed inset-0 z-[9999] ${
+      isOpen ? "flex" : "hidden"
+    } items-center justify-center bg-black/40 backdrop-blur-sm`}
+  >
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-primary/90 rounded-2xl p-8 w-[90%] max-w-md text-primary-content shadow-lg">
         <button
           onClick={onClose}
-          aria-label="Close login modal"
-          className="absolute top-4 right-4 text-primary-content/70 hover:text-accent transition"
+          className="absolute top-4 right-4 text-accent/70 hover:text-accent transition"
         >
-          <IoClose className="w-6 h-6" />
+          <IoClose size={24} />
         </button>
         <h2 className="text-4xl font-bold text-accent text-center mb-2">
           Welcome Back
@@ -54,7 +67,7 @@ const LoginModal = ({ isOpen, onClose, openSignUpModal }) => {
             <div className="relative">
               <IoMailOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
               <input
-                id="email"
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +89,7 @@ const LoginModal = ({ isOpen, onClose, openSignUpModal }) => {
             <div className="relative">
               <IoLockClosedOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
               <input
-                id="password"
+                id="login-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -132,6 +145,7 @@ const LoginModal = ({ isOpen, onClose, openSignUpModal }) => {
             </button>
           </p>
         </div>
+      </div>
       </div>
     </div>,
     document.body
