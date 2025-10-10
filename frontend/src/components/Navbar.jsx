@@ -5,10 +5,14 @@ import LanguageSelector from "./LanguageSelector.jsx";
 import MobileMenu from "./MobileMenu.jsx";
 import { useTranslation } from "react-i18next";
 
+import { useUserStore } from "../stores/useUserStore";
+
 const Navbar = ({onLoginClick}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#hero");
   const { t } = useTranslation();
+
+  const { user } = useUserStore();
 
   const navLinks = [
     { href: "#hero", label: t("navbar.home") },
@@ -94,7 +98,7 @@ const Navbar = ({onLoginClick}) => {
           >
             <div className="flex gap-2">
               
-            <FaUser className="w-5 h-5 self-center" />
+            {user ? <span>Hi, {user.name}</span> : <FaUser className="w-5 h-5 self-center" />}
             <span className="hidden lg:inline font-bold text-xl">Login</span>
             </div>
           </button>
