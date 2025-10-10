@@ -10,11 +10,13 @@ import ContactsFAQSection from "./sections/ContactsFAQSection";
 import CoreValuesSection from "./sections/CoreValuesSection";
 
 import AuthModal from "./components/AuthModal";
+import CartModal from "./components/CartModal";
 
 import { useUserStore } from "./stores/useUserStore";
 
 function App() {
   const [authModalOpen, setAuthModalOpen] = useState(null);
+  const [cartModalOpen, setCartModalOpen] = useState(false);
   const { user } = useUserStore();
 
   const openAuthModal = () => {
@@ -22,10 +24,12 @@ function App() {
   };
 
   const closeAuthModal = () => setAuthModalOpen(false);
+  const openCartModal = () => setCartModalOpen(true);
+  const closeCartModal = () => setCartModalOpen(false);
 
   return (
     <div>
-      <Navbar onLoginClick={openAuthModal} />
+      <Navbar onLoginClick={openAuthModal} onCartClick={openCartModal} />
       <div className="relative min-h-screen overflow-x-hidden">
         <div className="fixed inset-0 bg-gradient-to-b from-secondary/80 via-secondary/30  to-secondary/80" />
         <div className="relative z-10">
@@ -40,6 +44,7 @@ function App() {
           isOpen={authModalOpen}
           onClose={closeAuthModal}
         />
+        <CartModal isOpen={cartModalOpen} onClose={closeCartModal} />
       </div>
       <Footer />
     </div>
