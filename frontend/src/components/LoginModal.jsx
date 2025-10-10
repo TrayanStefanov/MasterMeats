@@ -14,7 +14,7 @@ import { LuLoader } from "react-icons/lu";
 
 import { useUserStore } from "../stores/useUserStore";
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, openSignUpModal }) => {
   if (!isOpen) return null;
 
   const [email, setEmail] = useState("");
@@ -27,6 +27,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     login(email, password);
   };
+
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -95,9 +96,7 @@ const LoginModal = ({ isOpen, onClose }) => {
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm text-center mt-2">
-              {error}
-            </p>
+            <p className="text-red-400 text-sm text-center mt-2">{error}</p>
           )}
 
           <button
@@ -124,12 +123,13 @@ const LoginModal = ({ isOpen, onClose }) => {
         <div className="mt-8 text-center text-sm">
           <p className="text-primary-content/80">
             Don’t have an account?{" "}
-            <Link
-              to="/signup"
+            <button
+              type="button"
+              onClick={openSignUpModal}
               className="text-accent hover:text-accent/80 transition-colors font-medium"
             >
-              Sign up <IoArrowRedoOutline className="inline w-4 h-4 ml-1" />
-            </Link>
+              Sign up
+            </button>
           </p>
         </div>
       </div>
