@@ -2,13 +2,20 @@ import { FaShoppingBasket } from "react-icons/fa";
 
 const EmptyCartUI = ({ onClose }) => {
   const handleStartShopping = () => {
-    const productsSection = document.querySelector("#products");
-    if (productsSection) {
-      productsSection.scrollIntoView({ behavior: "smooth" });
-    }
+  const productsSection = document.querySelector("#products");
+  if (productsSection) {
+    const navbarHeight = document.querySelector("nav.navbar")?.offsetHeight || 0;
 
-    if (onClose) onClose();
-  };
+    // Scroll to the top of the section minus navbar height
+    const sectionTop = productsSection.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: sectionTop - navbarHeight,
+      behavior: "smooth",
+    });
+  }
+
+  if (onClose) onClose();
+};
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4 py-16">
