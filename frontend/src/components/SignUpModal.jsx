@@ -5,7 +5,6 @@ import { LuLoader } from "react-icons/lu";
 import { useUserStore } from "../stores/useUserStore";
 
 const SignUpModal = ({ isOpen, onClose, openLoginModal }) => {
-  if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -16,12 +15,22 @@ const SignUpModal = ({ isOpen, onClose, openLoginModal }) => {
   const [showPassword, setShowPassword] = useState(false);
   const { signup, loading, error } = useUserStore();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    signup(formData);
+    try {
+      await signup(formData);
+      openLoginModal(); // switches to login modal after successful signup
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return createPortal(
+    <div
+    className={`fixed inset-0 z-[9999] ${
+      isOpen ? "flex" : "hidden"
+    } items-center justify-center bg-black/40 backdrop-blur-sm`}
+  >
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm"
       onClick={onClose}
@@ -71,7 +80,7 @@ const SignUpModal = ({ isOpen, onClose, openLoginModal }) => {
             <div className="relative">
               <IoMailOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
               <input
-                id="email"
+                id="signup-email"
                 type="email"
                 required
                 value={formData.email}
@@ -90,7 +99,7 @@ const SignUpModal = ({ isOpen, onClose, openLoginModal }) => {
             <div className="relative">
               <IoLockClosedOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
               <input
-                id="password"
+                id="signup-password"
                 type={showPassword ? "text" : "password"}
                 required
                 value={formData.password}
@@ -167,6 +176,7 @@ const SignUpModal = ({ isOpen, onClose, openLoginModal }) => {
             </button>
           </p>
         </div>
+      </div>
       </div>
     </div>,
     document.body
