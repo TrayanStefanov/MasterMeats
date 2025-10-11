@@ -1,10 +1,39 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ProductCard from "../components/ProductCard.jsx";
+import axios from "../lib/axios.js";
 
 const ProductsSection = () => {
   const { t } = useTranslation();
+  const [products, setProducts] = useState([]);
   const title = t("products.title");
-  const products = t("products.product", { returnObjects: true });
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("/products");
+        const backendProducts = res.data;
+
+        const localizedProducts = backendProducts.map((p) => {
+          const i18nData = t(`products.${p.name}`, { returnObjects: true });
+
+          return {
+            ...p,
+            title: i18nData.title || p.name, // fallback if missing
+            description: i18nData.description || p.description,
+            badge: i18nData.badge || "",
+            btnBuy: i18nData.btnBuy || "Buy",
+          };
+        });
+
+        setProducts(localizedProducts);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      }
+    };
+
+    fetchProducts();
+  }, [t]);
 
   return (
     <section id="products" className="py-4">
@@ -18,7 +47,7 @@ const ProductsSection = () => {
       <div className="container mx-auto flex flex-col gap-6">
         {products.map((product, idx) => (
           <ProductCard
-            key={idx}
+            key={product._id}
             product={product}
             reverse={idx % 2 === 1}
           />
