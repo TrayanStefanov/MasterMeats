@@ -46,7 +46,7 @@ const CartModal = ({ isOpen, onClose }) => {
                             ))}
                         </div>
                         <div className="lg:w-[35%] space-y-6">
-                            <OrderSummary />
+                            <OrderSummary onClose={onClose} />
                         </div>
                     </div>
                 )}
