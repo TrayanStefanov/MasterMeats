@@ -6,6 +6,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import productRoutes from "./routes/product.routes.js";
+import paymentsRoutes from "./routes/payments.routes.js";
 
 import { connectDB } from "./lib/db.js";
 
@@ -24,7 +25,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/products", productRoutes);
-
+app.use("/api/payments", paymentsRoutes);
 
 app.listen(PORT, () => {
 	console.log("Server is running on http://localhost:" + PORT);
