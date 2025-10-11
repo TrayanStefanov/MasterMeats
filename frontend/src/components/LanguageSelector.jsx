@@ -78,7 +78,7 @@ const LanguageSelector = () => {
           <React.Fragment key={lang.code}>
             <button
               onClick={() => handleChange(lang.code)}
-              className={`flex items-center text-sm lg:text-lg font-bold transition-colors ${
+              className={`flex items-center text-lg font-bold transition-colors ${
                 language === lang.code
                   ? "text-accent"
                   : "text-secondary hover:text-accent-content"
