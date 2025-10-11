@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 import authRoutes from "./routes/auth.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
@@ -12,6 +13,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+app.use(cors({
+  origin: process.env.CLIENT_URL, // allow requests from frontend
+  credentials: true,             // allow cookies to be sent
+}));
 
 app.use(express.json({ limit: "10mb" })); // allows you to parse the body of the request
 app.use(cookieParser());
