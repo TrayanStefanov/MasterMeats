@@ -69,40 +69,30 @@
     },
     "products": {
         "title": "Our Selection, Made Especially for You!",
-        "product": [
-            {
-                "title": "Elena Fillet Mix",
-                "description": "Fresh Bulgarian meat seasoned with red and black pepper, savory, and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
-                "price": "60 BGN/kg",
-                "btnBuy": "Buy",
-                "image": "/file1.jpeg",
-                "badge": "New"
-            },
-            {
-                "title": "Elena Fillet Classic",
-                "description": "Fresh Bulgarian meat seasoned with savory and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
-                "price": "50 BGN/kg",
-                "btnBuy": "Buy",
-                "image": "/file2.jpg",
-                "badge": "Most Popular"
-            },
-            {
-                "title": "Pastarma",
-                "description": "Fresh Bulgarian meat seasoned with red pepper (optionally smoked). Dried for a minimum of 15 days for maximum tenderness.",
-                "price": "50 BGN/kg",
-                "btnBuy": "Buy",
-                "image": "/file3.jpg",
-                "badge": ""
-            },
-            {
-                "title": "Spicy Pastarma",
-                "description": "Fresh Bulgarian meat seasoned with red pepper, hot chili, savory, and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
-                "price": "60 BGN/kg",
-                "btnBuy": "Buy",
-                "image": "/file4.png",
-                "badge": "Spicy"
-            }
-        ]
+        "elena_fillet_mix": {
+            "title": "Elena Fillet Mix",
+            "description": "Fresh Bulgarian meat seasoned with red and black pepper, savory, and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
+            "badge": "New",
+            "btnBuy": "Buy"
+        },
+        "elena_fillet_clasic": {
+            "title": "Elena Fillet Classic",
+            "description": "Fresh Bulgarian meat seasoned with savory and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
+            "badge": "Most Popular",
+            "btnBuy": "Buy"
+        },
+        "pastarma": {
+            "title": "Pastarma",
+            "description": "Fresh Bulgarian meat seasoned with red pepper (optionally smoked). Dried for a minimum of 15 days for maximum tenderness.",
+            "badge": "",
+            "btnBuy": "Buy"
+        },
+        "pastarma_spicy": {
+            "title": "Spicy Pastarma",
+            "description": "Fresh Bulgarian meat seasoned with red pepper, hot chili, savory, and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
+            "badge": "Spicy",
+            "btnBuy": "Buy"
+        }
     },
     "about": {
         "intro": {
