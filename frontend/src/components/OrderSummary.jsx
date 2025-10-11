@@ -1,9 +1,19 @@
-import { useCartStore } from "../stores/useCartStore";
 import { Link } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { loadStripe } from "@stripe/stripe-js";
+
+import axios from "../lib/axios";
+import { useCartStore } from "../stores/useCartStore";
+import { useScrollToProducts } from "../hooks/useScrollToProducts";
 
 
-const OrderSummary = () => {
+const stripePromise = loadStripe(
+  "pk_test_51KZYccCoOZF2UhtOwdXQl3vcizup20zqKqT9hVUIsVzsdBrhqbUI2fE0ZdEVLdZfeHjeyFXtqaNsyCJCmZWnjNZa00PzMAjlcL"
+);
+
+const OrderSummary = ({onClose}) => {
+  const handleContinueShopping = useScrollToProducts(onClose);
+
   const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
 
   const savings = subtotal - total;
@@ -13,8 +23,16 @@ const OrderSummary = () => {
 
   const handlePayment = async () => {
     try {
-      // Make a payment request to your payment gateway here
-      console.log("Payment successful!");
+      const stripe = await stripePromise;
+      const res = await axios.post("/payments/create-checkout-session", {
+        products: cart,
+        couponCode: coupon ? coupon.code : null,
+      });
+
+      const session = res.data;
+      const result = await stripe.redirectToCheckout({ sessionId: session.id });
+
+      if (result.error) console.error("Stripe checkout error:", result.error);
     } catch (error) {
       console.error("Payment error:", error);
     }
@@ -61,11 +79,15 @@ const OrderSummary = () => {
         </button>
 
         <Link
-          to="/#products"
-          className="flex items-center justify-center gap-1 text-primary-content/80 hover:text-primary underline text-sm font-medium"
-        >
-          Continue Shopping <FaArrowRightLong size={16} />
-        </Link>
+      to="/"
+      onClick={(e) => {
+        e.preventDefault();
+        handleContinueShopping();
+      }}
+      className="flex items-center justify-center gap-1 text-primary-content/80 hover:text-primary underline text-sm font-medium"
+    >
+      Continue Shopping <FaArrowRightLong size={16} />
+    </Link>
       </div>
     </div>
   );
