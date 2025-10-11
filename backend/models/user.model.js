@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
 		},
 		cartItems: [
 			{
-				quantity: {
+				quantityInGrams: {
 					type: Number,
 					default: 1,
 				},
