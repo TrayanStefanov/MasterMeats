@@ -10,10 +10,10 @@ const productSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		price: {
+		pricePerKg: {
 			type: Number,
-			min: 0,
-			required: true,
+			required: [true, "Price per kilogram is required"],
+			min: [0, "Price must be a positive number"],
 		},
 		image: {
 			type: String,
@@ -22,6 +22,11 @@ const productSchema = new mongoose.Schema(
 		category: {
 			type: String,
 			required: true,
+		},
+		stockInGrams: {
+			type: Number,
+			min: [0, "Stock cannot be negative"],
+			default: null,
 		},
 	},
 	{ timestamps: true }
