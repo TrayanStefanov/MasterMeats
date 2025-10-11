@@ -1,20 +1,25 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements, } from "@stripe/react-stripe-js";
 
 import axios from "../lib/axios";
 import { useCartStore } from "../stores/useCartStore";
 import { useScrollToProducts } from "../hooks/useScrollToProducts";
 
-
 const stripePromise = loadStripe(
-  "pk_test_51KZYccCoOZF2UhtOwdXQl3vcizup20zqKqT9hVUIsVzsdBrhqbUI2fE0ZdEVLdZfeHjeyFXtqaNsyCJCmZWnjNZa00PzMAjlcL"
+  "pk_test_51S0odII9slnLG2ht6hVJGDyVLleTQIcqTIPFbdYUE7NBgJwoi4R6Myeq4ZmdeeGmYC06YDD9D4I42Fj5fE0MAguw00s5SopSI1"
 );
 
-const OrderSummary = ({onClose}) => {
+const CheckoutForm = ({ onClose }) => {
+  const stripe = useStripe();
+  const elements = useElements();
   const handleContinueShopping = useScrollToProducts(onClose);
 
-  const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
+  const { total, subtotal, coupon, isCouponApplied, cart, clearCart } = useCartStore();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const savings = subtotal - total;
   const formattedSubtotal = subtotal.toFixed(2);
@@ -22,19 +27,45 @@ const OrderSummary = ({onClose}) => {
   const formattedSavings = savings.toFixed(2);
 
   const handlePayment = async () => {
+    if (!stripe || !elements) return;
+
+    setLoading(true);
+    setError(null);
+
     try {
-      const stripe = await stripePromise;
-      const res = await axios.post("/payments/create-checkout-session", {
+      const { data } = await axios.post("/payments/create-payment-intent", {
         products: cart,
         couponCode: coupon ? coupon.code : null,
       });
 
-      const session = res.data;
-      const result = await stripe.redirectToCheckout({ sessionId: session.id });
+      const clientSecret = data.clientSecret;
 
-      if (result.error) console.error("Stripe checkout error:", result.error);
-    } catch (error) {
-      console.error("Payment error:", error);
+      const cardElement = elements.getElement(CardElement);
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: { card: cardElement },
+      });
+
+      if (result.error) {
+        console.error(result.error.message);
+        setError(result.error.message);
+
+        if (
+          result.error.type === "card_error" ||
+          result.error.type === "validation_error"
+        ) {
+          window.location.href = "/purchase-cancel";
+        }
+      } else if (result.paymentIntent.status === "succeeded") {
+        clearCart();
+        window.location.href = "/purchase-success";
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Unexpected error occurred. Please try again.");
+
+      window.location.href = "/purchase-cancel";
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,29 +99,41 @@ const OrderSummary = ({onClose}) => {
             <span className="text-white">${formattedTotal}</span>
           </div>
         </div>
+
+        <div className="mt-4">
+          <CardElement className="p-2 rounded-md bg-primary-content/10 text-primary-content" />
+          {error && <p className="text-red-400 mt-2 text-sm">{error}</p>}
+        </div>
       </div>
 
       <div className="mt-6 flex flex-col gap-3">
         <button
           onClick={handlePayment}
-          className="w-full py-3 bg-accent/80 hover:bg-accent rounded-lg text-primary font-semibold transition-shadow shadow-md shadow-accent/20"
+          disabled={!stripe || loading}
+          className="w-full py-3 bg-accent/80 hover:bg-accent rounded-lg text-primary font-semibold transition-shadow shadow-md shadow-accent/20 disabled:opacity-50"
         >
-          Proceed to Checkout
+          {loading ? "Processing..." : "Proceed to Checkout"}
         </button>
 
         <Link
-      to="/"
-      onClick={(e) => {
-        e.preventDefault();
-        handleContinueShopping();
-      }}
-      className="flex items-center justify-center gap-1 text-primary-content/80 hover:text-primary underline text-sm font-medium"
-    >
-      Continue Shopping <FaArrowRightLong size={16} />
-    </Link>
+          to="/"
+          onClick={(e) => {
+            e.preventDefault();
+            handleContinueShopping();
+          }}
+          className="flex items-center justify-center gap-1 text-primary-content/80 hover:text-primary underline text-sm font-medium"
+        >
+          Continue Shopping <FaArrowRightLong size={16} />
+        </Link>
       </div>
     </div>
   );
 };
+
+const OrderSummary = ({ onClose }) => (
+  <Elements stripe={stripePromise}>
+    <CheckoutForm onClose={onClose} />
+  </Elements>
+);
 
 export default OrderSummary;
