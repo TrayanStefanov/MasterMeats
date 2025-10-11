@@ -31,6 +31,8 @@ export const useUserStore = create((set, get) => ({
 			const res = await axios.post("/auth/login", { email, password });
 
 			set({ user: res.data, loading: false });
+
+			useCartStore.getState().getCartItems();
 		} catch (error) {
 			set({ loading: false });
 			toast.error(error.response.data.message || "An error occurred");
@@ -52,11 +54,21 @@ export const useUserStore = create((set, get) => ({
 		try {
 			const response = await axios.get("/auth/profile");
 			set({ user: response.data, checkingAuth: false });
+
+			// Directly populate cart store
+			useCartStore.setState({
+				cart: response.data.cartItems.map(item => ({
+					...item.product,
+					quantityInGrams: item.quantityInGrams
+				}))
+			});
+			useCartStore.getState().calculateTotals();
 		} catch (error) {
 			console.log(error.message);
 			set({ checkingAuth: false, user: null });
 		}
 	},
+
 
 	refreshToken: async () => {
 		// Prevent multiple simultaneous refresh attempts
@@ -100,6 +112,7 @@ axios.interceptors.response.use(
 			} catch (refreshError) {
 				// If refresh fails, redirect to login or handle as needed
 				useUserStore.getState().logout();
+				useCartStore.getState().clearCartFrontendOnly();
 				return Promise.reject(refreshError);
 			}
 		}
