@@ -9,16 +9,13 @@ import MobileMenu from "./MobileMenu.jsx";
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
 
-
 const Navbar = ({ onLoginClick, onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#hero");
   const { t } = useTranslation();
 
-  const { getCartCount } = useCartStore();
+  const totalItems = useCartStore((state) => state.cart.length);
   const { user, logout } = useUserStore();
-
-  const totalItems = getCartCount();
   const navLinks = [
     { href: "#hero", label: t("navbar.home") },
     { href: "#products", label: t("navbar.products") },
@@ -92,12 +89,12 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
         <div className="flex items-center gap-1 lg:gap-4 mx-4">
           <button
             onClick={onCartClick}
-            className="btn btn-ghost btn-circle"
+            className="relative btn btn-ghost btn-circle"
             aria-label="Shopping Basket"
           >
             <FaShoppingBasket className="w-6 h-6" />
             {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 rounded-full bg-accent text-primary text-xs w-5 h-5 flex items-center justify-center font-bold">
+              <span className="absolute -top-2 -right-2 rounded-full bg-secondary text-primary text-xs w-5 h-5 flex items-center justify-center font-bold">
                 {totalItems}
               </span>
             )}
@@ -132,7 +129,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
           <LanguageSelector />
           {/* Mobile Menu Toggle */}
           <button
-            className="btn btn-ghost md:hidden"
+            className="btn btn-ghost md:hidden text-xl"
             onClick={() => setIsOpen(!isOpen)}
             aria-label={isOpen ? "Close Menu" : "Open Menu"}
           >
