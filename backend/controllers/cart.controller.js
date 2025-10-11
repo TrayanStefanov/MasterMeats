@@ -6,15 +6,15 @@ export const getCartProducts = async (req, res) => {
 		const productIds = req.user.cartItems.map((item) => item.product);
 		const products = await Product.find({ _id: { $in: productIds } });
 
-		// Combine product data with quantity in grams
+		// Combine product data with quantityInGrams
 		const cartItems = products.map((product) => {
 			const item = req.user.cartItems.find(
 				(cartItem) => cartItem.product.toString() === product._id.toString()
 			);
 			return {
 				...product.toJSON(),
-				quantityInGrams: item.quantity, 
-				subtotal: (product.pricePerKg * item.quantity) / 1000, // price per kg × grams ÷ 1000
+				quantityInGrams: item.quantityInGrams,
+				subtotal: (product.pricePerKg * item.quantityInGrams) / 1000, // price per kg × grams ÷ 1000
 			};
 		});
 
@@ -25,12 +25,13 @@ export const getCartProducts = async (req, res) => {
 	}
 };
 
+// Add product to cart
 export const addToCart = async (req, res) => {
 	try {
 		const { productId, quantityInGrams } = req.body;
 		const user = req.user;
 
-		if (quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
+		if (!quantityInGrams || quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
 			return res.status(400).json({
 				message: "Minimum order is 500g, and quantity must be in 100g increments.",
 			});
@@ -38,17 +39,17 @@ export const addToCart = async (req, res) => {
 
 		const product = await Product.findById(productId);
 		if (!product) {
-			return res.status(404).json({ message: "Product not found" });
-		}
+            return res.status(404).json({ message: "Product not found" });
+        }
 
 		const existingItem = user.cartItems.find(
 			(item) => item.product.toString() === productId
 		);
 
 		if (existingItem) {
-			existingItem.quantity += quantityInGrams;
+			existingItem.quantityInGrams += quantityInGrams;
 		} else {
-			user.cartItems.push({ product: productId, quantity: quantityInGrams });
+			user.cartItems.push({ product: productId, quantityInGrams });
 		}
 
 		await user.save();
@@ -59,6 +60,7 @@ export const addToCart = async (req, res) => {
 	}
 };
 
+// Remove product(s) from cart
 export const removeAllFromCart = async (req, res) => {
 	try {
 		const { productId } = req.body;
@@ -80,13 +82,14 @@ export const removeAllFromCart = async (req, res) => {
 	}
 };
 
+// Update quantity of a cart item
 export const updateQuantity = async (req, res) => {
 	try {
 		const { id: productId } = req.params;
 		const { quantityInGrams } = req.body;
 		const user = req.user;
 
-		if (quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
+		if (!quantityInGrams || quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
 			return res.status(400).json({
 				message: "Minimum order is 500g, and quantity must be in 100g increments.",
 			});
@@ -97,21 +100,14 @@ export const updateQuantity = async (req, res) => {
 		);
 
 		if (!existingItem) {
-			return res.status(404).json({ message: "Product not found in cart" });
-		}
-
-		if (quantityInGrams === 0) {
-			user.cartItems = user.cartItems.filter(
-				(item) => item.product.toString() !== productId
-			);
-		} else {
-			existingItem.quantity = quantityInGrams;
-		}
+            return res.status(404).json({ message: "Product not in cart" });
+        }
+		existingItem.quantityInGrams = quantityInGrams;
 
 		await user.save();
 		res.status(200).json(user.cartItems);
 	} catch (error) {
-		console.log("Error in updateQuantity controller:", error.message);
+		console.log("Error in updateQuantity:", error.message);
 		res.status(500).json({ message: "Server error", error: error.message });
 	}
 };
