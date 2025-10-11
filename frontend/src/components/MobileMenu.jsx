@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
+import { IoClose } from "react-icons/io5";
+
 
 const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
   // Close menu on Escape key
@@ -38,7 +40,13 @@ const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
             role="dialog"
             aria-modal="true"
           >
-            
+            <button
+              onClick={onClose}
+              className="absolute top-6 right-6 text-primary-content text-3xl p-2 rounded-full hover:bg-white/20 transition"
+              aria-label="Close menu"
+            >
+              <IoClose />
+            </button>
             <motion.div
               initial="hidden"
               animate="visible"
