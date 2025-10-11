@@ -20,9 +20,9 @@ export const useCartStore = create((set, get) => ({
         }
     },
 
-    getCartCount: () => {
+    getDistinctProductCount: () => {
         const { cart } = get();
-        return cart.reduce((sum, item) => sum + item.quantityInGrams, 0);
+        return cart.length;
     },
     clearCartFrontendOnly: () => {
         set({ cart: [], coupon: null, total: 0, subtotal: 0 });
@@ -38,31 +38,31 @@ export const useCartStore = create((set, get) => ({
         }
     },
     addToCart: async (product, quantityInGrams = 500) => {
-        if (quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
-            toast.error("Minimum 500g, in 100g increments");
-            return;
-        }
-        try {
-            await axios.post("/cart", { productId: product._id, quantityInGrams });
-            toast.success("Product added to cart");
+    if (quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
+      toast.error("Minimum 500g, in 100g increments");
+      return;
+    }
+    try {
+      await axios.post("/cart", { productId: product._id, quantityInGrams }); 
+      toast.success("Product added to cart");
 
-            set((prev) => {
-                const existing = prev.cart.find((item) => item._id === product._id);
-                const newCart = existing
-                    ? prev.cart.map((item) =>
-                        item._id === product._id
-                            ? { ...item, quantityInGrams: item.quantityInGrams + quantityInGrams }
-                            : item
-                    )
-                    : [...prev.cart, { ...product, quantityInGrams }];
-                return { cart: newCart };
-            });
+      set((prev) => {
+        const existing = prev.cart.find((item) => item._id === product._id);
+        const newCart = existing
+          ? prev.cart.map((item) =>
+              item._id === product._id
+                ? { ...item, quantityInGrams: item.quantityInGrams + quantityInGrams } 
+                : item
+            )
+          : [...prev.cart, { ...product, quantityInGrams }]; 
+        return { cart: newCart };
+      });
 
-            get().calculateTotals();
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to add to cart");
-        }
-    },
+      get().calculateTotals();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to add to cart");
+    }
+  },
     removeFromCart: async (productId) => {
         try {
             await axios.delete("/cart", { data: { productId } }); // same as before
@@ -76,23 +76,23 @@ export const useCartStore = create((set, get) => ({
         }
     },
     updateQuantity: async (productId, quantityInGrams) => {
-        if (quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
-            toast.error("Minimum 500g, in 100g increments");
-            return;
-        }
+    if (quantityInGrams < 500 || quantityInGrams % 100 !== 0) {
+      toast.error("Minimum 500g, in 100g increments");
+      return;
+    }
 
-        try {
-            await axios.put(`/cart/${productId}`, { quantityInGrams });
-            set((prev) => ({
-                cart: prev.cart.map((item) =>
-                    item._id === productId ? { ...item, quantityInGrams } : item
-                ),
-            }));
-            get().calculateTotals();
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to update quantity");
-        }
-    },
+    try {
+      await axios.put(`/cart/${productId}`, { quantityInGrams });
+      set((prev) => ({
+        cart: prev.cart.map((item) =>
+          item._id === productId ? { ...item, quantityInGrams } : item
+        ),
+      }));
+      get().calculateTotals();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update quantity");
+    }
+  },
     calculateTotals: () => {
         const { cart, coupon } = get();
         // subtotal in terms of kg: price * quantity in grams / 1000
