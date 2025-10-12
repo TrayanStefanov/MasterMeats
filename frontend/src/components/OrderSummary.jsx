@@ -2,11 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements, } from "@stripe/react-stripe-js";
-
+import {Elements, CardElement, useStripe, useElements} from "@stripe/react-stripe-js";
 import axios from "../lib/axios";
 import { useCartStore } from "../stores/useCartStore";
-import { useScrollToProducts } from "../hooks/useScrollToProducts";
+import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const stripePromise = loadStripe(
   "pk_test_51S0odII9slnLG2ht6hVJGDyVLleTQIcqTIPFbdYUE7NBgJwoi4R6Myeq4ZmdeeGmYC06YDD9D4I42Fj5fE0MAguw00s5SopSI1"
@@ -15,7 +14,7 @@ const stripePromise = loadStripe(
 const CheckoutForm = ({ onClose }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const handleContinueShopping = useScrollToProducts(onClose);
+  const { scrollToSection } = useSmoothScrollNav([{ href: "#products" }], onClose);
 
   const { total, subtotal, coupon, isCouponApplied, cart, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
@@ -62,7 +61,6 @@ const CheckoutForm = ({ onClose }) => {
     } catch (err) {
       console.error(err);
       setError("Unexpected error occurred. Please try again.");
-
       window.location.href = "/purchase-cancel";
     } finally {
       setLoading(false);
@@ -119,7 +117,7 @@ const CheckoutForm = ({ onClose }) => {
           to="/"
           onClick={(e) => {
             e.preventDefault();
-            handleContinueShopping();
+            scrollToSection("#products");
           }}
           className="flex items-center justify-center gap-1 text-primary-content/80 hover:text-primary underline text-sm font-medium"
         >
