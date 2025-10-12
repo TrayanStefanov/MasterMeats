@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaShoppingBasket, FaUser } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -8,14 +8,15 @@ import MobileMenu from "./MobileMenu.jsx";
 
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
+import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const Navbar = ({ onLoginClick, onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("#hero");
   const { t } = useTranslation();
 
   const totalItems = useCartStore((state) => state.cart.length);
   const { user, logout } = useUserStore();
+
   const navLinks = [
     { href: "#hero", label: t("navbar.home") },
     { href: "#products", label: t("navbar.products") },
@@ -23,31 +24,20 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
     { href: "#contacts", label: t("navbar.contacts") },
   ];
 
-  // Scroll tracker
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPos = window.scrollY + window.innerHeight / 3;
-      navLinks.forEach((link) => {
-        const ele = document.querySelector(link.href);
-        if (ele) {
-          const top = ele.offsetTop;
-          const bottom = top + ele.offsetHeight;
-          if (scrollPos >= top && scrollPos < bottom) {
-            setActiveSection(link.href);
-          }
-        }
-      });
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const { activeSection, scrollToSection } = useSmoothScrollNav(
+    navLinks,
+    () => setIsOpen(false)
+  );
 
   const hoverVariants = {
     hover: { scale: 1.1, y: -2, color: "#FBBF24" },
   };
 
   return (
-    <nav className="navbar h-24 bg-primary text-primary-content shadow-md sticky top-0 z-50 backdrop-blur-lg opacity-90">
+    <nav
+      role="navigation"
+      className="navbar h-24 bg-primary text-primary-content shadow-md sticky top-0 z-50 backdrop-blur-lg opacity-90"
+    >
       <div className="w-full lg:w-4/5 mx-auto flex items-center justify-between font-emphasis-heading">
         <div className="w-28 h-14 lg:w-40 lg:h-28 bg-contain bg-no-repeat bg-center">
           <img
@@ -68,6 +58,10 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
             >
               <a
                 href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(link.href);
+                }}
                 className={`transition-colors ${
                   activeSection === link.href ? "text-accent" : ""
                 }`}
@@ -133,7 +127,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
             onClick={() => setIsOpen(!isOpen)}
             aria-label={isOpen ? "Close Menu" : "Open Menu"}
           >
-            <span className="material-icons">{isOpen ? "Close" : "Menu"}</span>
+            <span className="material-icons">{isOpen ? "close" : "menu"}</span>
           </button>
         </div>
       </div>
