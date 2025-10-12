@@ -1,9 +1,9 @@
 import { FaShoppingBasket } from "react-icons/fa";
-
-import { useScrollToProducts } from "../hooks/useScrollToProducts";
+import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const CartModalEmpty = ({ onClose }) => {
-  const handleStartShopping = useScrollToProducts(onClose);
+  const { scrollToSection } = useSmoothScrollNav([{ href: "#products" }], onClose);
+  const handleStartShopping = () => scrollToSection("#products");
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4 py-16">
