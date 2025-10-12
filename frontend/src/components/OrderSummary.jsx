@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { loadStripe } from "@stripe/stripe-js";
-import {Elements, CardElement, useStripe, useElements} from "@stripe/react-stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import axios from "../lib/axios";
 import { useCartStore } from "../stores/useCartStore";
 import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
@@ -34,28 +34,34 @@ const CheckoutForm = ({ onClose }) => {
     try {
       const { data } = await axios.post("/payments/create-payment-intent", {
         products: cart,
-        couponCode: coupon ? coupon.code : null,
-      });
+        couponCode: coupon?.code || null,
+      }, { withCredentials: true });
 
       const clientSecret = data.clientSecret;
 
+      // 2. Confirm card payment
       const cardElement = elements.getElement(CardElement);
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: { card: cardElement },
       });
 
       if (result.error) {
-        console.error(result.error.message);
+        console.error(result.error);
         setError(result.error.message);
-
-        if (
-          result.error.type === "card_error" ||
-          result.error.type === "validation_error"
-        ) {
+        if (result.error.type === "card_error" || result.error.type === "validation_error") {
           window.location.href = "/purchase-cancel";
         }
-      } else if (result.paymentIntent.status === "succeeded") {
-        clearCart();
+        return;
+      }
+
+      if (result.paymentIntent.status === "succeeded") {
+        await axios.post(
+          "/payments/confirm-payment",
+          { paymentIntentId: result.paymentIntent.id },
+          { withCredentials: true }
+        );
+
+        clearCart(); 
         window.location.href = "/purchase-success";
       }
     } catch (err) {
