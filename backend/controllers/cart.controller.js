@@ -62,24 +62,24 @@ export const addToCart = async (req, res) => {
 
 // Remove product(s) from cart
 export const removeAllFromCart = async (req, res) => {
-	try {
-		const { productId } = req.body;
-		const user = req.user;
+  try {
+    const { productId } = req.body || {};
+    const user = req.user;
 
-		if (productId) {
-			user.cartItems = user.cartItems.filter(
-				(item) => item.product.toString() !== productId
-			);
-		} else {
-			user.cartItems = [];
-		}
+    if (productId) {
+      user.cartItems = user.cartItems.filter(
+        (item) => item.product.toString() !== productId
+      );
+    } else {
+      user.cartItems = [];
+    }
 
-		await user.save();
-		res.status(200).json(user.cartItems);
-	} catch (error) {
-		console.log("Error in removeAllFromCart controller:", error.message);
-		res.status(500).json({ message: "Server error", error: error.message });
-	}
+    await user.save();
+    res.status(200).json(user.cartItems);
+  } catch (error) {
+    console.log("Error in removeAllFromCart controller:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 };
 
 // Update quantity of a cart item
