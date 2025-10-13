@@ -1,8 +1,5 @@
 import { React, useState } from "react";
-import { Routes, Route } from "react-router-dom";
 
-import PurchaseSuccessPage from "./pages/PurchaseSuccessPage";
-import PurchaseCancelPage from "./pages/PurchaseCancelPage";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -37,26 +34,15 @@ function App() {
       <div className="relative min-h-screen overflow-x-hidden">
         <div className="fixed inset-0 bg-gradient-to-b from-secondary/80 via-secondary/30  to-secondary/80" />
         <div className="relative z-10">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <>
-                  <HeroSection />
-                  <CoreValuesSection />
-                  <ProductsSection />
-                  <AboutSection />
-                  <ReviewsSection />
-                  <ContactsFAQSection />
-                </>
-              }
-            />
-            <Route path="/purchase-success" element={<PurchaseSuccessPage />} />
-            <Route path="/purchase-cancel" element={<PurchaseCancelPage />} />
-          </Routes>
-          <AuthModal isOpen={authModalOpen} onClose={closeAuthModal} />
-          <CartModal isOpen={cartModalOpen} onClose={closeCartModal} />
+          <HeroSection />
+          <CoreValuesSection />
+          <ProductsSection />
+          <AboutSection />
+          <ReviewsSection />
+          <ContactsFAQSection />
         </div>
+        <AuthModal isOpen={authModalOpen} onClose={closeAuthModal} />
+        <CartModal isOpen={cartModalOpen} onClose={closeCartModal} />
       </div>
       <Footer />
     </div>
