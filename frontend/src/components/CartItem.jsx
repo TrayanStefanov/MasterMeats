@@ -12,13 +12,13 @@ const CartItem = ({ item }) => {
     const deltaGrams = Math.round(deltaKg * 1000);
     const newQuantityGrams = (item.quantityInGrams ?? 0) + deltaGrams;
     if (newQuantityGrams < 500) return; // Minimum 500g
-    updateQuantity(item._id, newQuantityGrams);
+    updateQuantity(item._id, newQuantityGrams); 
   };
   // Calculate total price in euros
   const totalPrice = ((item.pricePerKg ?? 0) * quantityKg).toFixed(2);
 
   return (
-    <div className="bg-primary/90 border border-accent/20 rounded-2xl p-5 md:p-6 text-primary-content shadow-lg shadow-accent/10 transition-all hover:shadow-accent/20">
+    <div className="bg-primary/90 border-4 border-accent text-primary-content rounded-2xl p-5 md:p-6 shadow-lg shadow-accent/10 transition-all hover:shadow-accent/20">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between md:gap-6">
         <div className="shrink-0 md:order-1">
           <img
@@ -29,7 +29,7 @@ const CartItem = ({ item }) => {
         </div>
 
         <div className="flex-1 space-y-2 mt-4 md:mt-0 md:order-2 md:max-w-md">
-          <p className="text-lg font-semibold text-accent hover:text-accent/80 transition">
+          <p className="text-2xl font-semibold text-accent hover:text-accent/80 transition">
             {item.title ?? "Unnamed Product"}
           </p>
           <p className="text-sm text-primary-content/70 line-clamp-2">
@@ -38,14 +38,14 @@ const CartItem = ({ item }) => {
 
           <button
             onClick={() => removeFromCart(item._id)}
-            className="inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-accent/80 hover:underline transition"
+            className="inline-flex items-center gap-1 text-lg font-medium text-accent hover:text-accent/80 hover:underline transition"
           >
-            <FaTrash size={14} />
+            <FaTrash className="w-4 h-4" size={14} />
             <span>Remove</span>
           </button>
         </div>
 
-        <div className="flex items-center justify-between mt-4 md:mt-0 md:order-3 md:justify-end gap-4">
+        <div className="flex flex-col items-center justify-between mt-4 md:mt-0 md:order-3 md:justify-end gap-4">
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold">€{item.pricePerKg}</span>
             <button
