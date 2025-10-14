@@ -59,13 +59,13 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   };
 
   return (
-    <div className="flex flex-col justify-between bg-primary/90 text-primary-content rounded-xl p-6 lg:h-full">
+    <div className="flex flex-col justify-between bg-primary/90 border-4 border-accent rounded-2xl  p-6 lg:h-full text-secondary">
       <div className="space-y-4">
-        <h3 className="text-xl font-bold text-white">Order Summary</h3>
+        <h3 className="text-xl font-bold">Order Summary</h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-300">Original price</span>
-            <span className="text-white">${subtotal.toFixed(2)}</span>
+            <span>Original price</span>
+            <span>${subtotal.toFixed(2)}</span>
           </div>
 
           {savings > 0 && (
@@ -92,7 +92,7 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
           <CardElement
             options={{
               style: {
-                base: { color: "#fff", fontSize: "16px", "::placeholder": { color: "#aaa" } },
+                base: { color: "#fff", fontSize: "16px", "::placeholder": { color: "#D4AF37" } },
                 invalid: { color: "#f87171" },
               },
             }}
@@ -105,7 +105,7 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
         <button
           onClick={handlePayment}
           disabled={!stripe || loading}
-          className="w-full py-3 bg-accent/80 hover:bg-accent rounded-lg text-primary font-semibold transition-shadow shadow-md shadow-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3 bg-accent/80 hover:bg-accent rounded-lg text-accent-content font-semibold transition-shadow shadow-md shadow-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading ? "Processing..." : "Proceed to Checkout"}
           {loading && <span className="animate-spin">⏳</span>}
