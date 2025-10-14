@@ -81,6 +81,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
 
         {/* Right Icons */}
         <div className="flex items-center gap-1 lg:gap-4 mx-4">
+          {user ? (
           <button
             onClick={onCartClick}
             className="relative btn btn-ghost btn-circle"
@@ -93,7 +94,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
               </span>
             )}
           </button>
-
+          ) : null}
           {user ? (
             <div className="flex flex-row items-end gap-3 me-4">
               <span className="hidden md:inline font-medium">
