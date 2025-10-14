@@ -6,7 +6,7 @@ const PurchaseSuccessModal = ({ order, onClose }) => {
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-primary/90 rounded-2xl shadow-xl shadow-accent/20 p-6 max-w-md w-full text-primary-content space-y-6">
         <div className="flex flex-col items-center gap-2">
-          <IoCheckmarkCircle className="text-accent w-16 h-16" />
+          <IoCheckmarkCircle className="text-secondary w-16 h-16" />
           <h1 className="text-2xl font-bold text-accent text-center">
             Purchase Successful!
           </h1>
@@ -19,11 +19,11 @@ const PurchaseSuccessModal = ({ order, onClose }) => {
           <div className="bg-primary-content/10 rounded-xl p-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Order number</span>
-              <span className="text-accent font-semibold">#{order._id}</span>
+              <span className="text-secondary/50 font-semibold">#{order._id}</span>
             </div>
             <div className="flex justify-between">
               <span>Estimated delivery</span>
-              <span className="text-accent font-semibold">
+              <span className="text-secondary/50 font-semibold">
                 3–5 business days
               </span>
             </div>
