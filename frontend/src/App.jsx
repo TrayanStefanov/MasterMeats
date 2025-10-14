@@ -1,6 +1,5 @@
 import { React, useState } from "react";
 
-
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HeroSection from "./sections/HeroSection";
@@ -12,6 +11,7 @@ import CoreValuesSection from "./sections/CoreValuesSection";
 
 import AuthModal from "./components/AuthModal";
 import CartModal from "./components/CartModal";
+import BackToTopButton from "./components/BackToTopButton";
 
 import { useUserStore } from "./stores/useUserStore";
 
@@ -23,7 +23,6 @@ function App() {
   const openAuthModal = () => {
     if (!user) setAuthModalOpen("login");
   };
-
   const closeAuthModal = () => setAuthModalOpen(false);
   const openCartModal = () => setCartModalOpen(true);
   const closeCartModal = () => setCartModalOpen(false);
@@ -32,7 +31,7 @@ function App() {
     <div>
       <Navbar onLoginClick={openAuthModal} onCartClick={openCartModal} />
       <div className="relative min-h-screen overflow-x-hidden">
-        <div className="fixed inset-0 bg-gradient-to-b from-secondary/80 via-secondary/30  to-secondary/80" />
+        <div className="fixed inset-0 bg-gradient-to-b from-secondary/80 via-secondary/30 to-secondary/80" />
         <div className="relative z-10">
           <HeroSection />
           <CoreValuesSection />
@@ -43,6 +42,7 @@ function App() {
         </div>
         <AuthModal isOpen={authModalOpen} onClose={closeAuthModal} />
         <CartModal isOpen={cartModalOpen} onClose={closeCartModal} />
+        <BackToTopButton />
       </div>
       <Footer />
     </div>
