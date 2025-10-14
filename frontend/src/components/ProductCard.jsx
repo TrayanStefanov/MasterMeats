@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { FaMinus, FaPlus } from "react-icons/fa";
 
 import { useCartStore } from "../stores/useCartStore";
+import StackedImages from "./StackedImages";
 const ProductCard = ({ product, reverse = false }) => {
   // Quantity stored in grams internally
   const [quantityGrams, setQuantityGrams] = useState(500);
@@ -25,64 +26,79 @@ const ProductCard = ({ product, reverse = false }) => {
   };
 
   const increment = () => setQuantityGrams((prev) => prev + 100);
-  const decrement = () => setQuantityGrams((prev) => (prev > 500 ? prev - 100 : 500));
+  const decrement = () =>
+    setQuantityGrams((prev) => (prev > 500 ? prev - 100 : 500));
 
   return (
     <motion.div
-      className={`relative flex flex-col md:flex-row items-stretch rounded-3xl overflow-hidden transition-all duration-300 bg-accent ${reverse ? "md:flex-row-reverse" : ""}`}
+      className={`flex h-[50vh] relative overflow-hidden transition-all duration-300`}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8 }}
       whileHover={{ scale: 1.01 }}
     >
-      {/* Image section */}
-      <div className="flex-1 relative p-4">
-        <div className="w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg">
-          <img
-            src={product.image}
-            alt={product.title}
-            className="w-full h-full object-cover object-center"
+      {/* Image layer-2nd layer */}
+      <div
+        className={`absolute flex w-full h-full mx-auto ${
+          reverse ? "md:flex-row-reverse" : "md:flex-row"
+        }`}
+      >
+        {/* Image section */}
+        <div className="w-[40vw] h-full self-center flex relative">
+          <StackedImages
+            images={[product.image, product.image, product.image]}
           />
         </div>
-        {product.badge && (
-          <span className="absolute top-5 left-5 bg-accent text-primary-content px-4 py-1 text-xs font-bold uppercase rounded-full tracking-wider shadow-lg">
-            {product.badge}
-          </span>
-        )}
+        <div className="min-w-[45%] max-w-[45%]"></div>
       </div>
 
-      {/* Text section */}
-      <div className="flex-1 backdrop-blur-md text-white p-4 lg:p-8 flex flex-col justify-between relative z-10">
-        <h3 className="text-2xl lg:text-4xl font-serif font-bold mx-4 lg:mx-8 mb-4 indent-4">
-          {product.title}
-        </h3>
-        <p className="text-lg leading-relaxed mb-6 lg:mb-0 mx-4 lg:mx-8">
-          {product.description}
-        </p>
+      {/* innermost layer/ 3rd layer */}
+      <div
+        className={`w-[80%] h-[33vh] self-center mx-auto bg-accent/90 relative items-stretch rounded-3xl overflow-hidden flex ${
+          reverse ? "md:flex-row" : "md:flex-row-reverse"
+        }`}
+      >
+        {/* Text section */}
+        <div className="self-end max-w-[50%] h-full text-secondary p-4 lg:p-8 justify-between relative z-10 flex flex-col">
+          <div className="flex justify-between">
+            <h3 className="text-2xl lg:text-4xl font-serif font-bold mx-4 lg:mx-8 mb-4 indent-4">
+              {product.title}
+            </h3>
+            {product.badge && (
+              <span className=" bg-accent text-primary-content content-center h-7 px-4 py-1 text-xs font-bold uppercase rounded-full tracking-wider shadow-lg whitespace-nowrap">
+                {product.badge}
+              </span>
+            )}
+          </div>
+          <p className="text-lg leading-relaxed mb-6 lg:mb-0 mx-4 lg:mx-8">
+            {product.description}
+          </p>
 
-        <div className="flex items-center justify-between lg:justify-end gap-4 mx-4 lg:mx-8">
-          <span className="text-2xl font-bold">€{product.pricePerKg}</span>
+          <div className="flex items-center justify-between lg:justify-end gap-4 mx-4 lg:mx-8">
+            <span className="text-3xl font-bold">€{product.pricePerKg}</span>
 
-          <div className="flex items-center gap-2 border border-white/30 rounded-md overflow-hidden">
-            <button onClick={decrement} className="px-3 py-1">
-              <FaMinus className="text-white w-3 h-3" />
-            </button>
-            <span className="px-3 py-1">
-              {(quantityGrams / 1000).toFixed(1)} kg
-            </span>
-            <button onClick={increment} className="px-3">
-              <FaPlus className="text-white w-3 h-3" />
+            <div className="flex items-center gap-2 border border-white/30 rounded-md overflow-hidden">
+              <button onClick={decrement} className="px-3 py-1">
+                <FaMinus className="text-secondary w-5 h-5" />
+              </button>
+              <span className="px-3 py-1 text-xl font-bold">
+                {(quantityGrams / 1000).toFixed(1)} kg
+              </span>
+              <button onClick={increment} className="px-3">
+                <FaPlus className="text-secondary w-5 h-5" />
+              </button>
+            </div>
+
+            <button
+              onClick={handleBuy}
+              className="border-4 border-secondary px-6 py-2 rounded-xl font-semibold hover:scale-110 transition-transform shadow-md"
+            >
+              {product.btnBuy}
             </button>
           </div>
-
-          <button
-            onClick={handleBuy}
-            className="border border-secondary px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform shadow-md"
-          >
-            {product.btnBuy}
-          </button>
         </div>
+        <div className="min-w-[45%]"></div>
       </div>
     </motion.div>
   );
