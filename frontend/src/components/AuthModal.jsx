@@ -19,7 +19,7 @@ const AuthModal = ({ isOpen, onClose }) => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    confirmPassword: "", 
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -72,12 +72,12 @@ const AuthModal = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-primary/90 rounded-2xl p-8 w-[90%] max-w-md text-primary-content shadow-lg relative"
+        className="bg-primary/90 border-4 border-accent text-primary-content rounded-2xl p-8 w-[90%] max-w-md shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-accent/70 hover:text-accent transition"
+          className="absolute top-4 right-4 text-secondary/70 hover:text-accent transition"
         >
           <IoClose size={24} />
         </button>
@@ -111,7 +111,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="John Doe"
-                  className="w-full pl-10 pr-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
+                  className="w-full pl-10 pr-3 py-2 rounded-md bg-secondary text-primary placeholder:text-primary/50
                     border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
                 />
               </div>
@@ -133,7 +133,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 placeholder="you@example.com"
-                className="w-full pl-10 pr-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
+                className="w-full pl-10 pr-3 py-2 rounded-md bg-secondary text-primary placeholder:text-primary/50
                   border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
               />
             </div>
@@ -157,7 +157,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                   setFormData({ ...formData, password: e.target.value })
                 }
                 placeholder="••••••••"
-                className="w-full pl-10 pr-10 py-2 rounded-md bg-primary-content/10 text-primary-content 
+                className="w-full pl-10 pr-10 py-2 rounded-md bg-secondary text-primary placeholder:text-primary/50
                   border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
               />
               <button
@@ -192,7 +192,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                     })
                   }
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-3 py-2 rounded-md bg-primary-content/10 text-primary-content 
+                  className="w-full pl-10 pr-3 py-2 rounded-md bg-secondary text-primary placeholder:text-primary/50
                     border border-accent/20 focus:ring-2 focus:ring-accent focus:outline-none transition-all"
                 />
               </div>
@@ -206,7 +206,7 @@ const AuthModal = ({ isOpen, onClose }) => {
           <button
             type="submit"
             className="w-full flex justify-center items-center gap-2 py-2 rounded-md bg-accent 
-            text-primary font-semibold hover:bg-accent/80 focus:ring-2 focus:ring-accent/50 
+            text-secondary/70 font-semibold hover:bg-accent/80 focus:ring-2 focus:ring-accent/50 
             transition-all shadow-md shadow-accent/20 disabled:opacity-50"
             disabled={loading}
           >
