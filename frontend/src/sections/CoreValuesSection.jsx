@@ -25,7 +25,7 @@ const CoreValuesSection = () => {
   return (
     <section
       id="core-values"
-      className="relative min-h-[700px] flex flex-col justify-center items-center text-white overflow-hidden"
+      className="relative flex flex-col my-20 justify-center items-center text-white overflow-hidden"
     >
       <motion.div
         className="absolute inset-0"
@@ -33,12 +33,7 @@ const CoreValuesSection = () => {
         transition={{ duration: 0.4 }}
       />
 
-      <motion.div
-        className="relative z-20 flex flex-col items-center w-full"
-        initial={{ y: 0 }}
-        animate={{ y: selected !== null && isDesktop ? -180 : 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
+      <div className="relative z-20 flex flex-col items-center w-full">
         <div className="text-center px-4 mt-12 mb-12 lg:mt-0">
           <h2 className="text-4xl font-emphasis-heading font-bold mb-2 text-accent">
             {t("coreValues.title")}
@@ -67,7 +62,7 @@ const CoreValuesSection = () => {
             />
           ))}
         </motion.div>
-      </motion.div>
+      </div>
 
       {/* Expanded info for Desktop */}
       {isDesktop && (
@@ -75,16 +70,16 @@ const CoreValuesSection = () => {
           {selected !== null && (
             <motion.div
               key={selected}
-              className="absolute bottom-0 left-0 w-full px-6 md:px-12 z-30"
-              initial={{ opacity: 0, y: 150 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 150 }}
+              className="relative w-full px-6 md:px-12 z-30 mt-8"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <div
                 className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center 
-                     p-10 rounded-3xl border-t-0
-                     bg-white/20 backdrop-blur-lg overflow-hidden"
+               p-10 rounded-3xl border-t-0
+               bg-white/20 backdrop-blur-lg overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-white/10 to-transparent pointer-events-none rounded-3xl" />
 
