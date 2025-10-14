@@ -31,15 +31,14 @@ const CartModal = ({ isOpen, onClose }) => {
         onClick={onClose}
       >
         <div
-          className="relative w-[90%] bg-primary/90 border border-accent/20 
-            rounded-2xl shadow-lg shadow-accent/10 text-primary-content p-6 md:p-8 
+          className="relative w-[90%] max-w-6xl bg-primary/90 border-4 border-accent text-primary-content rounded-2xl shadow-lg shadow-accent/10 p-6 md:p-8 
             overflow-y-auto max-h-[85vh]"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={onClose}
             aria-label="Close Cart Modal"
-            className="absolute top-4 right-4 text-accent/70 hover:text-accent transition"
+            className="absolute top-4 right-4 text-secondary/70 hover:text-accent transition"
           >
             <IoClose size={26} />
           </button>
@@ -60,7 +59,7 @@ const CartModal = ({ isOpen, onClose }) => {
                   <CartItem key={item._id} item={item} />
                 ))}
               </div>
-              <div className="lg:w-[35%]">
+              <div className="lg:w-[45%]">
                 <OrderSummary
                   onPaymentSuccess={(orderData) => {
                     setOrder(orderData);
