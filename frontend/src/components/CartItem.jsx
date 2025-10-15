@@ -1,7 +1,11 @@
 import { FaMinus, FaPlus, FaTrash } from "react-icons/fa";
 import { useCartStore } from "../stores/useCartStore";
 
+import { useTranslation } from "react-i18next";
+
 const CartItem = ({ item }) => {
+  const { t } = useTranslation();
+
   const { removeFromCart, updateQuantity } = useCartStore();
 
   // Convert grams to kg for display
@@ -41,7 +45,7 @@ const CartItem = ({ item }) => {
             className="inline-flex items-center gap-1 text-lg font-medium text-accent hover:text-accent/80 hover:underline transition"
           >
             <FaTrash className="w-4 h-4" size={14} />
-            <span>Remove</span>
+            <span>{t("cart.removeItem")}</span>
           </button>
         </div>
 
@@ -56,7 +60,7 @@ const CartItem = ({ item }) => {
               <FaMinus className="text-accent w-3 h-3" />
             </button>
 
-            <p className="text-primary-content font-semibold">{quantityKg.toFixed(1)} kg</p>
+            <p className="text-primary-content font-semibold">{quantityKg.toFixed(1)} {t("cart.kg")}</p>
 
             <button
               onClick={() => handleQuantityChange(0.1)}
