@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { useTranslation } from "react-i18next";
+
 import axios from "../lib/axios";
 import { useCartStore } from "../stores/useCartStore";
 
@@ -9,6 +11,8 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   const { total, subtotal, coupon, isCouponApplied, cart, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const { t } = useTranslation();
 
   const savings = subtotal - total;
 
@@ -61,29 +65,29 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   return (
     <div className="flex flex-col justify-between bg-primary/90 border-4 border-accent rounded-2xl  p-6 lg:h-full text-secondary">
       <div className="space-y-4">
-        <h3 className="text-xl font-bold">Order Summary</h3>
+        <h3 className="text-xl font-bold">{t("cart.checkout.title")}</h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span>Original price</span>
+            <span>{t("cart.checkout.subtotal")}</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
 
           {savings > 0 && (
-            <div className="flex justify-between text-green-400">
-              <span>Savings</span>
+            <div className="flex justify-between text-accent-content">
+              <span>{t("cart.checkout.discount")}</span>
               <span>- ${savings.toFixed(2)}</span>
             </div>
           )}
 
           {coupon && isCouponApplied && (
             <div className="flex justify-between">
-              <span>Coupon ({coupon.code})</span>
+              <span>{t("cart.checkout.coupon")} ({coupon.code})</span>
               <span>- ${((subtotal * coupon.discountPercentage) / 100).toFixed(2)}</span>
             </div>
           )}
 
           <div className="flex justify-between font-bold border-t border-gray-700 pt-2">
-            <span>Total</span>
+            <span>{t("cart.checkout.total")}</span>
             <span>${total.toFixed(2)}</span>
           </div>
         </div>
@@ -107,7 +111,7 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
           disabled={!stripe || loading}
           className="w-full py-3 bg-accent/80 hover:bg-accent rounded-lg text-accent-content font-semibold transition-shadow shadow-md shadow-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {loading ? "Processing..." : "Proceed to Checkout"}
+          {loading ? t("cart.checkout.loading") : t("cart.checkout.btnCheckout")}
           {loading && <span className="animate-spin">⏳</span>}
         </button>
       </div>
