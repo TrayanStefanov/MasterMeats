@@ -2,6 +2,8 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { IoClose } from "react-icons/io5";
 import { useCartStore } from "../stores/useCartStore";
+import { useTranslation } from "react-i18next";
+
 import CartItem from "../components/CartItem";
 import CartModalEmpty from "../components/CartModalEmpty";
 import OrderSummary from "../components/OrderSummary";
@@ -13,6 +15,8 @@ const CartModal = ({ isOpen, onClose }) => {
   const [order, setOrder] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
+
+  const { t } = useTranslation();
 
   const handleSuccessClose = () => {
     setShowSuccess(false);
@@ -44,10 +48,10 @@ const CartModal = ({ isOpen, onClose }) => {
           </button>
 
           <h2 className="text-3xl font-bold text-accent mb-2 text-center">
-            Your Shopping Cart
+            {t("cart.title")}
           </h2>
           <p className="text-center text-primary-content/80 mb-8 text-sm">
-            Review your items and complete your purchase
+            {t("cart.subtitle")}
           </p>
 
           {cart.length === 0 ? (
