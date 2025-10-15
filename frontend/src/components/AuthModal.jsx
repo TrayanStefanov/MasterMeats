@@ -10,10 +10,12 @@ import {
   IoClose,
 } from "react-icons/io5";
 import { LuLoader } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
 
 import { useUserStore } from "../stores/useUserStore";
 
 const AuthModal = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState("login");
   const [formData, setFormData] = useState({
     name: "",
@@ -83,12 +85,10 @@ const AuthModal = ({ isOpen, onClose }) => {
         </button>
 
         <h2 className="text-4xl font-bold text-accent text-center mb-2">
-          {mode === "login" ? "Welcome Back" : "Create an Account"}
+          {mode === "login" ? t("auth.loginMode.title") : t("auth.signupMode.title")}
         </h2>
         <p className="text-center text-primary-content/80 mb-8 text-sm">
-          {mode === "login"
-            ? "Sign in to your account"
-            : "Join us today — it’s quick and easy"}
+          {mode === "login" ? t("auth.loginMode.subtitle") : t("auth.signupMode.subtitle")}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -98,7 +98,7 @@ const AuthModal = ({ isOpen, onClose }) => {
               htmlFor="name" 
               className="block text-sm font-medium mb-1"
               >
-                Full Name
+                {t("auth.form.name")}
               </label>
               <div className="relative">
                 <IoPersonOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
@@ -120,7 +120,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email Address
+              {t("auth.form.email")}
             </label>
             <div className="relative">
               <IoMailOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
@@ -144,7 +144,7 @@ const AuthModal = ({ isOpen, onClose }) => {
             htmlFor="password" 
             className="block text-sm font-medium mb-1"
             >
-              Password
+              {t("auth.form.password")}
             </label>
             <div className="relative">
               <IoLockClosedOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
@@ -176,7 +176,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium mb-1"
               >
-                Confirm Password
+                {t("auth.form.confirmPassword")}
               </label>
               <div className="relative">
                 <IoLockClosedOutline className="absolute left-3 top-2.5 w-5 h-5 text-accent/70" />
@@ -213,7 +213,7 @@ const AuthModal = ({ isOpen, onClose }) => {
             {loading ? (
               <>
                 <LuLoader className="w-5 h-5 animate-spin" />
-                {mode === "login" ? "Logging in..." : "Creating Account..."}
+                {mode === "login" ? t("auth.loginMode.loading") : t("auth.signupMode.loading")}
               </>
             ) : (
               <>
@@ -222,7 +222,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                 ) : (
                   <IoPersonOutline className="w-5 h-5" />
                 )}
-                {mode === "login" ? "Login" : "Sign Up"}
+                {mode === "login" ? t("auth.loginMode.btn") : t("auth.signupMode.btn")}
               </>
             )}
           </button>
@@ -230,15 +230,13 @@ const AuthModal = ({ isOpen, onClose }) => {
 
         <div className="mt-8 text-center text-sm">
           <p className="text-primary-content/80">
-            {mode === "login"
-              ? "Don’t have an account? "
-              : "Already have an account? "}
+            {mode === "login" ? t("auth.loginMode.belowtext") : t("auth.signupMode.belowtext")}
             <button
               type="button"
               onClick={switchMode}
               className="text-accent hover:text-accent/80 transition-colors font-medium"
             >
-              {mode === "login" ? "Sign up" : "Login"}
+              {mode === "login" ? t("auth.loginMode.btnCTA") : t("auth.signupMode.btnCTA")}
             </button>
           </p>
         </div>
