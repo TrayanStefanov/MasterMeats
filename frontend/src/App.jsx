@@ -1,4 +1,5 @@
 import { React, useState } from "react";
+import { Toaster } from "react-hot-toast";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -29,6 +30,7 @@ function App() {
 
   return (
     <div>
+      <Toaster position="top-right"/>
       <Navbar onLoginClick={openAuthModal} onCartClick={openCartModal} />
       <div className="relative min-h-screen overflow-x-hidden">
         <div className="fixed inset-0 bg-gradient-to-b from-secondary/80 via-secondary/30 to-secondary/80" />
