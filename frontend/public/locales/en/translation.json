@@ -4,7 +4,9 @@
         "home": "Home",
         "products": "Products",
         "about": "About us",
-        "contacts": "Contacts"
+        "contacts": "Contacts",
+        "login": "Login",
+        "logout": "Logout"
     },
     "footer": {
         "phone": {
@@ -30,6 +32,71 @@
         "en": {
             "label": "English",
             "code": "en"
+        }
+    },
+    "auth": {
+        "loginMode": {
+            "title": "Welcome",
+            "subtitle": "Log in to your account!",
+            "btn": "Login",
+            "loading": "Logging in...",
+            "belowtext": "Don’t have an account? ",
+            "btnCTA": "Sign up now!"
+        },
+        "signupMode": {
+            "title": "Create an Account",
+            "subtitle": "Join us – quick and easy!",
+            "btn": "Sign Up",
+            "loading": "Signing up...",
+            "belowtext": "Already have an account? ",
+            "btnCTA": "Log in here!"
+        },
+        "form": {
+            "name": "Full Name",
+            "email": "Email",
+            "password": "Password",
+            "confirmPassword": "Confirm Password"
+        }
+    },
+    "cart": {
+        "title": "Your Cart",
+        "subtitle": "Review your cart and complete your order.",
+        "empty":{
+            "title": "Your cart is empty.",
+            "text": "Looks like you haven't added anything yet.",
+            "btnCTA": "Start Shopping"
+        },
+        "grams" : "g",
+        "kg": "kg",
+        "of": "of",
+        "removeItem": "Remove",
+        "removeAll": "Remove All",
+        "checkout": {
+            "title": "Order Summary",
+            "subtotal": "Original Price",
+            "discount": "Discount",
+            "coupon": "Coupon",
+            "total": "Total",
+            "btnCheckout": "Proceed to Checkout",
+            "loading": "Processing..."
+        },
+        "paymentSuccess": {
+            "title": "Payment Successful",
+            "subtitle": "Thank you for your order. It will be processed as soon as possible!",
+            "orderDetails": {
+                "title": "Order Details",
+                "orderId": "Order Number",
+                "deliveryDate": "Estimated Delivery Date",
+                "deliveryText": "7-10 business days",
+                "items": "Items:",
+                "total": "Total"
+            },
+            "btnClose": "Back"
+        },
+        "paymentCancel": {
+            "title": "Payment Failed",
+            "subtitle": "An error occurred during payment. Please try again.",
+            "btn": "Close"
         }
     },
     "home": {
@@ -68,30 +135,32 @@
         }
     },
     "products": {
-        "title": "Our Selection, Made Especially for You!",
+        "title": "Our Selection, Crafted Especially for You!",
+        "btnBuy": "Add to Cart",
+        "kg": "kg",
         "elena_fillet_mix": {
             "title": "Elena Fillet Mix",
-            "description": "Fresh Bulgarian meat seasoned with red and black pepper, savory, and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
-            "badge": "New",
-            "btnBuy": "Buy"
+            "description": "An aroma and taste that unfolds with every bite – a flavor for true connoisseurs. A pinch of black pepper to tease the senses. Tender fillet that melts in your mouth. Dried for at least 15 days.",
+            "ingredients": "Pork loin, sweet red pepper, black pepper, savory, and fenugreek",
+            "badge": "New"
         },
         "elena_fillet_clasic": {
-            "title": "Elena Fillet Classic",
-            "description": "Fresh Bulgarian meat seasoned with savory and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
-            "badge": "Most Popular",
-            "btnBuy": "Buy"
+            "title": "Elena Fillet",
+            "description": "A classic to the table. Fresh Bulgarian meat – pure loin, delicately seasoned only with savory, fenugreek, and time. A taste up to standard. Dried for at least 15 days.",
+            "ingredients": "Pork loin, savory, and fenugreek",
+            "badge": "Most Popular"
         },
         "pastarma": {
-            "title": "Pastarma",
-            "description": "Fresh Bulgarian meat seasoned with red pepper (optionally smoked). Dried for a minimum of 15 days for maximum tenderness.",
-            "badge": "",
-            "btnBuy": "Buy"
+            "title": "Pastarma (Cured Pork)",
+            "description": "True Bulgarian pride – aromatic pastarma with a rich red pepper flavor, cured with craftsmanship and respect for tradition. A pleasure in every bite. Dried for at least 15 days.",
+            "ingredients": "Pork loin and sweet red pepper",
+            "badge": ""
         },
         "pastarma_spicy": {
-            "title": "Spicy Pastarma",
-            "description": "Fresh Bulgarian meat seasoned with red pepper, hot chili, savory, and fenugreek. Dried for a minimum of 15 days for maximum tenderness.",
-            "badge": "Spicy",
-            "btnBuy": "Buy"
+            "title": "Pastarma Fire",
+            "description": "For those who aren’t afraid of the heat! Spicy, aromatic, and irresistibly delicious – a flavor that awakens the senses. Every bite – a test of will. Dried for at least 15 days.",
+            "ingredients": "Pork loin with sweet red pepper and several kinds of hot red pepper",
+            "badge": "Spicy"
         }
     },
     "about": {
