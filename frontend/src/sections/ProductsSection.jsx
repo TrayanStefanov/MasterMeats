@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+
 import ProductCard from "../components/ProductCard.jsx";
 import axios from "../lib/axios.js";
 
@@ -21,8 +23,8 @@ const ProductsSection = () => {
             ...p,
             title: i18nData.title || p.name, // fallback if missing
             description: i18nData.description || p.description,
+            ingredients: i18nData.ingredients || "",
             badge: i18nData.badge || "",
-            btnBuy: i18nData.btnBuy || "Buy",
           };
         });
 
@@ -44,7 +46,15 @@ const ProductsSection = () => {
         <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full"></div>
       </div>
 
-      <div className="container mx-auto flex flex-col gap-6">
+      <motion.div
+        className="container mx-auto flex flex-col gap-6"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.15 } },
+        }}
+      >
         {products.map((product, idx) => (
           <ProductCard
             key={product._id}
@@ -52,7 +62,7 @@ const ProductsSection = () => {
             reverse={idx % 2 === 1}
           />
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 };
