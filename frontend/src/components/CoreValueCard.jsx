@@ -37,7 +37,7 @@ const CoreValueCard = ({
                 <p className="text-accent">{value.description}</p>
               </div>
               {value.image && (
-                <div className="w-full flex justify-end">
+                <div className="w-full flex justify-end h-48">
                   <img
                     src={value.image}
                     alt={value.title}
