@@ -20,7 +20,9 @@ const CoreValueCard = ({
     >
       <div className="flex flex-col items-center gap-3 text-accent">
         {value.Icon && <value.Icon className="text-5xl" />}
-        <h3 className="text-2xl font-serif font-bold">{value.title}</h3>
+        <h3 className="text-xl lg:text-2xl 2xl:text-3xl font-serif font-bold">
+          {value.title}
+        </h3>
       </div>
 
       {!isDesktop && (
