@@ -11,38 +11,50 @@ const PurchaseSuccessModal = ({ order, onClose }) => {
       <div className="bg-primary/90 rounded-2xl shadow-xl shadow-accent/20 p-6 max-w-md w-full text-primary-content space-y-6">
         <div className="flex flex-col items-center gap-2">
           <IoCheckmarkCircle className="text-secondary w-16 h-16" />
-          <h1 className="text-2xl font-bold text-accent text-center">
+          <h1 className="text-xl lg:text-2xl 2xl:text-3xl font-bold text-accent text-center">
             {t("cart.paymentSuccess.title")}
           </h1>
-          <p className="text-primary-content/80 text-center">
+          <p className="text-base lg:text-lg 2xl:text-xl text-primary-content/80 text-center">
             {t("cart.paymentSuccess.subtitle")}
           </p>
         </div>
 
         {order && order.products && order.products.length > 0 && (
           <div className="bg-primary-content/10 rounded-xl p-4 space-y-2 text-sm">
-            <h2 className="text-lg font-semibold">{t("cart.paymentSuccess.orderDetails.title")}</h2>
-            <div className="flex justify-between">
-              <span>{t("cart.paymentSuccess.orderDetails.orderId")}</span>
-              <span className="text-secondary/50 font-semibold">#{order._id}</span>
+            <h2 className="text-sm lg:text-base 2xl:text-lg font-semibold text-center">
+              {t("cart.paymentSuccess.orderDetails.title")}
+            </h2>
+            <div className="flex justify-between items-center">
+              <span className="text-sm lg:text-base 2xl:text-lg">
+                {t("cart.paymentSuccess.orderDetails.orderId")}
+              </span>
+              <span className="text-secondary/50 font-semibold">
+                #{order._id}
+              </span>
             </div>
-            <div className="flex justify-between">
-              <span>{t("cart.paymentSuccess.orderDetails.deliveryDate")}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-sm 2xl:text-base">
+                {t("cart.paymentSuccess.orderDetails.deliveryDate")}
+              </span>
               <span className="text-secondary/50 font-semibold">
                 {t("cart.paymentSuccess.orderDetails.deliveryText")}
               </span>
             </div>
             <div className="mt-2">
-              <span className="font-semibold">{t("cart.paymentSuccess.orderDetails.items")}</span>
+              <span className="font-semibold text-sm 2xl:text-base">
+                {t("cart.paymentSuccess.orderDetails.items")}
+              </span>
               <ul className="mt-1 list-disc list-inside">
                 {order.products.map((p) => (
                   <li key={p.product._id}>
-                    {p.quantity}{t("cart.kg")}  {t("cart.of")} {p.product.title} — €{p.price.toFixed(2)}
+                    {p.quantity}
+                    {t("cart.kg")} {t("cart.of")} {p.product.title} — €
+                    {p.price.toFixed(2)}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="flex justify-between font-bold border-t border-gray-700 pt-2 mt-2">
+            <div className="flex justify-between text-sm 2xl:text-base font-bold border-t border-gray-700 pt-2 mt-2">
               <span>{t("cart.paymentSuccess.orderDetails.total")}</span>
               <span>€{order.totalAmount.toFixed(2)}</span>
             </div>
