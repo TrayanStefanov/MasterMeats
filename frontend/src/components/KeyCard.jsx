@@ -8,7 +8,7 @@ const KeyCard = ({ title, text, delay = 0 }) => (
     transition={{ duration: 0.5, delay }}
     className="rounded-2xl shadow-md shadow-accent/30 p-6 flex flex-col justify-center text-left hover:shadow-accent/50 transition-transform duration-300 hover:scale-[1.02]"
   >
-    <h3 className="text-xl md:text-2xl font-semibold text-accent mb-2">
+    <h3 className="text-xl lg:text-2xl 2xl:text-3xl font-semibold text-accent mb-2">
       {title}
     </h3>
     <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
