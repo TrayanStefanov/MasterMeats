@@ -4,11 +4,11 @@ import { IoClose } from "react-icons/io5";
 import { useCartStore } from "../stores/useCartStore";
 import { useTranslation } from "react-i18next";
 
-import CartItem from "../components/CartItem";
-import CartModalEmpty from "../components/CartModalEmpty";
-import OrderSummary from "../components/OrderSummary";
-import PurchaseSuccessModal from "../components/PurchaseSuccessModal";
-import PurchaseCancelModal from "../components/PurchaseCancelModal";
+import CartItem from "./CartItem";
+import CartModalEmpty from "./CartModalEmpty";
+import OrderSummary from "./OrderSummary";
+import PurchaseSuccessModal from "./PurchaseSuccessModal";
+import PurchaseCancelModal from "./PurchaseCancelModal";
 
 const CartModal = ({ isOpen, onClose }) => {
   const cart = useCartStore((state) => state.cart);
@@ -20,7 +20,7 @@ const CartModal = ({ isOpen, onClose }) => {
 
   const handleSuccessClose = () => {
     setShowSuccess(false);
-    onClose(); 
+    onClose();
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -47,10 +47,10 @@ const CartModal = ({ isOpen, onClose }) => {
             <IoClose size={26} />
           </button>
 
-          <h2 className="text-3xl font-bold text-accent mb-2 text-center">
+          <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-bold text-accent mb-2 text-center">
             {t("cart.title")}
           </h2>
-          <p className="text-center text-primary-content/80 mb-8 text-sm">
+          <p className="text-center text-primary-content/80 mb-8 text-sm lg:text-base 2xl:text-lg">
             {t("cart.subtitle")}
           </p>
 
@@ -69,7 +69,7 @@ const CartModal = ({ isOpen, onClose }) => {
                     setOrder(orderData);
                     setShowSuccess(true);
                   }}
-                  onPaymentCancel={() => setShowCancel(true)} 
+                  onPaymentCancel={() => setShowCancel(true)}
                 />
               </div>
             </div>
