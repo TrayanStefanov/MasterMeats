@@ -65,28 +65,28 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   return (
     <div className="flex flex-col justify-between bg-primary/90 border-4 border-accent rounded-2xl  p-6 lg:h-full text-secondary">
       <div className="space-y-4">
-        <h3 className="text-xl font-bold">{t("cart.checkout.title")}</h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
+        <h3 className="text-lg lg:text-xl 2xl:text-2xl font-bold">{t("cart.checkout.title")}</h3>
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs lg:text-sm 2xl:text-base">
             <span>{t("cart.checkout.subtotal")}</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
 
           {savings > 0 && (
-            <div className="flex justify-between text-accent-content">
+            <div className="flex justify-between text-accent-content text-xs lg:text-sm 2xl:text-base">
               <span>{t("cart.checkout.discount")}</span>
               <span>- ${savings.toFixed(2)}</span>
             </div>
           )}
 
           {coupon && isCouponApplied && (
-            <div className="flex justify-between">
+            <div className="flex justify-between text-xs lg:text-sm 2xl:text-base">
               <span>{t("cart.checkout.coupon")} ({coupon.code})</span>
               <span>- ${((subtotal * coupon.discountPercentage) / 100).toFixed(2)}</span>
             </div>
           )}
 
-          <div className="flex justify-between font-bold border-t border-gray-700 pt-2">
+          <div className="flex justify-between text-sm lg:text-base 2xl:text-lg font-bold border-t border-gray-700 pt-2">
             <span>{t("cart.checkout.total")}</span>
             <span>${total.toFixed(2)}</span>
           </div>
@@ -101,7 +101,7 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
               },
             }}
           />
-          {error && <p className="text-red-400 mt-2 text-sm">{error}</p>}
+          {error && <p className="text-red-400 mt-2 text-base lg:text-lg 2xl:text-xl">{error}</p>}
         </div>
       </div>
 
@@ -109,7 +109,7 @@ const CheckoutForm = ({ onPaymentSuccess, onPaymentCancel }) => {
         <button
           onClick={handlePayment}
           disabled={!stripe || loading}
-          className="w-full py-3 bg-accent/80 hover:bg-accent rounded-lg text-accent-content font-semibold transition-shadow shadow-md shadow-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3 bg-accent/80 hover:bg-accent text-sm lg:text-base 2xl:text-lg rounded-lg text-accent-content font-semibold transition-shadow shadow-md shadow-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading ? t("cart.checkout.loading") : t("cart.checkout.btnCheckout")}
           {loading && <span className="animate-spin">⏳</span>}
