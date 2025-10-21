@@ -7,9 +7,12 @@ const AboutSection = () => {
   const keycards = t("about.keycards", { returnObjects: true });
 
   return (
-    <section id="about" className="bg-background text-primary py-4 md:py-8 lg:py-10">
+    <section
+      id="about"
+      className="bg-background text-primary py-4 md:py-8 lg:py-10"
+    >
       <div className="max-w-7xl mx-auto text-center mb-12 px-6">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-accent mb-4">
+        <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-accent mb-4">
           {t("about.title")}
         </h2>
         <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full mb-8"></div>
@@ -58,7 +61,7 @@ const AboutSection = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="bg-card p-8 rounded-2xl shadow-md shadow-accent flex flex-col justify-center w-full lg:w-4/5"
           >
-            <p className="text-lg md:text-xl leading-relaxed text-muted-foreground text-accent text-center italic font-bold">
+            <p className="text-xl lg:text-2xl 2xl:text-3xl leading-relaxed text-muted-foreground text-accent text-center italic font-bold">
               {t("about.footer")}
             </p>
           </motion.div>
