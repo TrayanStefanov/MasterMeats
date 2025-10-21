@@ -42,7 +42,7 @@ const LanguageSelector = () => {
       <div className="hidden md:block">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-1 py-1 rounded-full text-secondary font-bold cursor-pointer text-xl hover:text-accent"
+          className="flex items-center gap-1 py-1 rounded-full text-secondary font-bold cursor-pointer text-lg lg:text-xl 2xl:text-2xl hover:text-accent"
         >
           <span>{languages.find((l) => l.code === language)?.label}</span>
           <span className="ml-1">▾</span>
