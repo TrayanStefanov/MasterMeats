@@ -16,7 +16,7 @@ const CartItem = ({ item }) => {
     const deltaGrams = Math.round(deltaKg * 1000);
     const newQuantityGrams = (item.quantityInGrams ?? 0) + deltaGrams;
     if (newQuantityGrams < 500) return; // Minimum 500g
-    updateQuantity(item._id, newQuantityGrams); 
+    updateQuantity(item._id, newQuantityGrams);
   };
   // Calculate total price in euros
   const totalPrice = ((item.pricePerKg ?? 0) * quantityKg).toFixed(2);
@@ -33,16 +33,16 @@ const CartItem = ({ item }) => {
         </div>
 
         <div className="flex-1 space-y-2 mt-4 md:mt-0 md:order-2 md:max-w-md">
-          <p className="text-2xl font-semibold text-accent hover:text-accent/80 transition">
+          <p className="text-lg lg:text-xl 2xl:text-2xl font-semibold text-accent hover:text-accent/80 transition">
             {item.title ?? "Unnamed Product"}
           </p>
-          <p className="text-sm text-primary-content/70 line-clamp-2">
+          <p className="text-xs lg:text-sm 2xl:text-base text-primary-content/70 line-clamp-2">
             {item.description ?? "No description available."}
           </p>
 
           <button
             onClick={() => removeFromCart(item._id)}
-            className="inline-flex items-center gap-1 text-lg font-medium text-accent hover:text-accent/80 hover:underline transition"
+            className="inline-flex items-center gap-1 text-sm lg:text-base 2xl:text-lg font-medium text-accent hover:text-accent/80 hover:underline transition"
           >
             <FaTrash className="w-4 h-4" size={14} />
             <span>{t("cart.removeItem")}</span>
@@ -51,7 +51,9 @@ const CartItem = ({ item }) => {
 
         <div className="flex flex-col items-center justify-between mt-4 md:mt-0 md:order-3 md:justify-end gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold">€{item.pricePerKg}</span>
+            <span className="text-base lg:text-lg 2xl:text-xl font-bold">
+              €{item.pricePerKg}
+            </span>
             <button
               onClick={() => handleQuantityChange(-0.1)}
               className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-accent/30 bg-primary-content/10 hover:bg-primary-content/20 focus:outline-none focus:ring-2 focus:ring-accent/50"
@@ -60,7 +62,9 @@ const CartItem = ({ item }) => {
               <FaMinus className="text-accent w-3 h-3" />
             </button>
 
-            <p className="text-primary-content font-semibold">{quantityKg.toFixed(1)} {t("cart.kg")}</p>
+            <p className="text-primary-content text-base lg:text-lg 2xl:text-xl font-semibold">
+              {quantityKg.toFixed(1)} {t("cart.kg")}
+            </p>
 
             <button
               onClick={() => handleQuantityChange(0.1)}
@@ -71,7 +75,9 @@ const CartItem = ({ item }) => {
             </button>
           </div>
           <div className="text-right md:w-32">
-            <p className="text-lg font-bold text-accent">€{totalPrice}</p>
+            <p className="text-lg lg:text-xl 2xl:text-2xl font-bold text-accent">
+              €{totalPrice}
+            </p>
           </div>
         </div>
       </div>
