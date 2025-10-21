@@ -42,11 +42,10 @@ const HeroSection = () => {
       />
 
       {/* Content */}
-      <div className="relative z-10 text-center text-secondary flex flex-col items-center justify-between font-emphasis-heading min-h-[80vh] p-6 md:p-12 lg:p-20 gap-6">
-        
+      <div className="relative z-10 text-center text-secondary flex flex-col items-center justify-between font-emphasis-heading min-h-[80vh] p-8 md:p-12 lg:p-20 gap-8">
         {/* Title */}
         <div className="px-6 lg:px-0">
-          <h1 className="text-3xl md:text-5xl lg:text-6xl max-w-4xl flex flex-wrap justify-center leading-tight mt-8 sm:mt-16 lg:mt-0">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl max-w-4xl flex flex-wrap justify-center leading-tight mt-8 sm:mt-16 lg:mt-0">
             {titleWords.map((word, index) => (
               <motion.span
                 key={index}
@@ -65,7 +64,7 @@ const HeroSection = () => {
         {/* Subtitle */}
         <div className="justify-items-center mb-16 lg:mb-0">
           <motion.h2
-            className="text-xl sm:text-3xl lg:text-4xl max-w-4xl leading-snug px-6 lg:px-0 lg:mb-12"
+            className="text-2xl lg:text-3xl 2xl:text-4xl max-w-4xl leading-snug px-6 lg:px-0 lg:mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.5, duration: 0.8 }}
@@ -80,7 +79,7 @@ const HeroSection = () => {
               animate="visible"
               whileHover="hover"
               variants={buttonVariants}
-              className="btn btn-primary w-80 lg:btn-wide rounded-lg border-4 border-accent text-primary-content/70 text-lg lg:text-xl hover:border-accent-content/70 hover:text-primary-content"
+              className="btn btn-primary w-80 lg:btn-wide rounded-lg border-4 border-accent text-primary-content/70 text-lg lg:text-xl 2xl:text-2xl hover:border-accent-content/70 hover:text-primary-content"
               onClick={() => scrollToSection("#products")}
             >
               {t("home.btnProducts")}
@@ -90,7 +89,7 @@ const HeroSection = () => {
               animate="visible"
               whileHover="hover"
               variants={buttonVariants}
-              className="btn btn-primary w-80 lg:btn-wide rounded-lg border-4 border-accent text-primary-content/70 text-lg lg:text-xl hover:border-accent-content/70 hover:text-primary-content"
+              className="btn btn-primary w-80 lg:btn-wide rounded-lg border-4 border-accent text-primary-content/70 text-lg lg:text-xl 2xl:text-2xl hover:border-accent-content/70 hover:text-primary-content"
               onClick={() => scrollToSection("#about")}
             >
               {t("home.btnAbout")}
