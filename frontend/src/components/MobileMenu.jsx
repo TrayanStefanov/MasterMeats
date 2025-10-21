@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { IoClose } from "react-icons/io5";
 
-
 const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
   // Close menu on Escape key
   useEffect(() => {
@@ -36,7 +35,7 @@ const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
             animate={{ y: 0 }}
             exit={{ y: "-100%" }}
             transition={{ type: "spring", stiffness: 120, damping: 18 }}
-            className="fixed top-0 left-0 w-full h-screen bg-primary text-primary-content z-50 flex flex-col justify-center items-center gap-8 text-3xl font-bold"
+            className="fixed top-0 left-0 w-full h-screen bg-primary text-primary-content z-50 flex flex-col justify-center items-center gap-8 text-xl font-bold"
             role="dialog"
             aria-modal="true"
           >
@@ -66,9 +65,9 @@ const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0 },
                   }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 1.1 }}
                   className={`transition-colors ${
-                    activeSection === link.href ? "text-accent" : ""
+                    activeSection === link.href ? "text-accent text-3xl" : ""
                   }`}
                 >
                   {link.label}
