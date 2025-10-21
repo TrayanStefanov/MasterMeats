@@ -17,9 +17,9 @@ const MobileImageCarousel = ({ images, title }) => {
   };
 
   return (
-    <div className="md:hidden w-full flex justify-center items-center relative overflow-hidden py-4">
+    <div className="w-full flex justify-center items-center relative overflow-hidden py-4">
       {/* Image wrapper */}
-      <div className="relative w-5/6 h-48 overflow-hidden rounded-2xl">
+      <div className="relative w-5/6 sm:w-1/2 lg:w-5/6 h-48 overflow-hidden rounded-2xl">
         <AnimatePresence mode="wait" initial={false}>
           <motion.img
             key={current}
