@@ -24,9 +24,8 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
     { href: "#contacts", label: t("navbar.contacts") },
   ];
 
-  const { activeSection, scrollToSection } = useSmoothScrollNav(
-    navLinks,
-    () => setIsOpen(false)
+  const { activeSection, scrollToSection } = useSmoothScrollNav(navLinks, () =>
+    setIsOpen(false)
   );
 
   const hoverVariants = {
@@ -48,7 +47,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
         </div>
 
         {/* Desktop Nav Links */}
-        <ul className="hidden md:flex ml-auto gap-6 font-bold text-xl">
+        <ul className="hidden md:flex ml-auto gap-6 font-bold text-lg lg:text-xl 2xl:text-2xl">
           {navLinks.map((link) => (
             <motion.li
               key={link.href}
@@ -82,27 +81,25 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
         {/* Right Icons */}
         <div className="flex items-center gap-1 lg:gap-4 mx-4">
           {user ? (
-          <button
-            onClick={onCartClick}
-            className="relative btn btn-ghost btn-circle"
-            aria-label="Shopping Basket"
-          >
-            <FaShoppingBasket className="w-6 h-6" />
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 rounded-full bg-secondary text-primary text-xs w-5 h-5 flex items-center justify-center font-bold">
-                {totalItems}
-              </span>
-            )}
-          </button>
+            <button
+              onClick={onCartClick}
+              className="relative btn btn-ghost btn-circle"
+              aria-label="Shopping Basket"
+            >
+              <FaShoppingBasket className="w-6 h-6" />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 rounded-full bg-secondary text-primary text-xs w-5 h-5 flex items-center justify-center font-bold">
+                  {totalItems}
+                </span>
+              )}
+            </button>
           ) : null}
           {user ? (
-            <div className="flex flex-row items-end gap-3 me-4">
-              <span className="hidden md:inline font-medium">
-                {user.name}
-              </span>
+            <div className="flex flex-row items-end gap-2">
+              <span className="hidden md:inline font-medium">{user.name}</span>
               <button
                 onClick={logout}
-                className="text-accent hover:text-accent/80 font-bold text-xl"
+                className="text-accent hover:text-accent/80 font-bold text-lg lg:text-xl 2xl:text-2xl"
               >
                 {t("navbar.logout")}
               </button>
@@ -112,11 +109,9 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
               className="btn btn-ghost btn-circle mx-4"
               onClick={onLoginClick}
             >
-              <div className="flex flex-row me-4 items-center gap-1">
+              <div className="flex flex-row mx-4 items-center gap-1 font-bold text-lg lg:text-xl 2xl:text-2xl">
                 <FaUser className="w-5 h-5" />
-                <span className="hidden lg:inline font-bold text-xl">
-                  {t("navbar.login")}
-                </span>
+                <span className="hidden lg:inline">{t("navbar.login")}</span>
               </div>
             </button>
           )}
