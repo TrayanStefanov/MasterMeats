@@ -35,7 +35,7 @@ const CoreValuesSection = () => {
 
       <div className="relative z-20 flex flex-col items-center w-full">
         <div className="text-center px-4 mt-12 mb-12 lg:mt-0">
-          <h2 className="text-4xl font-emphasis-heading font-bold mb-2 text-accent">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-emphasis-heading font-bold mb-2 text-accent">
             {t("coreValues.title")}
           </h2>
         </div>
