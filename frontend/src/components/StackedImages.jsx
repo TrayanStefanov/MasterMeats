@@ -4,13 +4,12 @@ const StackedImages = ({ images, reverse }) => {
   return (
     <div className="relative w-full h-[40vh] flex justify-center items-center">
       {images.map((src, i) => {
-        const direction = reverse ? 1 : -1; // flip offsets if reversed
+        const direction = reverse ? 1 : -1;
+
         return (
-          <motion.img
+          <motion.div
             key={i}
-            src={src}
-            alt={`Product view ${i + 1}`}
-            className="absolute w-[55%] h-[35vh] object-cover rounded-3xl border-8 border-accent/90 shadow-md cursor-pointer"
+            className="absolute aspect-[4/3] w-[65%] max-w-[500px] overflow-hidden rounded-3xl border-8 border-accent/90 shadow-md cursor-pointer"
             style={{ zIndex: 10 - i }}
             initial={{
               x: i * 60 * direction,
@@ -26,7 +25,13 @@ const StackedImages = ({ images, reverse }) => {
               opacity: 1,
               transition: { type: "spring", stiffness: 250, damping: 20 },
             }}
-          />
+          >
+            <img
+              src={src}
+              alt={`Product view ${i + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
         );
       })}
     </div>
