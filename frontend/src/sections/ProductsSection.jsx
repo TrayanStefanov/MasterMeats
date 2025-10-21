@@ -40,7 +40,7 @@ const ProductsSection = () => {
   return (
     <section id="products" className="py-4">
       <div className="container mx-auto text-center mb-16">
-        <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-accent px-6 lg:px-0 my-2">
+        <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-accent px-6 lg:px-0 my-2">
           {title}
         </h2>
         <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full"></div>
