@@ -61,12 +61,12 @@
     "cart": {
         "title": "Your Cart",
         "subtitle": "Review your cart and complete your order.",
-        "empty":{
+        "empty": {
             "title": "Your cart is empty.",
             "text": "Looks like you haven't added anything yet.",
             "btnCTA": "Start Shopping"
         },
-        "grams" : "g",
+        "grams": "g",
         "kg": "kg",
         "of": "of",
         "removeItem": "Remove",
@@ -164,6 +164,33 @@
         }
     },
     "about": {
+        "title": "Why Choose Us",
+        "intro": "Because we offer MEZE made by hand — with craftsmanship, passion, and meat from Bulgarian pigs. An authentic aroma that fills the table, a rich taste that awakens the senses. Our meze is simply the best because it’s:",
+        "keycards": [
+            {
+                "title": "Made from Fresh Meat",
+                "text": "Fresh Bulgarian meat only from verified sources. Vacuum-sealed right after drying for maximum freshness."
+            },
+            {
+                "title": "No Additives",
+                "text": "No preservatives, antioxidants, colorants, stabilizers, sweeteners, or anything artificial. Only spices."
+            },
+            {
+                "title": "High in Protein",
+                "text": "At least 45g of protein per 100g of meze and only 4g of fat. 217 kcal per 100g — perfect for fueling your body after a workout."
+            },
+            {
+                "title": "Tender and Juicy",
+                "text": "Our meze is carefully dried to achieve a tender texture — not hard or chewy — so everyone can enjoy it."
+            },
+            {
+                "title": "A Flavor for Everyone",
+                "text": "We constantly experiment with new spices and flavors. Our goal is to offer a meze for every taste."
+            }
+        ],
+        "footer": "This is just the beginning — every bite is a taste of Bulgaria."
+    },
+    "about2": {
         "intro": {
             "title": "Why Us",
             "subtitle": "Meat lovers. We appreciate true flavor!",
