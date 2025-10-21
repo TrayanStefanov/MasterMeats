@@ -31,61 +31,62 @@ const Footer = () => {
             alt="Logo"
             className="w-full lg:max-w-[200px] h-full object-contain"
           />
-          <p className="text-lg lg:text-2xl">{t("footer.slogan")}</p>
+          <p className="text-xl lg:text-2xl 2xl:text-3xl">
+            {t("footer.slogan")}
+          </p>
         </motion.div>
 
         {/* Center: Quick Nav */}
         <div className="flex flex-row justify-around">
-
-        <motion.div
-          className="flex flex-col items-center justify-around lg:justify-center gap-1 md:gap-2 text-sm md:text-lg font-bold"
-          variants={fadeUp}
+          <motion.div
+            className="flex flex-col items-center justify-around lg:justify-center gap-1 md:gap-2 text-lg 2xl:text-xl font-bold"
+            variants={fadeUp}
           >
-          {["#hero", "#products", "#about", "#contacts"].map((href, i) => (
-            <motion.a
-            key={i}
-            href={href}
-            whileHover={{ x: 5, color: "#FBBF24" }}
-            transition={{ type: "spring", stiffness: 300 }}
-            className="hover:underline"
-            >
-              {i === 0
-                ? t("navbar.home")
-                : i === 1
-                ? t("navbar.products")
-                : i === 2
-                ? t("navbar.about")
-                : t("navbar.contacts")}
-            </motion.a>
-          ))}
-        </motion.div>
-        <motion.div
-          className="lg:hidden flex flex-col items-center justify-center gap-2 md:gap-3"
-          variants={fadeUp}
-        >
-          <div className="flex flex-col gap-3 md:gap-4 mt-1 md:mt-2">
-            {[t("footer.social-links.linkedin"), "#", "#"].map((link, i) => (
+            {["#hero", "#products", "#about", "#contacts"].map((href, i) => (
               <motion.a
                 key={i}
-                href={link}
-                target="_blank"
-                rel="noreferrer"
-                whileHover={{ scale: 1.2, color: "#FBBF24" }}
+                href={href}
+                whileHover={{ x: 5, color: "#FBBF24" }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="text-secondary"
+                className="hover:underline"
               >
-                {i === 0 ? (
-                  <FaLinkedinIn className="text-secondary" size={40} />
-                ) : i === 1 ? (
-                  <FaFacebookF className="text-secondary" size={40} />
-                ) : (
-                  <FaTwitter className="text-secondary" size={40} />
-                )}
+                {i === 0
+                  ? t("navbar.home")
+                  : i === 1
+                  ? t("navbar.products")
+                  : i === 2
+                  ? t("navbar.about")
+                  : t("navbar.contacts")}
               </motion.a>
             ))}
-          </div>
-        </motion.div>
-          </div>
+          </motion.div>
+          <motion.div
+            className="lg:hidden flex flex-col items-center justify-center gap-2 md:gap-3"
+            variants={fadeUp}
+          >
+            <div className="flex flex-col gap-3 md:gap-4 mt-1 md:mt-2">
+              {[t("footer.social-links.linkedin"), "#", "#"].map((link, i) => (
+                <motion.a
+                  key={i}
+                  href={link}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={{ scale: 1.2, color: "#FBBF24" }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className="text-secondary"
+                >
+                  {i === 0 ? (
+                    <FaLinkedinIn className="text-secondary" size={40} />
+                  ) : i === 1 ? (
+                    <FaFacebookF className="text-secondary" size={40} />
+                  ) : (
+                    <FaTwitter className="text-secondary" size={40} />
+                  )}
+                </motion.a>
+              ))}
+            </div>
+          </motion.div>
+        </div>
 
         {/* Right: Socials */}
         <motion.div
@@ -113,13 +114,15 @@ const Footer = () => {
               </motion.a>
             ))}
           </div>
-          <p className="text-sm md:text-lg">
+          <p className="flex flex-row text-lg 2xl:text-xl gap-2">
+            <FaPhoneAlt className="text-lg lg:text-xl 2xl:text-2xl" />
             {t("footer.phone.note")}{" "}
             <a href={`tel:${t("footer.phone.value")}`} className="underline">
               {t("footer.phone.value")}
             </a>
           </p>
-          <p className="text-sm md:text-lg">
+          <p className="flex flex-row text-lg 2xl:text-xl gap-2">
+            <FaEnvelope className="text-lg lg:text-xl 2xl:text-2xl" />
             {t("footer.email.note")}{" "}
             <a
               href={`mailto:${t("footer.email.value1")}@${t(
