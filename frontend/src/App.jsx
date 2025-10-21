@@ -10,8 +10,8 @@ import AboutSection from "./sections/AboutSection";
 import ContactsFAQSection from "./sections/ContactsFAQSection";
 import CoreValuesSection from "./sections/CoreValuesSection";
 
-import AuthModal from "./components/AuthModal";
-import CartModal from "./components/CartModal";
+import AuthModal from "./modals/AuthModal";
+import CartModal from "./modals/CartModal";
 import BackToTopButton from "./components/BackToTopButton";
 
 import { useUserStore } from "./stores/useUserStore";
