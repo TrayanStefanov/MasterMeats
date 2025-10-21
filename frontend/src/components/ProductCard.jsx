@@ -8,7 +8,6 @@ import { useCartStore } from "../stores/useCartStore";
 import StackedImages from "./StackedImages";
 import MobileImageCarousel from "./MobileImageCarousel";
 
-
 const ProductCard = ({ product, reverse = false }) => {
   const [quantityGrams, setQuantityGrams] = useState(500);
   const addToCart = useCartStore((state) => state.addToCart);
@@ -20,14 +19,17 @@ const ProductCard = ({ product, reverse = false }) => {
     }
     try {
       await addToCart(product, quantityGrams);
-      toast.success(`${product.title} added (${(quantityGrams / 1000).toFixed(1)}kg)`);
+      toast.success(
+        `${product.title} added (${(quantityGrams / 1000).toFixed(1)}kg)`
+      );
     } catch {
       toast.error("Failed to add product to cart");
     }
   };
 
   const increment = () => setQuantityGrams((prev) => prev + 100);
-  const decrement = () => setQuantityGrams((prev) => (prev > 500 ? prev - 100 : 500));
+  const decrement = () =>
+    setQuantityGrams((prev) => (prev > 500 ? prev - 100 : 500));
 
   return (
     <motion.div
@@ -40,11 +42,11 @@ const ProductCard = ({ product, reverse = false }) => {
     >
       {/* Image layer */}
       <div
-        className={`flex flex-col w-full lg:absolute lg:h-full lg:mx-auto ${
+        className={`flex flex-col w-full lg:absolute justify-center lg:h-full lg:mx-auto ${
           reverse ? "lg:flex-row-reverse" : "lg:flex-row"
         }`}
       >
-        <div className="hidden lg:flex w-[40vw] h-full self-center relative">
+        <div className="hidden lg:flex lg:w-[45vw] xl:w-[50vw] 2xl:w-[55vw] h-full self-center relative">
           <StackedImages
             images={[product.image, product.image, product.image]}
             reverse={reverse}
@@ -55,19 +57,20 @@ const ProductCard = ({ product, reverse = false }) => {
 
       {/* Card layer */}
       <div
-        className={`w-full lg:w-[70%] lg:h-[33vh] self-center mx-auto bg-accent/90 relative items-stretch rounded-3xl overflow-hidden flex flex-col ${
-          reverse ? "md:flex-row" : "md:flex-row-reverse"
+        className={`w-full lg:w-[70%] lg:h-[80%] 2xl:h-[70%] self-center mx-auto bg-accent/90 relative items-stretch rounded-3xl overflow-hidden flex flex-col ${
+          reverse ? "lg:flex-row" : "lg:flex-row-reverse"
         }`}
-      ><div className=" lg:hidden w-full">
+      >
+        <div className=" lg:hidden w-full">
           <MobileImageCarousel
-  images={[product.image, product.image, product.image]} //Same image
-  title={product.title}
-/>
+            images={[product.image, product.image, product.image]} //Same image
+            title={product.title}
+          />
         </div>
         {/* Text section */}
         <div className="self-end max-w-full lg:max-w-[60%] h-full text-secondary p-4 lg:p-8 justify-between relative z-10 flex flex-col">
           <div className="flex justify-between items-start">
-            <h3 className="text-2xl lg:text-4xl font-serif font-bold mx-4 lg:mx-8 mb-4 indent-4">
+            <h3 className="text-xl lg:text-2xl 2xl:text-3xl font-serif font-bold mx-4 lg:mx-8 mb-4 indent-4">
               {product.title}
             </h3>
             {product.badge && (
@@ -76,16 +79,18 @@ const ProductCard = ({ product, reverse = false }) => {
               </span>
             )}
           </div>
-          <p className="text-lg leading-relaxed mb-6 lg:mb-0 mx-4 lg:mx-8">
+          <p className="text-base lg:text-lg 2xl:text-xl leading-relaxed mb-6 lg:mb-0 mx-4 lg:mx-8">
             {product.description}
           </p>
 
-          <p className="text-right w-full lg:w-1/2 text-sm leading-relaxed mb-6 lg:mb-0 mx-3 lg:mx-8 self-center lg:self-end">
+          <p className="text-right w-full 2xl:w-1/2 text-sm lg:text-base leading-relaxed mb-6 lg:mb-3 mx-3 lg:mx-8 self-center lg:self-end">
             {product.ingredients}
           </p>
 
-          <div className="flex items-center justify-between lg:justify-end gap-2 lg:gap-4 mx-2 lg:mx-8">
-            <span className="text-2xl lg:text-3xl font-bold">€{product.pricePerKg}</span>
+          <div className="flex items-center justify-between lg:justify-end gap-2 lg:gap-4 mx-2 2xl:mx-8">
+            <span className="text-2xl lg:text-3xl font-bold">
+              €{product.pricePerKg}
+            </span>
 
             <div className="flex items-center gap-1 lg:gap-2 border border-white/30 rounded-md overflow-hidden">
               <button onClick={decrement} className="px-1 lg:px-3 py-1">
@@ -97,7 +102,7 @@ const ProductCard = ({ product, reverse = false }) => {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="p-1 text-base lg:text-xl font-bold flex"
+                className="p-1 text-base lg:text-lg 2xl:text-xl font-bold flex text-center"
               >
                 {(quantityGrams / 1000).toFixed(1)} {t("products.kg")}
               </motion.span>
@@ -108,7 +113,7 @@ const ProductCard = ({ product, reverse = false }) => {
 
             <button
               onClick={handleBuy}
-              className="border lg:border-4 border-secondary px-4 lg:px-6 py-2 rounded-lg font-semibold hover:scale-110 transition-transform shadow-md"
+              className="border lg:border-4 border-secondary 2xl:text-lg px-1 lg:px-3 py-2 rounded-lg font-semibold hover:scale-110 transition-transform shadow-md"
             >
               {t("products.btnBuy")}
             </button>
