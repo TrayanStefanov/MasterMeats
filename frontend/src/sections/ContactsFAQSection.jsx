@@ -37,34 +37,39 @@ const ContactsFAQSection = () => {
   const faqs = Object.values(faqsObj);
 
   return (
-    <section id="contacts" className="text-accent">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 p-8 lg:px-20 lg:w-4/5">
+    <section id="contacts" className="text-accent my-12">
+      <div className="max-w-7xl container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 p-6 lg:w-4/5">
         {/* Contacts */}
         <div>
-          <h2 className="text-3xl font-bold mb-6">{t("contacts.title")}</h2>
-          <ul className="space-y-4 mb-8 text-lg text-primary">
+          <h2 className="text-xl lg:text-2xl 2xl:text-3xl font-bold mb-6">
+            {t("contacts.title")}
+          </h2>
+          <ul className="space-y-4 mb-8 text-base lg:text-lg 2xl:text-xl text-primary">
             <li className="flex items-center gap-3">
-              <FaPhoneAlt className="text-accent" />
+              <FaPhoneAlt className="text-accent text-lg lg:text-xl 2xl:text-2xl" />
               <span>{phone}</span>
             </li>
             <li className="flex items-center gap-3">
-              <FaEnvelope className="text-accent" />
+              <FaEnvelope className="text-accent text-lg lg:text-xl 2xl:text-2xl" />
               <span>{email}</span>
             </li>
             <li className="flex items-center gap-3">
-              <FaMapMarkerAlt className="text-accent" />
+              <FaMapMarkerAlt className="text-accent text-lg lg:text-xl 2xl:text-2xl" />
               <span>{location}</span>
             </li>
           </ul>
 
-          <form className="space-y-4 text-primary" onSubmit={handleSubmit}>
+          <form
+            className="space-y-4 text-primary text-base 2xl:text-lg"
+            onSubmit={handleSubmit}
+          >
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder={t("contacts.form.name")}
-              className="input input-bordered w-full border border-primary placeholder:text-primary"
+              className="input input-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
               required
             />
             <input
@@ -73,7 +78,7 @@ const ContactsFAQSection = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder={t("contacts.form.email")}
-              className="input input-bordered w-full border border-primary placeholder:text-primary"
+              className="input input-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
               required
             />
             <input
@@ -82,18 +87,21 @@ const ContactsFAQSection = () => {
               value={formData.subject}
               onChange={handleChange}
               placeholder={t("contacts.form.subject")}
-              className="input input-bordered w-full border border-primary placeholder:text-primary"
+              className="input input-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
             />
             <textarea
               name="message"
               value={formData.message}
               onChange={handleChange}
               placeholder={t("contacts.form.message")}
-              className="textarea textarea-bordered w-full border border-primary placeholder:text-primary"
+              className="textarea textarea-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
               rows="4"
               required
             ></textarea>
-            <button type="submit" className="btn btn-accent text-primary-content w-full">
+            <button
+              type="submit"
+              className="btn btn-accent text-lg lg:text-xl 2xl:text-2xl text-primary-content w-full"
+            >
               {t("contacts.form.btnSend")}
             </button>
           </form>
@@ -101,15 +109,25 @@ const ContactsFAQSection = () => {
 
         {/* FAQ */}
         <div>
-          <h2 className="text-3xl font-bold mb-6">{t("faq.title")}</h2>
+          <h2 className="text-xl lg:text-2xl 2xl:text-3xl font-bold mb-6">
+            {t("faq.title")}
+          </h2>
           <div className="space-y-3">
             {faqs.map((faq, idx) => {
               const answer = faq.answer
-                ? faq.answer.replace("phone or by email", `${phone} or ${email}`)
+                ? faq.answer.replace(
+                    "phone or by email",
+                    `${phone} or ${email}`
+                  )
                 : "";
 
               return (
-                <FAQItem key={idx} question={faq.question} answer={answer} idx={idx} />
+                <FAQItem
+                  key={idx}
+                  question={faq.question}
+                  answer={answer}
+                  idx={idx}
+                />
               );
             })}
           </div>
