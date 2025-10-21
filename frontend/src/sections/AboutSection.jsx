@@ -1,53 +1,67 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import TriangleTile from "../components/TriangleTile.jsx";
-import BadgeTile from "../components/BadgeTile.jsx";
-import HexaTile from "../components/HexaTile.jsx";
+import KeyCard from "../components/KeyCard.jsx";
+import { useTranslation } from "react-i18next";
 
 const AboutSection = () => {
   const { t } = useTranslation();
-  const intro = t("about.intro", { returnObjects: true });
-  const tiles = intro.tiles;
+  const keycards = t("about.keycards", { returnObjects: true });
 
   return (
-    <section id="about" className="relative w-full content-center lg:max-h-[80vh] py-6 lg:py-12 overflow-hidden">
-      <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold place-self-center text-accent  ">
-          {intro.title}
+    <section id="about" className="bg-background text-primary py-4 md:py-8 lg:py-10">
+      <div className="max-w-7xl mx-auto text-center mb-12 px-6">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-accent mb-4">
+          {t("about.title")}
         </h2>
-        <div className="w-1/4 h-[3px] bg-accent mx-auto rounded-full"></div>
-      <div className="max-w-7xl mx-auto lg:px-4 xl:px-8 lg:grid lg:grid-cols-[1fr_2fr_1fr] items-center pt-2 lg:pt-12">
-        {/* Left Column */}
-        <div className="flex lg:flex-col items-center justify-center gap-1 lg:gap-8">
-          <TriangleTile
-            image={tiles.triangle["1"].image}
-            title={tiles.triangle["1"].title}
-          />
-          <BadgeTile
-            image={tiles.badge["1"].image}
-            text={tiles.badge["1"].text}
-          />
+        <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full mb-8"></div>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-base md:text-lg leading-relaxed text-semibold max-w-3xl mx-auto"
+        >
+          {t("about.intro")}
+        </motion.p>
+      </div>
+
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-6 lg:px-12 items-start">
+        <div className="flex flex-col gap-6">
+          {keycards.map((card, index) => (
+            <KeyCard
+              key={index}
+              title={card.title}
+              text={card.text}
+              delay={index * 0.1}
+            />
+          ))}
         </div>
 
-        {/* Center Column */}
-        <div className="flex flex-col items-center justify-center">
-          <HexaTile
-            image={tiles.hexa.image}
-            title={tiles.hexa.title}
-            paragraphs={tiles.hexa.text}
-          />
-        </div>
+        <div className="flex flex-col justify-between items-center h-full gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="w-full lg:w-4/5 aspect-[3/4] overflow-hidden rounded-2xl shadow-lg shadow-accent mx-auto"
+          >
+            <img
+              src="/about.jpg"
+              alt={t("about.title")}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
 
-        {/* Right Column */}
-        <div className="flex lg:flex-col items-center justify-center gap-1 lg:gap-8">
-          <TriangleTile
-            image={tiles.triangle["2"].image}
-            title={tiles.triangle["2"].title}
-          />
-          <BadgeTile
-            image={tiles.badge["2"].image}
-            text={tiles.badge["2"].text}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-card p-8 rounded-2xl shadow-md shadow-accent flex flex-col justify-center w-full lg:w-4/5"
+          >
+            <p className="text-lg md:text-xl leading-relaxed text-muted-foreground text-accent text-center italic font-bold">
+              {t("about.footer")}
+            </p>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -55,5 +69,3 @@ const AboutSection = () => {
 };
 
 export default AboutSection;
-
-
