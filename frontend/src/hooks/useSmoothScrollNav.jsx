@@ -1,14 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 
-/**
- * A reusable hook for smooth scrolling navigation with active section tracking.
- * 
- * @param {Array<{ href: string }>} navLinks - Array of links (e.g. [{ href: "#hero" }, ...])
- * @param {Function} [onClose] - Optional callback (e.g. close mobile menu)
- * @returns {{ activeSection: string, scrollToSection: (selector: string) => void }}
- */
 export const useSmoothScrollNav = (navLinks, onClose) => {
   const [activeSection, setActiveSection] = useState(navLinks?.[0]?.href || "#");
+  const throttleRef = useRef(null);
 
   const scrollToSection = useCallback(
     (selector) => {
@@ -21,8 +15,7 @@ export const useSmoothScrollNav = (navLinks, onClose) => {
       const navbar = document.querySelector("nav.navbar");
       const navbarHeight = navbar?.offsetHeight || 0;
 
-      const sectionTop =
-        targetSection.getBoundingClientRect().top + window.scrollY;
+      const sectionTop = targetSection.getBoundingClientRect().top + window.scrollY;
 
       window.scrollTo({
         top: sectionTop - navbarHeight,
@@ -34,7 +27,6 @@ export const useSmoothScrollNav = (navLinks, onClose) => {
     [onClose]
   );
 
-  // Track which section is currently in view
   useEffect(() => {
     const handleScroll = () => {
       const scrollPos = window.scrollY + window.innerHeight / 3;
@@ -52,9 +44,20 @@ export const useSmoothScrollNav = (navLinks, onClose) => {
       }
     };
 
-    handleScroll(); // initialize
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const throttledScroll = () => {
+      if (throttleRef.current) return;
+      throttleRef.current = setTimeout(() => {
+        handleScroll();
+        throttleRef.current = null;
+      }, 100); // runs every 100ms max
+    };
+
+    handleScroll(); // initialize once
+    window.addEventListener("scroll", throttledScroll);
+    return () => {
+      window.removeEventListener("scroll", throttledScroll);
+      if (throttleRef.current) clearTimeout(throttleRef.current);
+    };
   }, [navLinks]);
 
   return { activeSection, scrollToSection };
