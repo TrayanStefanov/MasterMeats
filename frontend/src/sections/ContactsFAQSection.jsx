@@ -37,7 +37,7 @@ const ContactsFAQSection = () => {
   const faqs = Object.values(faqsObj);
 
   return (
-    <section id="contacts" className="text-accent my-12">
+    <section id="contacts" className="text-accent mt-8 lg:my-12">
       <div className="max-w-7xl container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 p-6 lg:w-4/5">
         {/* Contacts */}
         <div>
