@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { IoClose } from "react-icons/io5";
+import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
   // Close menu on Escape key
@@ -12,6 +13,8 @@ const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
     if (isOpen) window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
+
+  const { scrollToSection } = useSmoothScrollNav(navLinks, onClose);
 
   if (typeof document === "undefined") return null; // SSR check
 
@@ -46,6 +49,7 @@ const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
             >
               <IoClose />
             </button>
+
             <motion.div
               initial="hidden"
               animate="visible"
@@ -60,7 +64,10 @@ const MobileMenu = ({ isOpen, navLinks, activeSection, onClose }) => {
                 <motion.a
                   key={link.href}
                   href={link.href}
-                  onClick={onClose}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(link.href); // smooth scroll via hook
+                  }}
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0 },
