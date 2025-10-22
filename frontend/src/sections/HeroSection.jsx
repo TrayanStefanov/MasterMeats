@@ -1,8 +1,20 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const HeroSection = () => {
   const { t } = useTranslation();
+
+  // Define navigation links for the hook
+  const navLinks = [
+    { href: "#hero" },
+    { href: "#products" },
+    { href: "#about" },
+    { href: "#contacts" },
+  ];
+
+  // Use the smooth scroll hook
+  const { scrollToSection } = useSmoothScrollNav(navLinks);
 
   const wordVariants = {
     hiddenTop: { opacity: 0, y: -40 },
@@ -19,14 +31,11 @@ const HeroSection = () => {
     hover: { scale: 1.05, transition: { duration: 0.2 } },
   };
 
-  const scrollToSection = (id) => {
-    const el = document.querySelector(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
-    <div
+    <section
       id="hero"
+      role="banner"
+      aria-label={t("home.title")}
       className="relative min-h-[80vh] lg:min-h-[91vh] overflow-hidden flex items-center justify-center bg-base-100"
     >
       {/* Background */}
@@ -45,7 +54,10 @@ const HeroSection = () => {
       <div className="relative z-10 text-center text-secondary flex flex-col items-center justify-between font-emphasis-heading min-h-[80vh] p-8 md:p-12 lg:p-20 gap-8">
         {/* Title */}
         <div className="px-6 lg:px-0">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl max-w-4xl flex flex-wrap justify-center leading-tight mt-8 sm:mt-16 lg:mt-0">
+          <h1
+            key={t("home.title")}
+            className="text-4xl md:text-5xl lg:text-6xl max-w-4xl flex flex-wrap justify-center leading-tight mt-8 sm:mt-16 lg:mt-0"
+          >
             {titleWords.map((word, index) => (
               <motion.span
                 key={index}
@@ -97,7 +109,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
