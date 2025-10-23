@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaShoppingBasket, FaUser } from "react-icons/fa";
+import { FaShoppingBasket, FaUser, FaTools } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import LanguageSelector from "./LanguageSelector.jsx";
 import MobileMenu from "./MobileMenu.jsx";
@@ -13,6 +14,8 @@ import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 const Navbar = ({ onLoginClick, onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const totalItems = useCartStore((state) => state.cart.length);
   const { user, logout } = useUserStore();
@@ -32,13 +35,35 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
     hover: { scale: 1.1, y: -2, color: "#FBBF24" },
   };
 
+  const handleNavClick = (e, href) => {
+    e.preventDefault();
+
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const section = document.querySelector(href);
+        if (section) section.scrollIntoView({ behavior: "smooth" });
+      }, 300); 
+    } else {
+      scrollToSection(href);
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (location.pathname !== "/") navigate("/");
+    else scrollToSection("#hero");
+  };
+
   return (
     <nav
       role="navigation"
       className="navbar h-24 bg-primary text-primary-content shadow-md sticky top-0 z-50 backdrop-blur-lg opacity-90"
     >
       <div className="w-full lg:w-4/5 mx-auto flex items-center justify-between font-emphasis-heading">
-        <div className="w-28 h-14 lg:w-40 lg:h-28 bg-contain bg-no-repeat bg-center">
+        <div
+          onClick={handleLogoClick}
+          className="w-28 h-14 lg:w-40 lg:h-28 bg-contain bg-no-repeat bg-center cursor-pointer"
+        >
           <img
             src="/logo_en.png"
             alt="Logo"
@@ -57,10 +82,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
             >
               <a
                 href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection(link.href);
-                }}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={`transition-colors ${
                   activeSection === link.href ? "text-accent" : ""
                 }`}
@@ -79,23 +101,29 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
         </ul>
 
         {/* Right Icons */}
-        <div className="flex items-center gap-1 lg:gap-4 mx-4">
+        <div className="flex items-center gap-2 lg:gap-4 mx-4">
           {user ? (
-            <button
-              onClick={onCartClick}
-              className="relative btn btn-ghost btn-circle"
-              aria-label="Shopping Basket"
-            >
-              <FaShoppingBasket className="w-6 h-6" />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 rounded-full bg-secondary text-primary text-xs w-5 h-5 flex items-center justify-center font-bold">
-                  {totalItems}
-                </span>
+            <>
+              <button
+                onClick={onCartClick}
+                className="relative btn btn-ghost btn-circle"
+                aria-label="Shopping Basket"
+              >
+                <FaShoppingBasket className="w-6 h-6" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 rounded-full bg-secondary text-primary text-xs w-5 h-5 flex items-center justify-center font-bold">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+              {user.role === "admin" && (
+                <button
+                  onClick={() => navigate("/admin")}
+                  className="btn btn-ghost text-accent hover:text-accent/80 font-bold text-lg lg:text-xl 2xl:text-2xl flex items-center gap-1"
+                >
+                  <FaTools /> Admin
+                </button>
               )}
-            </button>
-          ) : null}
-          {user ? (
-            <div className="flex flex-row items-end gap-2">
               <span className="hidden md:inline font-medium">{user.name}</span>
               <button
                 onClick={logout}
@@ -103,7 +131,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
               >
                 {t("navbar.logout")}
               </button>
-            </div>
+            </>
           ) : (
             <button
               className="btn btn-ghost btn-circle mx-4"
@@ -115,7 +143,6 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
               </div>
             </button>
           )}
-
           <LanguageSelector />
           {/* Mobile Menu Toggle */}
           <button
