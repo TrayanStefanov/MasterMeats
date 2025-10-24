@@ -1,47 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-
 import ProductCard from "../components/ProductCard.jsx";
-import axios from "../lib/axios.js";
+import { useProductStore } from "../stores/useProductStore.js";
 
 const ProductsSection = () => {
   const { t } = useTranslation();
-  const [products, setProducts] = useState([]);
-  const title = t("products.title");
+
+  const { products, fetchAllProducts } = useProductStore();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get("/products");
-        const backendProducts = res.data;
-
-        const localizedProducts = backendProducts.map((p) => {
-          const i18nData = t(`products.${p.name}`, { returnObjects: true });
-
-          return {
-            ...p,
-            title: i18nData.title || p.name, // fallback if missing
-            description: i18nData.description || p.description,
-            ingredients: i18nData.ingredients || "",
-            badge: i18nData.badge || "",
-          };
-        });
-
-        setProducts(localizedProducts);
-      } catch (err) {
-        console.error("Failed to fetch products:", err);
-      }
-    };
-
-    fetchProducts();
-  }, [t]);
+    fetchAllProducts(); 
+  }, [fetchAllProducts]);
 
   return (
     <section id="products" className="py-4">
       <div className="container mx-auto text-center mb-16">
         <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-accent px-6 lg:px-0 my-2">
-          {title}
+          {t("products.title")}
         </h2>
         <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full"></div>
       </div>
