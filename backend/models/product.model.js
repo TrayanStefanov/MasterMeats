@@ -15,9 +15,13 @@ const productSchema = new mongoose.Schema(
 			required: [true, "Price per kilogram is required"],
 			min: [0, "Price must be a positive number"],
 		},
-		image: {
-			type: String,
-			required: [true, "Image is required"],
+		images: {
+			type: [String],
+			validate: {
+				validator: (arr) => arr.length > 0 && arr.length <= 5,
+				message: "You must upload between 1 and 5 images",
+			},
+			required: [true, "At least one image is required"],
 		},
 		category: {
 			type: String,
