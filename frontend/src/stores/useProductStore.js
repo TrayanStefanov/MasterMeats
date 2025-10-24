@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import axios from "../lib/axios";
+import i18next from "i18next";
 
 export const useProductStore = create((set) => ({
   products: [],
@@ -13,7 +14,21 @@ export const useProductStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await axios.get("/products");
-      set({ products: res.data.products, loading: false });
+      const backendProducts = res.data.products || res.data;
+
+      const localizedProducts = backendProducts.map((p) => ({
+        ...p,
+        title: i18next.t(`products.${p.name}.title`, { defaultValue: p.name }),
+        description: i18next.t(`products.${p.name}.description`, {
+          defaultValue: p.description || "",
+        }),
+        ingredients: i18next.t(`products.${p.name}.ingredients`, {
+          defaultValue: "",
+        }),
+        badge: i18next.t(`products.${p.name}.badge`, { defaultValue: "" }),
+      }));
+
+      set({ products: localizedProducts, loading: false });
     } catch (error) {
       console.error("Error fetching products:", error);
       set({ loading: false, error: "Failed to fetch products" });
@@ -25,10 +40,25 @@ export const useProductStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await axios.post("/products", productData);
+      const newProduct = res.data;
+
+      const localizedProduct = {
+        ...newProduct,
+        title: i18next.t(`products.${newProduct.name}.title`, { defaultValue: newProduct.name }),
+        description: i18next.t(`products.${newProduct.name}.description`, {
+          defaultValue: newProduct.description || "",
+        }),
+        ingredients: i18next.t(`products.${newProduct.name}.ingredients`, {
+          defaultValue: "",
+        }),
+        badge: i18next.t(`products.${newProduct.name}.badge`, { defaultValue: "" }),
+      };
+
       set((prevState) => ({
-        products: [...prevState.products, res.data],
+        products: [...prevState.products, localizedProduct],
         loading: false,
       }));
+
       toast.success("Product created!");
     } catch (error) {
       console.error("Error creating product:", error);
@@ -41,12 +71,27 @@ export const useProductStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await axios.put(`/products/${productId}`, updates);
+      const updatedProduct = res.data;
+
+      const localizedProduct = {
+        ...updatedProduct,
+        title: i18next.t(`products.${updatedProduct.name}.title`, { defaultValue: updatedProduct.name }),
+        description: i18next.t(`products.${updatedProduct.name}.description`, {
+          defaultValue: updatedProduct.description || "",
+        }),
+        ingredients: i18next.t(`products.${updatedProduct.name}.ingredients`, {
+          defaultValue: "",
+        }),
+        badge: i18next.t(`products.${updatedProduct.name}.badge`, { defaultValue: "" }),
+      };
+
       set((prevState) => ({
         products: prevState.products.map((p) =>
-          p._id === productId ? res.data : p
+          p._id === productId ? localizedProduct : p
         ),
         loading: false,
       }));
+
       toast.success("Product updated!");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -59,10 +104,12 @@ export const useProductStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       await axios.delete(`/products/${productId}`);
-      set((prevState) => ({
-        products: prevState.products.filter((p) => p._id !== productId),
+
+      set((prev) => ({
+        products: prev.products.filter((p) => p._id !== productId),
         loading: false,
       }));
+
       toast.success("Product deleted!");
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -71,3 +118,5 @@ export const useProductStore = create((set) => ({
     }
   },
 }));
+
+export default useProductStore;
