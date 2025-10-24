@@ -1,12 +1,19 @@
 import { FaMinus, FaPlus, FaTrash } from "react-icons/fa";
 import { useCartStore } from "../stores/useCartStore";
-
 import { useTranslation } from "react-i18next";
 
 const CartItem = ({ item }) => {
   const { t } = useTranslation();
-
   const { removeFromCart, updateQuantity } = useCartStore();
+
+  const keyBase = item.slug || item.name?.toLowerCase().replace(/\s+/g, "_") || item._id;
+
+  const title = t(`products.${keyBase}.title`, { defaultValue: item.title || "Unnamed Product" });
+  const description = t(`products.${keyBase}.description`, {
+    defaultValue: item.description || "No description available.",
+  });
+
+  const imageSrc = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : item.image;
 
   // Convert grams to kg for display
   const quantityKg = (item.quantityInGrams ?? 0) / 1000;
@@ -26,18 +33,18 @@ const CartItem = ({ item }) => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between md:gap-6">
         <div className="shrink-0 md:order-1">
           <img
-            src={item.image}
-            alt={item.title}
+            src={imageSrc}
+            alt={title}
             className="h-20 w-20 md:h-28 md:w-28 rounded-xl object-cover border border-accent/30"
           />
         </div>
 
         <div className="flex-1 space-y-2 mt-4 md:mt-0 md:order-2 md:max-w-md">
           <p className="text-lg lg:text-xl 2xl:text-2xl font-semibold text-accent hover:text-accent/80 transition">
-            {item.title ?? "Unnamed Product"}
+            {title}
           </p>
           <p className="text-xs lg:text-sm 2xl:text-base text-primary-content/70 line-clamp-2">
-            {item.description ?? "No description available."}
+            {description}
           </p>
 
           <button
