@@ -3,11 +3,6 @@ import { motion } from "framer-motion";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 
-const flags = {
-  en: "🇬🇧",
-  bg: "🇧🇬",
-};
-
 const LanguageSelector = () => {
   const { t } = useTranslation();
   const [language, setLanguage] = useState(i18next.language || "en");
@@ -20,10 +15,17 @@ const LanguageSelector = () => {
   ];
 
   const handleChange = (code) => {
-    setLanguage(code);
+    localStorage.removeItem("i18nextLng"); // clear cache
     i18next.changeLanguage(code);
+    setLanguage(code);
     setIsOpen(false);
   };
+
+  useEffect(() => {
+    const handleLanguageChange = (lng) => setLanguage(lng);
+    i18next.on("languageChanged", handleLanguageChange);
+    return () => i18next.off("languageChanged", handleLanguageChange);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
