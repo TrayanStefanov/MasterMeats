@@ -1,12 +1,27 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { FaFacebookF, FaTwitter, FaLinkedinIn, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaLinkedinIn,
+  FaPhoneAlt,
+  FaEnvelope,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const Footer = () => {
   const { t } = useTranslation();
 
-  // Animation variants
+  const navLinks = [
+    { href: "#hero", label: t("navbar.home") },
+    { href: "#products", label: t("navbar.products") },
+    { href: "#about", label: t("navbar.about") },
+    { href: "#contacts", label: t("navbar.contacts") },
+  ];
+
+  const { scrollToSection } = useSmoothScrollNav(navLinks);
+
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
@@ -42,24 +57,24 @@ const Footer = () => {
             className="flex flex-col items-center justify-around lg:justify-center gap-1 md:gap-2 text-lg 2xl:text-xl font-bold"
             variants={fadeUp}
           >
-            {["#hero", "#products", "#about", "#contacts"].map((href, i) => (
+            {navLinks.map((link, i) => (
               <motion.a
                 key={i}
-                href={href}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(link.href);
+                }}
                 whileHover={{ x: 5, color: "#FBBF24" }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="hover:underline"
+                className="hover:underline cursor-pointer"
               >
-                {i === 0
-                  ? t("navbar.home")
-                  : i === 1
-                  ? t("navbar.products")
-                  : i === 2
-                  ? t("navbar.about")
-                  : t("navbar.contacts")}
+                {link.label}
               </motion.a>
             ))}
           </motion.div>
+
+          {/* Mobile Socials */}
           <motion.div
             className="lg:hidden flex flex-col items-center justify-center gap-2 md:gap-3"
             variants={fadeUp}
@@ -88,7 +103,7 @@ const Footer = () => {
           </motion.div>
         </div>
 
-        {/* Right: Socials */}
+        {/* Right: Socials & Contact */}
         <motion.div
           className="hidden lg:flex flex-col items-center justify-center gap-2 md:gap-3"
           variants={fadeUp}
@@ -135,6 +150,7 @@ const Footer = () => {
           </p>
         </motion.div>
       </motion.div>
+
       {/* Bottom */}
       <motion.div
         className="text-center text-sm md:text-lg pt-4 border-t border-secondary"
