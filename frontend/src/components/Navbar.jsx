@@ -6,7 +6,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import LanguageSelector from "./LanguageSelector.jsx";
 import MobileMenu from "./MobileMenu.jsx";
-
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
 import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
@@ -27,32 +26,14 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
     { href: "#contacts", label: t("navbar.contacts") },
   ];
 
-  const { activeSection, scrollToSection } = useSmoothScrollNav(navLinks, () =>
-    setIsOpen(false)
+  const { activeSection, scrollToSection } = useSmoothScrollNav(
+    navLinks,
+    () => setIsOpen(false)
   );
 
-  const hoverVariants = {
-    hover: { scale: 1.1, y: -2, color: "#FBBF24" },
-  };
+  const hoverVariants = { hover: { scale: 1.1, y: -2, color: "#FBBF24" } };
 
-  const handleNavClick = (e, href) => {
-    e.preventDefault();
-
-    if (location.pathname !== "/") {
-      navigate("/");
-      setTimeout(() => {
-        const section = document.querySelector(href);
-        if (section) section.scrollIntoView({ behavior: "smooth" });
-      }, 300); 
-    } else {
-      scrollToSection(href);
-    }
-  };
-
-  const handleLogoClick = () => {
-    if (location.pathname !== "/") navigate("/");
-    else scrollToSection("#hero");
-  };
+  const handleLogoClick = () => scrollToSection("#hero");
 
   return (
     <nav
@@ -60,6 +41,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
       className="navbar h-24 bg-primary text-primary-content shadow-md sticky top-0 z-50 backdrop-blur-lg opacity-90"
     >
       <div className="w-full lg:w-4/5 mx-auto flex items-center justify-between font-emphasis-heading">
+        {/* Logo */}
         <div
           onClick={handleLogoClick}
           className="w-28 h-14 lg:w-40 lg:h-28 bg-contain bg-no-repeat bg-center cursor-pointer"
@@ -82,7 +64,10 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
             >
               <a
                 href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(link.href);
+                }}
                 className={`transition-colors ${
                   activeSection === link.href ? "text-accent" : ""
                 }`}
@@ -116,6 +101,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
                   </span>
                 )}
               </button>
+
               {user.role === "admin" && (
                 <button
                   onClick={() => navigate("/admin")}
@@ -124,6 +110,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
                   <FaTools /> Admin
                 </button>
               )}
+
               <span className="hidden md:inline font-medium">{user.name}</span>
               <button
                 onClick={logout}
@@ -143,7 +130,9 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
               </div>
             </button>
           )}
+
           <LanguageSelector />
+
           {/* Mobile Menu Toggle */}
           <button
             className="btn btn-ghost md:hidden text-xl"
@@ -155,7 +144,6 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
         </div>
       </div>
 
-      {/* Portal-based Mobile Menu */}
       <MobileMenu
         isOpen={isOpen}
         navLinks={navLinks}
