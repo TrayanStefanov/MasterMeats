@@ -72,6 +72,71 @@ export const createProduct = async (req, res) => {
 	}
 };
 
+export const updateProduct = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const updates = req.body;
+
+		const existingProduct = await Product.findById(id);
+		if (!existingProduct) {
+			return res.status(404).json({ message: "Product not found" });
+		}
+
+		if (updates.images && Array.isArray(updates.images)) {
+			for (const img of existingProduct.images) {
+				const publicId = img.split("/").pop().split(".")[0];
+				try {
+					await cloudinary.uploader.destroy(`products/${publicId}`);
+				} catch (err) {
+					console.warn("Failed to delete old Cloudinary image:", err.message);
+				}
+			}
+
+			const uploaded = [];
+			for (const img of updates.images.slice(0, 5)) {
+				const upload = await cloudinary.uploader.upload(img, {
+					folder: "products",
+				});
+				uploaded.push(upload.secure_url);
+			}
+
+			updates.images = uploaded;
+		}
+
+		const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
+			new: true,
+		});
+
+		if (
+			updates.title ||
+			updates.description ||
+			updates.ingredients ||
+			updates.badge
+		) {
+			const i18nData = {
+				en: {
+					title: updates.title?.en,
+					description: updates.description?.en,
+					ingredients: updates.ingredients?.en,
+					badge: updates.badge?.en,
+				},
+				bg: {
+					title: updates.title?.bg,
+					description: updates.description?.bg,
+					ingredients: updates.ingredients?.bg,
+					badge: updates.badge?.bg,
+				},
+			};
+			updateLocaleKey(updatedProduct.name, i18nData);
+		}
+
+		res.status(200).json(updatedProduct);
+	} catch (error) {
+		console.log("Error in updateProduct controller:", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
+
 export const deleteProduct = async (req, res) => {
 	try {
 		const { id } = req.params;
