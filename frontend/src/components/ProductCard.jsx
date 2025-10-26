@@ -27,9 +27,11 @@ const ProductCard = ({ product, reverse = false }) => {
 
   // ensure image array order is correct (top = first)
   const productImages =
-    product.images && product.images.length > 0
-      ? [...product.images].reverse() // reversed so index 0 is top
-      : [product.image];
+  product.images && product.images.length > 0
+    ? [...product.images]
+        .map((img) => (typeof img === "string" ? img : img.url))
+        .reverse()
+    : [product.image];
 
   const title = t(`products.${product.name}.title`, {
     defaultValue: product.name,
