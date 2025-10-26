@@ -2,14 +2,12 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { useProductStore } from "../stores/useProductStore";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 
-const ProductsList = () => {
+const ProductsList = ({ onEdit }) => {
   const { products, fetchAllProducts, deleteProduct, loading } = useProductStore();
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAllProducts();
@@ -21,11 +19,19 @@ const ProductsList = () => {
   }, [fetchAllProducts]);
 
   if (loading && products.length === 0) {
-    return <p className="text-center py-8 text-secondary/60">{t("common.loading")}</p>;
+    return (
+      <p className="text-center py-8 text-secondary/60">
+        {t("common.loading")}
+      </p>
+    );
   }
 
   if (!products || products.length === 0) {
-    return <p className="text-center py-8 text-secondary/60">{t("common.noProducts")}</p>;
+    return (
+      <p className="text-center py-8 text-secondary/60">
+        {t("common.noProducts")}
+      </p>
+    );
   }
 
   return (
@@ -56,17 +62,24 @@ const ProductsList = () => {
         <tbody className="bg-gray-800 divide-y divide-gray-700">
           {products.map((product) => {
             const firstImage =
-              product.images?.[0] || product.image || "/placeholder.png";
+              typeof product.images?.[0] === "string"
+                ? product.images[0]
+                : product.images?.[0]?.url ||
+                  product.image ||
+                  "/placeholder.png";
 
             const title = t(`products.${product.name}.title`, {
-              defaultValue: product.name,
+              defaultValue: product.title?.en || product.name,
             });
             const description = t(`products.${product.name}.description`, {
-              defaultValue: product.description || "",
+              defaultValue: product.description?.en || "",
             });
 
             return (
-              <tr key={product._id} className="hover:bg-gray-700 transition-colors">
+              <tr
+                key={product._id}
+                className="hover:bg-gray-700 transition-colors"
+              >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-12 w-12">
@@ -77,7 +90,9 @@ const ProductsList = () => {
                       />
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-white">{title}</div>
+                      <div className="text-sm font-medium text-white">
+                        {title}
+                      </div>
                       <div className="text-xs text-gray-400 truncate max-w-[200px]">
                         {description || "—"}
                       </div>
@@ -99,7 +114,7 @@ const ProductsList = () => {
 
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end gap-3">
                   <button
-                    onClick={() => navigate(`/admin/products/edit/${product._id}`)}
+                    onClick={() => onEdit(product)}
                     className="text-blue-400 hover:text-blue-300 transition-colors"
                     title={t("admin.editProduct")}
                   >
