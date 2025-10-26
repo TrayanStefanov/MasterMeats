@@ -2,19 +2,17 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaPlusCircle, FaBoxOpen, FaChartBar } from "react-icons/fa";
 
-import CreateProductForm from "./CreateProductForm";
-import ProductsList from "./ProductsList";
+import ProductTab from "./ProductTab";
 /* import AnalyticsTab from "./AnalyticsTab"; */
 import { useProductStore } from "../stores/useProductStore";
 
 const tabs = [
-  { id: "create", label: "Create Product", icon: <FaPlusCircle /> },
   { id: "products", label: "Products", icon: <FaBoxOpen /> },
   { id: "analytics", label: "Analytics", icon: <FaChartBar /> },
 ];
 
 const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState("create");
+  const [activeTab, setActiveTab] = useState("products");
   const { fetchAllProducts } = useProductStore();
 
   useEffect(() => {
@@ -51,8 +49,7 @@ const AdminPage = () => {
 
       {/* Content */}
       <div className="w-full max-w-6xl bg-primary/80 border-4 border-accent rounded-2xl p-8 shadow-xl">
-        {activeTab === "create" && <CreateProductForm />}
-        {activeTab === "products" && <ProductsList />}
+        {activeTab === "products" && <ProductTab />}
         {activeTab === "analytics" && <div className="text-secondary">Analytics</div>}
         {/* <AnalyticsTab /> */}
       </div>
