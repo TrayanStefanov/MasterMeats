@@ -1,4 +1,4 @@
-import { Routes, Route} from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
 
@@ -16,6 +16,7 @@ import CartModal from "./modals/CartModal";
 import BackToTopButton from "./components/BackToTopButton";
 
 import AdminPage from "./admin/AdminPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { useUserStore } from "./stores/useUserStore";
 
 function App() {
@@ -56,7 +57,14 @@ function App() {
           />
 
           {/* Admin Dashboard */}
-          <Route path="/admin" element={<AdminPage />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
 
         <AuthModal isOpen={authModalOpen} onClose={closeAuthModal} />
