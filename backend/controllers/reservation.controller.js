@@ -10,6 +10,8 @@ export const getAllReservations = async (req, res) => {
       completed,
       amountDue,
       sort, // deliveryDate, createdAt, etc.
+      page = 1, // current page
+      limit = 10, // results per page
     } = req.query;
 
     let filter = {};
@@ -34,7 +36,21 @@ export const getAllReservations = async (req, res) => {
       filter.amountDue = { $gt: 0 };
     }
 
-    let query = Reservation.find(filter)
+    // Sorting options
+    let sortOption = {};
+    if (sort === "deliveryDate") sortOption = { dateOfDelivery: 1 };
+    else if (sort === "createdAt") sortOption = { createdAt: -1 };
+
+    // Convert page/limit to integers
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Total count for pagination info
+    const totalCount = await Reservation.countDocuments(filter);
+
+    // Fetch paginated + filtered results
+    let reservations = await Reservation.find(filter)
       .populate({
         path: "orderId",
         populate: {
@@ -42,19 +58,12 @@ export const getAllReservations = async (req, res) => {
           select: "name category pricePerKg",
         },
       })
-      .sort(
-        sort === "deliveryDate"
-          ? { dateOfDelivery: 1 }
-          : sort === "createdAt"
-          ? { createdAt: -1 }
-          : {}
-      );
-
-    const reservations = await query.exec();
-
-    let filtered = reservations;
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNum)
+      .exec();
     if (category || productName) {
-      filtered = reservations.filter((res) =>
+      reservations = reservations.filter((res) =>
         res.orderId?.products?.some((p) => {
           const product = p.product || {};
           if (category && product.category !== category) return false;
@@ -64,7 +73,15 @@ export const getAllReservations = async (req, res) => {
       );
     }
 
-    res.status(200).json(filtered);
+    // Pagination metadata
+    const totalPages = Math.ceil(totalCount / limitNum);
+
+    res.status(200).json({
+      reservations,
+      currentPage: pageNum,
+      totalPages,
+      totalCount,
+    });
   } catch (error) {
     console.error("Error fetching reservations:", error);
     res.status(500).json({ message: "Server error", error: error.message });
