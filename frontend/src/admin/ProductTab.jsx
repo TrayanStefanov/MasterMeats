@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaPlusCircle, FaArrowLeft } from "react-icons/fa";
 
 import { useProductStore } from "../stores/useProductStore";
-import CreateProductForm from "./CreateProductForm";
+import ProductForm from "./ProductForm";
 import ProductsList from "./ProductsList";
 
 const ProductTab = () => {
@@ -87,7 +87,7 @@ const ProductTab = () => {
               <FaArrowLeft /> Back to Products
             </button>
 
-            <CreateProductForm
+            <ProductForm
               mode={mode}
               product={selectedProduct}
               onFinish={handleBack}
