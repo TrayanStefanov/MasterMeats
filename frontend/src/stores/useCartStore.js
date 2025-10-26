@@ -23,7 +23,14 @@ export const useCartStore = create((set, get) => ({
     if (!get()._requireAuth()) return;
     try {
       const res = await axios.get("/cart");
-      set({ cart: res.data });
+      const normalizedCart = res.data.map((item) => ({
+        ...item,
+        images: item.images?.map((img) =>
+          typeof img === "string" ? img : img.url
+        ) || [],
+      }));
+
+      set({ cart: normalizedCart });
       get().calculateTotals();
     } catch (error) {
       set({ cart: [] });
@@ -63,6 +70,9 @@ export const useCartStore = create((set, get) => ({
 
     try {
       await axios.post("/cart", { productId: product._id, quantityInGrams });
+      const normalizedImages = product.images?.map((img) =>
+        typeof img === "string" ? img : img.url
+      );
 
       toast.success(
         `${product.title} added (${(quantityInGrams / 1000).toFixed(1)}kg)`
@@ -79,7 +89,15 @@ export const useCartStore = create((set, get) => ({
                   }
                 : item
             )
-          : [...prev.cart, { ...product, quantityInGrams }];
+          : [
+              ...prev.cart,
+              {
+                ...product,
+                images: normalizedImages,
+                quantityInGrams,
+              },
+            ];
+
         return { cart: newCart };
       });
 
