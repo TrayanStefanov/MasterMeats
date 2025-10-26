@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+
 import ProductCard from "../components/ProductCard.jsx";
 import { useProductStore } from "../stores/useProductStore.js";
 
 const ProductsSection = () => {
   const { t } = useTranslation();
-
-  const { products, fetchAllProducts } = useProductStore();
+  const { products, fetchAllProducts, loading } = useProductStore();
 
   useEffect(() => {
-    fetchAllProducts(); 
-  }, [fetchAllProducts]);
+    fetchAllProducts();
+  }, [fetchAllProducts, t]);
 
   return (
     <section id="products" className="py-4">
@@ -21,6 +21,8 @@ const ProductsSection = () => {
         </h2>
         <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full"></div>
       </div>
+
+      {loading && <p className="text-center text-gray-500">Loading...</p>}
 
       <motion.div
         className="container mx-auto flex flex-col gap-6"
