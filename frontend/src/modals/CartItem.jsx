@@ -13,7 +13,12 @@ const CartItem = ({ item }) => {
     defaultValue: item.description || "No description available.",
   });
 
-  const imageSrc = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : item.image;
+  const imageSrc =
+  Array.isArray(item.images) && item.images.length > 0
+    ? typeof item.images[0] === "string"
+      ? item.images[0]
+      : item.images[0]?.url
+    : item.image || "/placeholder.png";
 
   // Convert grams to kg for display
   const quantityKg = (item.quantityInGrams ?? 0) / 1000;
