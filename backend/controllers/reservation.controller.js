@@ -3,14 +3,31 @@ import Product from "../models/product.model.js";
 
 export const getAllReservations = async (req, res) => {
   try {
-    const { category, productName, completed, amountDue, sort } = req.query;
+    const {
+      search, // client name or phone
+      category,
+      productName,
+      completed,
+      amountDue,
+      sort, // deliveryDate, createdAt, etc.
+    } = req.query;
 
     let filter = {};
 
+    // Search by client name or phone
+    if (search) {
+      filter.$or = [
+        { clientName: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Filter by completion
     if (completed !== undefined) {
       filter.completed = completed === "true";
     }
 
+    // Filter by amount due
     if (amountDue === "none") {
       filter.amountDue = { $lte: 0 };
     } else if (amountDue === "some") {
@@ -18,8 +35,20 @@ export const getAllReservations = async (req, res) => {
     }
 
     let query = Reservation.find(filter)
-      .populate("orderId")
-      .sort(sort === "deliveryDate" ? { dateOfDelivery: 1 } : { createdAt: -1 });
+      .populate({
+        path: "orderId",
+        populate: {
+          path: "products.product",
+          select: "name category pricePerKg",
+        },
+      })
+      .sort(
+        sort === "deliveryDate"
+          ? { dateOfDelivery: 1 }
+          : sort === "createdAt"
+          ? { createdAt: -1 }
+          : {}
+      );
 
     const reservations = await query.exec();
 
@@ -38,6 +67,22 @@ export const getAllReservations = async (req, res) => {
     res.status(200).json(filtered);
   } catch (error) {
     console.error("Error fetching reservations:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const getReservationById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reservation = await Reservation.findById(id).populate("orderId");
+
+    if (!reservation) {
+      return res.status(404).json({ message: "Reservation not found" });
+    }
+
+    res.status(200).json(reservation);
+  } catch (error) {
+    console.error("Error fetching reservation by ID:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -72,7 +117,6 @@ export const createReservation = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 export const updateReservation = async (req, res) => {
   try {
