@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+const imageSchema = new mongoose.Schema(
+	{
+		url: { type: String, required: true },
+		public_id: { type: String },
+	},
+	{ _id: false }
+);
+
 const productSchema = new mongoose.Schema(
 	{
 		name: {
@@ -16,7 +24,7 @@ const productSchema = new mongoose.Schema(
 			min: [0, "Price must be a positive number"],
 		},
 		images: {
-			type: [String],
+			type: [imageSchema],
 			validate: {
 				validator: (arr) => arr.length > 0 && arr.length <= 5,
 				message: "You must upload between 1 and 5 images",
@@ -37,5 +45,4 @@ const productSchema = new mongoose.Schema(
 );
 
 const Product = mongoose.model("Product", productSchema);
-
 export default Product;
