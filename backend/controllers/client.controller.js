@@ -1,5 +1,32 @@
 import Client from "../models/client.model.js";
 
+export const createOrFindClient = async (clientData) => {
+  if (!clientData.phone) throw new Error("Client phone number is required");
+
+  let existing = await Client.findOne({ phone: clientData.phone });
+
+  if (!existing) {
+    existing = await Client.create({
+      name: clientData.name,
+      phone: clientData.phone,
+      email: clientData.email || "",
+      notes: clientData.notes || "",
+    });
+  } else {
+    // Optionally update name/email
+    if (
+      (clientData.name && existing.name !== clientData.name) ||
+      (clientData.email && existing.email !== clientData.email)
+    ) {
+      existing.name = clientData.name || existing.name;
+      existing.email = clientData.email || existing.email;
+      await existing.save();
+    }
+  }
+
+  return existing._id;
+};
+
 export const getAllClients = async (req, res) => {
   try {
     const { search, page = 1, limit = 10, sort = "createdAt" } = req.query;
@@ -111,3 +138,4 @@ export const deleteClient = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
