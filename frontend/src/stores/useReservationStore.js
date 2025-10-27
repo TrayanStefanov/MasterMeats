@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useClientStore } from "./client.store";
 
 export const useReservationStore = create((set, get) => ({
   reservations: [],
@@ -48,7 +49,16 @@ export const useReservationStore = create((set, get) => ({
   createReservation: async (reservationData) => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.post(`/api/reservations`, reservationData);
+      const clientStore = useClientStore.getState();
+      const client = await clientStore.createOrFindClient(reservationData.client);
+
+      // Replace client data with its ObjectId if it exists
+      const payload = {
+        ...reservationData,
+        client: client._id,
+      };
+
+      const res = await axios.post(`/api/reservations`, payload);
       set((state) => ({
         reservations: [res.data, ...state.reservations],
         loading: false,
