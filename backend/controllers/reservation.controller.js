@@ -1,6 +1,5 @@
 import Reservation from "../models/reservation.model.js";
 import Client from "../models/client.model.js";
-import { createOrFindClient } from "./client.controller.js";
 
 export const getAllReservations = async (req, res) => {
   try {
@@ -126,15 +125,13 @@ export const createReservation = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const clientId = await createOrFindClient(client);
-
     const calculatedAmountDue = products.reduce(
       (sum, p) => sum + (p.priceAtReservation * p.quantityInGrams) / 1000,
       0
     );
 
     const reservation = await Reservation.create({
-      client: clientId,
+      client,
       products,
       amountDue: calculatedAmountDue,
       dateOfDelivery: dateOfDelivery || new Date(),
@@ -142,11 +139,12 @@ export const createReservation = async (req, res) => {
       notes,
     });
 
-    const populated = await reservation
-      .populate("client", "name phone email")
-      .populate("products.product", "name category pricePerKg");
+    await reservation.populate([
+      { path: "client", select: "name phone email" },
+      { path: "products.product", select: "name category pricePerKg" },
+    ]);
 
-    res.status(201).json(populated);
+    res.status(201).json(reservation);
   } catch (error) {
     console.error("Error creating reservation:", error);
     res.status(500).json({ message: "Server error", error: error.message });
