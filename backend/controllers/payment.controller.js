@@ -94,7 +94,7 @@ export const confirmPayment = async (req, res) => {
       user: userId,
       products: products.map((p) => ({
         product: p.id,
-        quantity: Math.max(1, Math.round(p.quantityInGrams)), 
+        quantityInGrams: Math.max(1, Math.round(p.quantityInGrams)), 
         price: p.pricePerKg,
       })),
       totalAmount: paymentIntent.amount / 100, // convert cents → euros
