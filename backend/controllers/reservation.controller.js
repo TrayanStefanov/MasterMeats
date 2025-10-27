@@ -1,27 +1,31 @@
 import Reservation from "../models/reservation.model.js";
-import Product from "../models/product.model.js";
+import Client from "../models/client.model.js";
 
 export const getAllReservations = async (req, res) => {
   try {
     const {
       search, // client name or phone
       category,
-      productName,
+      productId,
       completed,
       amountDue,
       sort, // deliveryDate, createdAt, etc.
       page = 1, // current page
       limit = 10, // results per page
     } = req.query;
-
+    
+    // Build the filter
     let filter = {};
-
+    
     // Search by client name or phone
     if (search) {
-      filter.$or = [
-        { clientName: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
-      ];
+      const matchingClients = await Client.find({
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ],
+      }).select("_id");
+      filter.client = { $in: matchingClients.map((c) => c._id) };
     }
 
     // Filter by completion
@@ -48,26 +52,24 @@ export const getAllReservations = async (req, res) => {
 
     // Total count for pagination info
     const totalCount = await Reservation.countDocuments(filter);
-
+    
     // Fetch paginated + filtered results
     let reservations = await Reservation.find(filter)
+    .populate("client", "name phone email")
       .populate({
-        path: "orderId",
-        populate: {
-          path: "products.product",
-          select: "name category pricePerKg",
-        },
+        path: "products.product",
+        select: "name category pricePerKg",
       })
       .sort(sortOption)
       .skip(skip)
       .limit(limitNum)
       .exec();
-    if (category || productName) {
+    if (category || productId) {
       reservations = reservations.filter((res) =>
-        res.orderId?.products?.some((p) => {
-          const product = p.product || {};
-          if (category && product.category !== category) return false;
-          if (productName && product.name !== productName) return false;
+        res.products?.some((p) => {
+          const prod = p.product || {};
+          if (category && prod.category !== category) return false;
+          if (productId && prod._id.toString() !== productId) return false;
           return true;
         })
       );
@@ -91,7 +93,12 @@ export const getAllReservations = async (req, res) => {
 export const getReservationById = async (req, res) => {
   try {
     const { id } = req.params;
-    const reservation = await Reservation.findById(id).populate("orderId");
+    const reservation = await Reservation.findById(id)
+      .populate("client", "name phone email")
+      .populate({
+        path: "products.product",
+        select: "name category pricePerKg",
+      });
 
     if (!reservation) {
       return res.status(404).json({ message: "Reservation not found" });
@@ -107,28 +114,37 @@ export const getReservationById = async (req, res) => {
 export const createReservation = async (req, res) => {
   try {
     const {
-      clientName,
-      phone,
-      orderId,
-      amountDue,
+      client,
+      products,
       dateOfDelivery,
       completed = false,
+      notes
     } = req.body;
 
-    if (!clientName || !phone || !orderId) {
+    if (!client || !products?.length) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+
+    const calculatedAmountDue = products.reduce(
+      (sum, product) => sum + (product.priceAtReservation * product.quantityInGrams) / 1000,
+      0
+    );
+
     const reservation = await Reservation.create({
-      clientName,
-      phone,
-      orderId,
-      amountDue,
+      client,
+      products,
+      amountDue: calculatedAmountDue,
       dateOfDelivery: dateOfDelivery || new Date(),
       completed,
+      notes,
     });
 
-    res.status(201).json(reservation);
+    const populated = await reservation
+      .populate("client", "name phone email")
+      .populate("products.product", "name category pricePerKg");
+
+    res.status(201).json(populated);
   } catch (error) {
     console.error("Error creating reservation:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -140,9 +156,18 @@ export const updateReservation = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
+    if (updates.products) {
+      updates.amountDue = updates.products.reduce(
+        (sum, product) => sum + (product.priceAtReservation * product.quantityInGrams) / 1000,
+      0
+      );
+    }
+
     const reservation = await Reservation.findByIdAndUpdate(id, updates, {
       new: true,
-    });
+    })
+      .populate("client", "name phone email")
+      .populate("products.product", "name category pricePerKg");
 
     if (!reservation) {
       return res.status(404).json({ message: "Reservation not found" });
