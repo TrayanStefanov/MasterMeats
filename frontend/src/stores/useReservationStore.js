@@ -47,6 +47,58 @@ export const useReservationStore = create((set, get) => ({
     }
   },
 
+  createReservation: async (reservationData) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axios.post(`/api/reservations`, reservationData);
+      set((state) => ({
+        reservations: [res.data, ...state.reservations],
+        loading: false,
+      }));
+      return res.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Failed to create reservation",
+      });
+    }
+  },
+
+  updateReservation: async (reservationId, updates) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axios.put(`/api/reservations/${reservationId}`, updates);
+      set((state) => ({
+        reservations: state.reservations.map((r) =>
+          r._id === reservationId ? res.data : r
+        ),
+        loading: false,
+      }));
+      return res.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Failed to update reservation",
+      });
+    }
+  },
+
+  deleteReservation: async (reservationId) => {
+    set({ loading: true, error: null });
+    try {
+      await axios.delete(`/api/reservations/${reservationId}`);
+      set((state) => ({
+        reservations: state.reservations.filter((r) => r._id !== reservationId),
+        loading: false,
+      }));
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Failed to delete reservation",
+      });
+    }
+  },
+
   setFilter: (key, value) =>
     set((state) => ({
       filters: { ...state.filters, [key]: value },
