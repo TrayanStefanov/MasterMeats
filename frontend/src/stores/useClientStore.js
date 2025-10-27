@@ -57,6 +57,23 @@ export const useClientStore = create((set, get) => ({
         error.response?.data?.message || "Failed to create client";
       set({ loading: false, error: message });
       toast.error(message);
+      throw error;
+    }
+  },
+
+  findOrCreateClient: async (clientData) => {
+    try {
+      // Try to find existing by phone
+      const res = await axios.get(`/api/clients?search=${clientData.phone}`);
+      const existing = res.data?.clients?.[0];
+      if (existing) return existing;
+
+      // Otherwise create
+      return await get().createClient(clientData);
+    } catch (error) {
+      const message = error.response?.data?.message || "Failed to create/find client";
+      toast.error(message);
+      throw error;
     }
   },
 
