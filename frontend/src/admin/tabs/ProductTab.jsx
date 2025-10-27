@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlusCircle, FaArrowLeft } from "react-icons/fa";
 
-import { useProductStore } from "../stores/useProductStore";
-import ProductForm from "./ProductForm";
-import ProductsList from "./ProductsList";
+import { useProductStore } from "../../stores/useProductStore";
+import ProductForm from "../components/ProductForm";
+import ProductsList from "../components/ProductsList";
 
 const ProductTab = () => {
   const { fetchAllProducts, products } = useProductStore();
@@ -59,7 +59,7 @@ const ProductTab = () => {
             className="flex flex-col gap-6"
           >
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-accent">Products</h2>
+              <h2 className="text-2xl font-bold text-accent-content">Products</h2>
               <button
                 onClick={handleCreate}
                 className="flex items-center gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"

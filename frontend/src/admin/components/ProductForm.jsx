@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaPlusCircle, FaSpinner, FaSave } from "react-icons/fa";
 
-import fetchLocales from "../lib/fetchLocales.js";
-import { useProductStore } from "../stores/useProductStore.js";
+import fetchLocales from "../../lib/fetchLocales.js";
+import { useProductStore } from "../../stores/useProductStore.js";
 import ProductImageUpload from "./ProductImageUpload.jsx";
 
 const categories = ["fillet", "loin", "ham"];

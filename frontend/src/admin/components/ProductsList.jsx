@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaTrash, FaEdit } from "react-icons/fa";
-import { useProductStore } from "../stores/useProductStore";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+
+import { useProductStore } from "../../stores/useProductStore";
 
 const ProductsList = ({ onEdit }) => {
   const { products, fetchAllProducts, deleteProduct, loading } = useProductStore();
@@ -41,25 +42,25 @@ const ProductsList = ({ onEdit }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <table className="min-w-full divide-y divide-gray-700">
-        <thead className="bg-gray-700">
+      <table className="min-w-full divide-y divide-accent-content">
+        <thead className="bg-secondary/50 font-semibold text-primary uppercase tracking-wider">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs">
               {t("admin.product")}
             </th>
-            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs">
               {t("admin.pricePerKg")}
             </th>
-            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs">
               {t("admin.category")}
             </th>
-            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">
+            <th className="px-6 py-3 text-right text-xs">
               {t("admin.actions")}
             </th>
           </tr>
         </thead>
 
-        <tbody className="bg-gray-800 divide-y divide-gray-700">
+        <tbody className="bg-accent/50 divide-y divide-accent-content">
           {products.map((product) => {
             const firstImage =
               typeof product.images?.[0] === "string"
@@ -78,7 +79,7 @@ const ProductsList = ({ onEdit }) => {
             return (
               <tr
                 key={product._id}
-                className="hover:bg-gray-700 transition-colors"
+                className="hover:bg-accent/80 transition-colors"
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
@@ -90,10 +91,10 @@ const ProductsList = ({ onEdit }) => {
                       />
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-secondary">
                         {title}
                       </div>
-                      <div className="text-xs text-gray-400 truncate max-w-[200px]">
+                      <div className="text-xs text-secondary/60 truncate max-w-[200px]">
                         {description || "—"}
                       </div>
                     </div>
@@ -101,13 +102,13 @@ const ProductsList = ({ onEdit }) => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-secondary/60">
                     €{product.pricePerKg?.toFixed(2) || "—"}
                   </div>
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-secondary/60">
                     {product.category || t("admin.uncategorized")}
                   </div>
                 </td>
@@ -115,14 +116,14 @@ const ProductsList = ({ onEdit }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end gap-3">
                   <button
                     onClick={() => onEdit(product)}
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                    className="text-accent-content/60 hover:text-accent-content transition-colors"
                     title={t("admin.editProduct")}
                   >
                     <FaEdit className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => deleteProduct(product._id)}
-                    className="text-red-400 hover:text-red-300 transition-colors"
+                    className="text-accent-content/60 hover:text-accent-content transition-colors"
                     title={t("admin.deleteProduct")}
                   >
                     <FaTrash className="h-5 w-5" />
