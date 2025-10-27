@@ -32,5 +32,8 @@ const reservationSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+reservationSchema.index({ dateOfDelivery: 1 });
+reservationSchema.index({ completed: 1 });
+
 const Reservation = mongoose.model("Reservation", reservationSchema);
 export default Reservation;
