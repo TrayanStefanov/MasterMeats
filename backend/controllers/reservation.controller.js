@@ -1,5 +1,6 @@
 import Reservation from "../models/reservation.model.js";
 import Client from "../models/client.model.js";
+import { createOrFindClient } from "./client.controller.js";
 
 export const getAllReservations = async (req, res) => {
   try {
@@ -125,14 +126,15 @@ export const createReservation = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    const clientId = await createOrFindClient(client);
 
     const calculatedAmountDue = products.reduce(
-      (sum, product) => sum + (product.priceAtReservation * product.quantityInGrams) / 1000,
+      (sum, p) => sum + (p.priceAtReservation * p.quantityInGrams) / 1000,
       0
     );
 
     const reservation = await Reservation.create({
-      client,
+      client: clientId,
       products,
       amountDue: calculatedAmountDue,
       dateOfDelivery: dateOfDelivery || new Date(),
@@ -155,6 +157,10 @@ export const updateReservation = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+
+    if (updates.client) {
+      updates.client = await createOrFindClient(updates.client);
+    }
 
     if (updates.products) {
       updates.amountDue = updates.products.reduce(
