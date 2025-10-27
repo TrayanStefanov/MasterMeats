@@ -43,9 +43,6 @@ export const useUserStore = create(
 				}
 			},
 
-			/**
-			 * 🚪 LOGOUT
-			 */
 			logout: async () => {
 				try {
 					await axios.post("/auth/logout");
