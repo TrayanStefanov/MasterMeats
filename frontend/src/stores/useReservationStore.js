@@ -39,11 +39,9 @@ export const useReservationStore = create((set, get) => ({
         loading: false,
       });
     } catch (error) {
-      set({
-        loading: false,
-        error: error.response?.data?.message || "Failed to fetch reservations",
-    });
-    toast.error(error.response?.data?.message || "Failed to fetch reservations")
+      const message = error.response?.data?.message || "Failed to fetch reservations";
+      set({ loading: false, error: message });
+      toast.error(message);
     }
   },
 
@@ -55,31 +53,34 @@ export const useReservationStore = create((set, get) => ({
         reservations: [res.data, ...state.reservations],
         loading: false,
       }));
+      toast.success("Reservation created successfully!");
       return res.data;
     } catch (error) {
-      set({
-        loading: false,
-        error: error.response?.data?.message || "Failed to create reservation",
-      });
+      const message = error.response?.data?.message || "Failed to create reservation";
+      set({ loading: false, error: message });
+      toast.error(message);
     }
   },
 
   updateReservation: async (reservationId, updates) => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.put(`/api/reservations/${reservationId}`, updates);
+      const res = await axios.put(
+        `/api/reservations/${reservationId}`,
+        updates
+      );
       set((state) => ({
         reservations: state.reservations.map((r) =>
           r._id === reservationId ? res.data : r
         ),
         loading: false,
       }));
+      toast.success("Reservation updated successfully!");
       return res.data;
     } catch (error) {
-      set({
-        loading: false,
-        error: error.response?.data?.message || "Failed to update reservation",
-      });
+      const message = error.response?.data?.message || "Failed to update reservation";
+      set({ loading: false, error: message });
+      toast.error(message);
     }
   },
 
@@ -91,11 +92,11 @@ export const useReservationStore = create((set, get) => ({
         reservations: state.reservations.filter((r) => r._id !== reservationId),
         loading: false,
       }));
+      toast.success("Reservation deleted successfully!");
     } catch (error) {
-      set({
-        loading: false,
-        error: error.response?.data?.message || "Failed to delete reservation",
-      });
+      const message = error.response?.data?.message || "Failed to delete reservation";
+      set({ loading: false, error: message });
+      toast.error(message);
     }
   },
 
