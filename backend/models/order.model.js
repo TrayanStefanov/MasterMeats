@@ -14,7 +14,7 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        quantity: {
+        quantityInGrams: {
           type: Number,
           required: true,
           min: 1,
