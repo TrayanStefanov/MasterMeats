@@ -116,24 +116,32 @@ export const createReservation = async (req, res) => {
     const {
       client,
       products,
+      amountDue,
       dateOfDelivery,
       completed = false,
-      notes
+      notes,
     } = req.body;
+
 
     if (!client || !products?.length) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const calculatedAmountDue = products.reduce(
-      (sum, p) => sum + (p.priceAtReservation * p.quantityInGrams) / 1000,
+    const calculatedTotalAmmount = products.reduce(
+      (sum, p) => sum + (p.priceAtReservation * (p.quantityInGrams || 0)) / 1000,
       0
     );
+
+    const numericAmountDue =
+      amountDue === undefined || amountDue === null || amountDue === ""
+        ? calculatedTotalAmmount
+        : Number(amountDue);
 
     const reservation = await Reservation.create({
       client,
       products,
-      amountDue: calculatedAmountDue,
+      calculatedTotalAmmount: calculatedTotalAmmount,
+      amountDue: numericAmountDue,
       dateOfDelivery: dateOfDelivery || new Date(),
       completed,
       notes,
@@ -156,15 +164,17 @@ export const updateReservation = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    if (updates.client) {
-      updates.client = await createOrFindClient(updates.client);
-    }
-
     if (updates.products) {
-      updates.amountDue = updates.products.reduce(
-        (sum, product) => sum + (product.priceAtReservation * product.quantityInGrams) / 1000,
-      0
+      const calculatedTotalAmmount = updates.products.reduce(
+        (sum, p) => sum + (p.priceAtReservation * (p.quantityInGrams || 0)) / 1000,
+        0
       );
+
+      updates.calculatedTotalAmmount = calculatedTotalAmmount;
+
+      if (updates.amountDue === undefined || updates.amountDue === null) {
+        updates.amountDue = calculatedTotalAmmount;
+      }
     }
 
     const reservation = await Reservation.findByIdAndUpdate(id, updates, {
