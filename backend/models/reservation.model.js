@@ -15,10 +15,16 @@ const reservationSchema = new mongoose.Schema(
         products: [
             {
                 product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-                quantity: { type: Number, required: true, min: 1 },
+                quantityInGrams: { type: Number, required: true, min: 1 },
                 priceAtReservation: { type: Number, required: true, min: 0 },
             },
         ],
+        calculatedTotalAmmount: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
         amountDue: {
             type: Number,
             required: true,
