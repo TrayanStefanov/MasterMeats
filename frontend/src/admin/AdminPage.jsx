@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
-import {FaBoxOpen, FaChartBar } from "react-icons/fa";
+import { FaBoxOpen, FaChartBar } from "react-icons/fa";
 import { FiBox } from "react-icons/fi";
-
-import { useTranslation } from "react-i18next";
-
-import ProductTab from "./tabs/ProductTab";
-import ReservationsTab from "./tabs/ReservationsTab";
-/* import AnalyticsTab from "./AnalyticsTab"; */
 import { useProductStore } from "../stores/useProductStore";
+
+const ProductTab = lazy(() => import("./tabs/ProductTab"));
+const ReservationsTab = lazy(() => import("./tabs/ReservationsTab"));
+// const AnalyticsTab = lazy(() => import("./tabs/AnalyticsTab"));
 
 const tabs = [
   { id: "products", label: "Products", icon: <FaBoxOpen /> },
@@ -54,10 +52,21 @@ const AdminPage = () => {
 
       {/* Content */}
       <div className="w-full max-w-6xl bg-primary/80 border-4 border-accent rounded-2xl p-8 shadow-xl">
-        {activeTab === "products" && <ProductTab />}
-        {activeTab === "reservations" && <ReservationsTab />}
-        {activeTab === "analytics" && <div className="text-secondary">Analytics</div>}
-        {/* <AnalyticsTab /> */}
+        <Suspense
+          fallback={
+            <p className="text-center text-secondary/70 py-8">
+              Loading {activeTab}...
+            </p>
+          }
+        >
+          {activeTab === "products" && <ProductTab />}
+          {activeTab === "reservations" && <ReservationsTab />}
+          {activeTab === "analytics" && (
+            <div className="text-center text-secondary/70 py-12">
+              Analytics tab coming soon!
+            </div>
+          )}
+        </Suspense>
       </div>
     </div>
   );
