@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaTrash, FaEdit, FaPhoneAlt, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useReservationStore } from "../stores/useReservationStore";
@@ -14,16 +14,25 @@ const IRLReservationsList = ({ onEdit }) => {
     filters,
     setFilter,
   } = useReservationStore();
-  const { t } = useTranslation();
+
+  const { t: tCommon } = useTranslation("admin/common");
+  const { t: tReservations } = useTranslation("admin/reservations");
+  const { t: tProducts } = useTranslation("productsSection");
+
+  const [expandedRows, setExpandedRows] = useState([]);
 
   useEffect(() => {
     fetchFilteredReservations();
-
     const handleLangChange = () => fetchFilteredReservations();
     i18next.on("languageChanged", handleLangChange);
-
     return () => i18next.off("languageChanged", handleLangChange);
   }, [fetchFilteredReservations]);
+
+  const toggleExpand = (id) => {
+    setExpandedRows((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
 
   const handleToggleCompleted = async (e) => {
     const showCompleted = e.target.checked ? "true" : "";
@@ -37,7 +46,6 @@ const IRLReservationsList = ({ onEdit }) => {
     await fetchFilteredReservations();
   };
 
-  // Apply amountDue filter on the frontend too (in case backend doesn’t filter)
   const filteredReservations =
     filters.amountDue === "nonzero"
       ? reservations.filter((r) => (r.amountDue || 0) > 0)
@@ -46,7 +54,7 @@ const IRLReservationsList = ({ onEdit }) => {
   if (loading && reservations.length === 0) {
     return (
       <p className="text-center py-8 text-secondary/60">
-        {t("common.loading")}
+        {tCommon("loading.loading")}
       </p>
     );
   }
@@ -54,7 +62,7 @@ const IRLReservationsList = ({ onEdit }) => {
   if (!filteredReservations || filteredReservations.length === 0) {
     return (
       <p className="text-center py-8 text-secondary/60">
-        {t("common.noReservations")}
+        {tReservations("empty")}
       </p>
     );
   }
@@ -69,7 +77,7 @@ const IRLReservationsList = ({ onEdit }) => {
       {/* Filter Bar */}
       <div className="flex flex-wrap justify-between items-center gap-4 px-6 py-3 bg-secondary/40 border-b border-accent-content">
         <h2 className="text-lg font-semibold text-primary">
-          {t("admin.reservations")}
+          {tReservations("filters.title")}
         </h2>
 
         <div className="flex items-center gap-6">
@@ -80,7 +88,7 @@ const IRLReservationsList = ({ onEdit }) => {
               onChange={handleToggleCompleted}
               className="checkbox checkbox-sm checkbox-accent"
             />
-            <span>{t("admin.showCompleted") || "Show completed"}</span>
+            <span>{tReservations("filters.completed")}</span>
           </label>
 
           <label className="flex items-center gap-2 text-sm text-secondary cursor-pointer select-none">
@@ -90,95 +98,174 @@ const IRLReservationsList = ({ onEdit }) => {
               onChange={handleToggleAmountDue}
               className="checkbox checkbox-sm checkbox-accent"
             />
-            <span>{t("admin.hideZeroAmount") || "Hide €0 reservations"}</span>
+            <span>{tReservations("filters.amountDue")}</span>
           </label>
         </div>
       </div>
 
-      <thead className="bg-secondary/50 font-semibold text-primary uppercase tracking-wider">
-        <tr>
-          <th className="px-6 py-3 text-left text-xs">{t("admin.client")}</th>
-          <th className="px-6 py-3 text-left text-xs">{t("admin.products")}</th>
-          <th className="px-6 py-3 text-left text-xs">
-            {t("admin.totalAmount") || "Total (€)"}
-          </th>
-          <th className="px-6 py-3 text-left text-xs">
-            {t("admin.amountDue") || "Due (€)"}
-          </th>
-          <th className="px-6 py-3 text-left text-xs">
-            {t("admin.deliveryDate")}
-          </th>
-          <th className="px-6 py-3 text-left text-xs">{t("admin.status")}</th>
-          <th className="px-6 py-3 text-right text-xs">{t("admin.actions")}</th>
-        </tr>
-      </thead>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-accent-content">
+          <thead className="bg-secondary/50 font-semibold text-primary uppercase tracking-wider">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs">
+                {tReservations("list.name")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tReservations("list.items")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tReservations("list.total")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tReservations("list.amountDue")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tReservations("list.dateOfDelivery")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tReservations("list.status")}
+              </th>
+              <th className="px-6 py-3 text-right text-xs">
+                {tReservations("list.actions")}
+              </th>
+            </tr>
+          </thead>
 
-      <tbody className="bg-accent/50 divide-y divide-accent-content">
-        {filteredReservations.map((res) => (
-          <tr key={res._id} className="hover:bg-accent/80 transition-colors">
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary">
-              {res.client?.name || "—"}
-              <br />
-              <span className="text-xs text-secondary/60">
-                {res.client?.phone || "—"}
-              </span>
-            </td>
+          <tbody className="bg-accent/50 divide-y divide-accent-content">
+            {filteredReservations.map((res) => {
+              const isExpanded = expandedRows.includes(res._id);
+              const firstProduct = res.products?.[0];
+              const remainingCount = (res.products?.length || 0) - 1;
 
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary/70">
-              {res.products
-                ?.map((p) => p.product?.name || "Unknown")
-                .join(", ") || "—"}
-            </td>
+              return (
+                <>
+                  <tr
+                    key={res._id}
+                    className="hover:bg-accent/80 transition-colors"
+                  >
+                    <td className="px-6 py-4 text-sm text-secondary align-middle">
+                      {res.client?.name}
+                      {isExpanded && res.client?.phone && (
+                        <div className="text-xs flex gap-2 items-center text-secondary/60 mt-1">
+                          <FaPhoneAlt /> {res.client?.phone}
+                        </div>
+                      )}
+                    </td>
 
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary/60">
-              €{res.calculatedTotalAmmount?.toFixed(2) || "0.00"}
-            </td>
+                    <td className="px-6 py-4 text-sm text-secondary/70 align-middle">
+                      {firstProduct && (
+                        <>
+                          {tProducts(
+                            `${firstProduct.product?.key || firstProduct.product?.name}.title`,
+                            { defaultValue: firstProduct.product?.name || "—" }
+                          )}{" "}
+                          ({firstProduct.quantityInGrams} g) — €
+                          {firstProduct.priceAtReservation?.toFixed(2) || "0.00"}
+                        </>
+                      )}
+                      {remainingCount > 0 && !isExpanded && (
+                        <span className="text-secondary/50 text-xs ml-2">
+                          +{remainingCount} more
+                        </span>
+                      )}
+                    </td>
 
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <span
-                className={
-                  res.amountDue > 0
-                    ? "text-red-400 font-semibold"
-                    : "text-green-400 font-semibold"
-                }
-              >
-                €{res.amountDue?.toFixed(2) || "0.00"}
-              </span>
-            </td>
+                    <td className="px-6 py-4 text-sm text-secondary/60 align-middle">
+                      €{res.calculatedTotalAmmount?.toFixed(2) || "0.00"}
+                    </td>
 
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary/60">
-              {new Date(res.dateOfDelivery).toLocaleDateString()}
-            </td>
+                    <td className="px-6 py-4 text-sm font-medium align-middle">
+                      <span
+                        className={
+                          res.amountDue > 0
+                            ? "text-red-400 font-semibold"
+                            : "text-green-400 font-semibold"
+                        }
+                      >
+                        €{res.amountDue?.toFixed(2) || "0.00"}
+                      </span>
+                    </td>
 
-            <td className="px-6 py-4 whitespace-nowrap text-sm">
-              {res.completed ? (
-                <span className="text-green-400 font-semibold">
-                  {t("admin.completed")}
-                </span>
-              ) : (
-                <span className="text-yellow-400 font-semibold">
-                  {t("admin.pending")}
-                </span>
-              )}
-            </td>
+                    <td className="px-6 py-4 text-sm text-secondary/60 align-middle">
+                      {new Date(res.dateOfDelivery).toLocaleDateString()}
+                    </td>
 
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end gap-3">
-              <button
-                onClick={() => onEdit && onEdit(res)}
-                className="text-accent-content/60 hover:text-accent-content transition-colors"
-              >
-                <FaEdit className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => deleteReservation(res._id)}
-                className="text-accent-content/60 hover:text-accent-content transition-colors"
-              >
-                <FaTrash className="h-5 w-5" />
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
+                    <td className="px-6 py-4 text-sm align-middle">
+                      {res.completed ? (
+                        <span className="text-green-400 font-semibold">
+                          {tCommon("status.completed")}
+                        </span>
+                      ) : (
+                        <span className="text-yellow-400 font-semibold">
+                          {tCommon("status.pending")}
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="px-6 py-4 text-right text-sm font-medium align-middle">
+                      <div className="flex justify-end items-center gap-3">
+                        <button
+                          onClick={() => onEdit && onEdit(res)}
+                          className="text-accent-content/60 hover:text-accent-content transition-colors"
+                        >
+                          <FaEdit className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => deleteReservation(res._id)}
+                          className="text-accent-content/60 hover:text-accent-content transition-colors"
+                        >
+                          <FaTrash className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => toggleExpand(res._id)}
+                          className="text-accent-content/60 hover:text-accent-content transition-colors"
+                        >
+                          {isExpanded ? (
+                            <FaChevronUp className="h-4 w-4" />
+                          ) : (
+                            <FaChevronDown className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.tr
+                        key={`${res._id}-details`}
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.2 }}
+                        className="bg-gray-900/60"
+                      >
+                        <td colSpan={7} className="px-8 py-4 text-sm text-secondary/80">
+                          <p className="font-semibold mb-2">
+                            {tReservations("details.title", { defaultValue: "Reservation Details" })}
+                          </p>
+                          <div className="space-y-1">
+                            {res.products?.map((p, idx) => (
+                              <div key={idx}>
+                                {tProducts(
+                                  `${p.product?.key || p.product?.name}.title`,
+                                  { defaultValue: p.product?.name || "—" }
+                                )}{" "}
+                                ({p.quantityInGrams} g) — €
+                                {p.priceAtReservation?.toFixed(2) || "0.00"}
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
+                </>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </motion.div>
   );
 };
