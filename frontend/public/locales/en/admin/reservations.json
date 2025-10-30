@@ -1,0 +1,26 @@
+{
+    "tabs": {
+        "irl": "IRL Reservations",
+        "online": "Online Reservations"
+    },
+    "filters": {
+        "title": "Filters",
+        "completed": "Show incopleted",
+        "amountDue": "Hide zero amount due",
+        "search": "Search by client name or email"
+    },
+    "list": {
+        "name": "Client Name",
+        "phone": "Phone:",
+        "items": "Items",
+        "total": "Total (€)",
+        "amountDue": "Due (€)",
+        "dateOfDelivery": "Delivery Date",
+        "status": "Status",
+        "actions": "Actions"
+    },
+    "editTitle": "Edit Reservation",
+    "createTitle": "Create New Reservation",
+    "back": "Back to Reservations",
+    "empty": "No reservations found."
+}

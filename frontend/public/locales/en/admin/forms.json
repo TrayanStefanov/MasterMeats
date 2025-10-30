@@ -1,0 +1,63 @@
+{
+    "client": {
+        "title": "Client Information",
+        "nameLabel": "Full Name",
+        "namePlaceholder": "John Doe",
+        "phoneLabel": "Phone",
+        "phonePlaceholder": "+359888888888",
+        "emailLabel": "Email(optional)",
+        "emailPlaceholder": "example@example.com",
+        "notesLabel": "Notes(optional)",
+        "notesPlaceholder": "Additional notes..."
+    },
+    "delivery": {
+        "title": "Delivery Details",
+        "dateOfDelivery": "Date of Delivery",
+        "completed": "Mark as Completed",
+        "total": "Total Amount",
+        "amountDue": "Amount Due",
+        "notesLabel": "Notes(optional)",
+        "notesPlaceholder": "Additional notes..."
+    },
+    "reservationItem": {
+        "title": "Products in Reservation",
+        "empty": "No products added yet",
+        "price": "Price",
+        "quantity": "Quantity"
+    },
+    "product": {
+        "title": "Product Info",
+        "nameLabel": "Product name (internal key)",
+        "namePlaceholder": "example_example",
+        "priceLabel": "Price per kg",
+        "pricePlaceholder": "0.00",
+        "categoryLabel": "Product Category",
+        "categoryDropdown": "Select Category",
+        "stock": "Stock in grams(optional)",
+        "subtitle": "Localization Info",
+        "langs": {
+            "bg": {
+                "title": "Bulgarian (BG)",
+                "titleLabel": "Заглавие",
+                "titlePlaceholder": "Месо",
+                "ingredientsLabel": "Съставки (по желание)",
+                "ingredientsPlaceholder": "Сол, месо, подправки...",
+                "descriptionLabel": "Описание",
+                "descriptionPlaceholder": "Описание...",
+                "badgeLabel": "Етикет (по желание)",
+                "badgePlaceholder": "Нов"
+            },
+            "en": {
+                "title": "English (EN)",
+                "titleLabel": "Title",
+                "titlePlaceholder": "Meat",
+                "ingredientsLabel": "Ingredients(optional)",
+                "ingredientsPlaceholder": "Salt, meat, spices...",
+                "descriptionLabel": "Description",
+                "descriptionPlaceholder": "Description...",
+                "badgeLabel": "Badge(optional)",
+                "badgePlaceholder": "New"
+            }
+        }
+    }
+}

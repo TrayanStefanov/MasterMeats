@@ -1,0 +1,31 @@
+{
+    "buttons": {
+        "createProduct": "Create Product",
+        "updateProduct": "Update Product",
+        "deleteProduct": "Delete Product",
+        "updateClient": "Update Client",
+        "createClient": "Create Client",
+        "deleteClient": "Delete Client",
+        "updateReservation": "Update Reservation",
+        "createReservation": "Create Reservation",
+        "deleteReservation": "Delete Reservation"
+    },
+    "loading": {
+        "loading": "Loading...",
+        "updating": "Updating...",
+        "creating": "Creating...",
+        "deleting": "Deleting...",
+        "uploading": "Uploading..."
+    },
+    "tabs": {
+        "products": "Products",
+        "reservations": "Reservations",
+        "analytics": "Analytics"
+    },
+    "status": {
+        "pending": "Pending",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+    }
+
+}

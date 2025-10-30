@@ -1,0 +1,19 @@
+{
+    "title": "Products",
+    "empty": "No products found.",
+    "back": "Back to Products",
+    "list": {
+        "name": "Name",
+        "category": "Category",
+        "price": "Price",
+        "actions": "Actions"
+    },
+    "upload": {
+        "title": "Upload Images (max 5)",
+        "imagesSelected": "{{count}} image selected",
+        "imagesSelected_plural": "{{count}} images selected",
+        "alert": "You must upload between 1 and 5 images"
+    },
+    "createTitle": "Create New Product",
+    "editTitle": "Editing: {{name}}"
+}

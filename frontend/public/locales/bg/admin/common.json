@@ -1,0 +1,30 @@
+{
+    "buttons": {
+        "createProduct": "Създай продукт",
+        "updateProduct": "Обнови продукта",
+        "deleteProduct": "Изтрий продукта",
+        "updateClient": "Обнови клиента",
+        "createClient": "Създай клиент",
+        "deleteClient": "Изтрий клиента",
+        "updateReservation": "Обнови резервацията",
+        "createReservation": "Създай резервация",
+        "deleteReservation": "Изтрий резервация"
+    },
+    "loading": {
+        "loading": "Зареждане...",
+        "updating": "Обновяване...",
+        "creating": "Създаване...",
+        "deleting": "Изтриване...",
+        "uploading": "Качване..."
+    },
+    "tabs": {
+        "products": "Продукти",
+        "reservations": "Резервации",
+        "analytics": "Анализи"
+    },
+    "status": {
+        "pending": "Чакаща",
+        "completed": "Завършена",
+        "cancelled": "Отказана"
+    }
+}
