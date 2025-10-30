@@ -1,0 +1,25 @@
+{
+    "tabs": {
+        "users": "Users",
+        "clients": "Clients"
+    },
+    "filters": {
+        "title": "Filters",
+        "search": "Search by client name or phone"
+    },
+    "list": {
+        "name": "Client Name",
+        "phone": "Phone:",
+        "items": "Items",
+        "total": "Total (€)",
+        "amountDue": "Due (€)",
+        "dateOfDelivery": "Delivery Date",
+        "status": "Status",
+        "actions": "Actions"
+    },
+    "editTitle": "Edit Client",
+    "createTitle": "Create New Client",
+    "back": "Back to Clients",
+    "title": "Clients",
+    "empty": "No clients found."
+}
