@@ -23,7 +23,8 @@
         "title": "Products in Reservation",
         "empty": "No products added yet",
         "price": "Price",
-        "quantity": "Quantity"
+        "quantity": "Quantity",
+        "total": "Total"
     },
     "product": {
         "title": "Product Info",

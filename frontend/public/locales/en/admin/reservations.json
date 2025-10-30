@@ -22,5 +22,6 @@
     "editTitle": "Edit Reservation",
     "createTitle": "Create New Reservation",
     "back": "Back to Reservations",
-    "empty": "No reservations found."
+    "title": "Reserved Items",
+    "empty": "No reserved items found."
 }
