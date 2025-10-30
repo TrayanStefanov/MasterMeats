@@ -16,7 +16,7 @@ const CartModal = ({ isOpen, onClose }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation("cart");
 
   const handleSuccessClose = () => {
     setShowSuccess(false);
@@ -48,10 +48,10 @@ const CartModal = ({ isOpen, onClose }) => {
           </button>
 
           <h2 className="text-2xl lg:text-3xl 2xl:text-4xl font-bold text-accent mb-2 text-center">
-            {t("cart.title")}
+            {t("title")}
           </h2>
           <p className="text-center text-primary-content/80 mb-8 text-sm lg:text-base 2xl:text-lg">
-            {t("cart.subtitle")}
+            {t("subtitle")}
           </p>
 
           {cart.length === 0 ? (

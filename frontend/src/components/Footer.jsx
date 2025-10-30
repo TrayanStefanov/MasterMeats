@@ -11,13 +11,13 @@ import { motion } from "framer-motion";
 import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const navLinks = [
-    { href: "#hero", label: t("navbar.home") },
-    { href: "#products", label: t("navbar.products") },
-    { href: "#about", label: t("navbar.about") },
-    { href: "#contacts", label: t("navbar.contacts") },
+    { href: "#hero", label: t("nav.home") },
+    { href: "#products", label: t("nav.products") },
+    { href: "#about", label: t("nav.about") },
+    { href: "#contacts", label: t("nav.contacts") },
   ];
 
   const { scrollToSection } = useSmoothScrollNav(navLinks);
@@ -47,7 +47,7 @@ const Footer = () => {
             className="w-full lg:max-w-[200px] h-full object-contain"
           />
           <p className="text-xl lg:text-2xl 2xl:text-3xl">
-            {t("footer.slogan")}
+            {t("socials.slogan")}
           </p>
         </motion.div>
 
@@ -80,7 +80,7 @@ const Footer = () => {
             variants={fadeUp}
           >
             <div className="flex flex-col gap-3 md:gap-4 mt-1 md:mt-2">
-              {[t("footer.social-links.linkedin"), "#", "#"].map((link, i) => (
+              {[t("socials.linkedin"), "#", "#"].map((link, i) => (
                 <motion.a
                   key={i}
                   href={link}
@@ -109,7 +109,7 @@ const Footer = () => {
           variants={fadeUp}
         >
           <div className="flex gap-3 md:gap-4 mt-1 md:mt-2">
-            {[t("footer.social-links.linkedin"), "#", "#"].map((link, i) => (
+            {[t("socials.linkedin"), "#", "#"].map((link, i) => (
               <motion.a
                 key={i}
                 href={link}
@@ -131,21 +131,21 @@ const Footer = () => {
           </div>
           <p className="flex flex-row text-lg 2xl:text-xl gap-2">
             <FaPhoneAlt className="text-lg lg:text-xl 2xl:text-2xl" />
-            {t("footer.phone.note")}{" "}
-            <a href={`tel:${t("footer.phone.value")}`} className="underline">
-              {t("footer.phone.value")}
+            {t("contacts.phone.note")}{" "}
+            <a href={`tel:${t("contacts.phone.value")}`} className="underline">
+              {t("contacts.phone.value")}
             </a>
           </p>
           <p className="flex flex-row text-lg 2xl:text-xl gap-2">
             <FaEnvelope className="text-lg lg:text-xl 2xl:text-2xl" />
-            {t("footer.email.note")}{" "}
+            {t("contacts.email.note")}{" "}
             <a
-              href={`mailto:${t("footer.email.value1")}@${t(
-                "footer.email.value2"
+              href={`mailto:${t("contacts.email.value1")}@${t(
+                "contacts.email.value2"
               )}.com`}
               className="underline"
             >
-              {t("footer.email.value1")}@{t("footer.email.value2")}.com
+              {t("contacts.email.value1")}@{t("contacts.email.value2")}.com
             </a>
           </p>
         </motion.div>

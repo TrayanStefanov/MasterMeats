@@ -18,14 +18,20 @@ export const useProductStore = create((set) => ({
 
       const localized = backendProducts.map((p) => ({
         ...p,
-        title: i18next.t(`products.${p.name}.title`, { defaultValue: p.name }),
-        description: i18next.t(`products.${p.name}.description`, {
-          defaultValue: p.description || "",
+        title: i18next.t(`productsSection:${p.name}.title`, {
+          defaultValue: p.name,
         }),
-        ingredients: i18next.t(`products.${p.name}.ingredients`, {
+        description: i18next.t(
+          `productsSection:${p.name}.description`,
+          { defaultValue: p.description || "" }
+        ),
+        ingredients: i18next.t(
+          `productsSection:${p.name}.ingredients`,
+          { defaultValue: "" }
+        ),
+        badge: i18next.t(`productsSection:${p.name}.badge`, {
           defaultValue: "",
         }),
-        badge: i18next.t(`products.${p.name}.badge`, { defaultValue: "" }),
       }));
 
       set({ products: localized, loading: false });

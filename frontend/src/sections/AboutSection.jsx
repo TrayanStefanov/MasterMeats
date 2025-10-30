@@ -3,8 +3,8 @@ import KeyCard from "../components/KeyCard.jsx";
 import { useTranslation } from "react-i18next";
 
 const AboutSection = () => {
-  const { t } = useTranslation();
-  const keycards = t("about.keycards", { returnObjects: true });
+  const { t } = useTranslation("aboutSection");
+  const keycards = t("keycards", { returnObjects: true });
 
   return (
     <section
@@ -13,7 +13,7 @@ const AboutSection = () => {
     >
       <div className="max-w-7xl mx-auto text-center mb-12 px-6">
         <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-accent mb-4">
-          {t("about.title")}
+          {t("title")}
         </h2>
         <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full mb-8"></div>
         <motion.p
@@ -23,7 +23,7 @@ const AboutSection = () => {
           transition={{ duration: 0.6 }}
           className="text-base md:text-lg leading-relaxed text-semibold max-w-3xl mx-auto"
         >
-          {t("about.intro")}
+          {t("intro")}
         </motion.p>
       </div>
 
@@ -49,7 +49,7 @@ const AboutSection = () => {
           >
             <img
               src="/about.jpg"
-              alt={t("about.title")}
+              alt={t("title")}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -62,7 +62,7 @@ const AboutSection = () => {
             className="bg-card p-8 rounded-2xl shadow-md shadow-accent flex flex-col justify-center w-full lg:w-4/5"
           >
             <p className="text-xl lg:text-2xl 2xl:text-3xl leading-relaxed text-muted-foreground text-accent text-center italic font-bold">
-              {t("about.footer")}
+              {t("footer")}
             </p>
           </motion.div>
         </div>

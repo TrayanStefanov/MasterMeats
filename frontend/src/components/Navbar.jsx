@@ -12,7 +12,7 @@ import { useSmoothScrollNav } from "../hooks/useSmoothScrollNav";
 
 const Navbar = ({ onLoginClick, onCartClick }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,10 +20,10 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
   const { user, logout } = useUserStore();
 
   const navLinks = [
-    { href: "#hero", label: t("navbar.home") },
-    { href: "#products", label: t("navbar.products") },
-    { href: "#about", label: t("navbar.about") },
-    { href: "#contacts", label: t("navbar.contacts") },
+    { href: "#hero", label: t("nav.home") },
+    { href: "#products", label: t("nav.products") },
+    { href: "#about", label: t("nav.about") },
+    { href: "#contacts", label: t("nav.contacts") },
   ];
 
   const { activeSection, scrollToSection } = useSmoothScrollNav(
@@ -116,7 +116,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
                 onClick={logout}
                 className="text-accent hover:text-accent/80 font-bold text-lg lg:text-xl 2xl:text-2xl"
               >
-                {t("navbar.logout")}
+                {t("logout")}
               </button>
             </>
           ) : (
@@ -126,7 +126,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
             >
               <div className="flex flex-row mx-4 items-center gap-1 font-bold text-lg lg:text-xl 2xl:text-2xl">
                 <FaUser className="w-5 h-5" />
-                <span className="hidden lg:inline">{t("navbar.login")}</span>
+                <span className="hidden lg:inline">{t("login")}</span>
               </div>
             </button>
           )}

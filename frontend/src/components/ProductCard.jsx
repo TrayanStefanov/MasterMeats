@@ -11,7 +11,7 @@ import MobileImageCarousel from "./MobileImageCarousel";
 const ProductCard = ({ product, reverse = false }) => {
   const [quantityGrams, setQuantityGrams] = useState(500);
   const addToCart = useCartStore((state) => state.addToCart);
-  const { t } = useTranslation();
+  const { t } = useTranslation("productsSection");
 
   const handleBuy = async () => {
     if (!product._id) {
@@ -33,16 +33,16 @@ const ProductCard = ({ product, reverse = false }) => {
         .reverse()
     : [product.image];
 
-  const title = t(`products.${product.name}.title`, {
+  const title = t(`${product.name}.title`, {
     defaultValue: product.name,
   });
-  const description = t(`products.${product.name}.description`, {
+  const description = t(`${product.name}.description`, {
     defaultValue: product.description || "",
   });
-  const ingredients = t(`products.${product.name}.ingredients`, {
+  const ingredients = t(`${product.name}.ingredients`, {
     defaultValue: "",
   });
-  const badge = t(`products.${product.name}.badge`, { defaultValue: "" });
+  const badge = t(`${product.name}.badge`, { defaultValue: "" });
 
   return (
     <motion.div
@@ -112,7 +112,7 @@ const ProductCard = ({ product, reverse = false }) => {
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="p-1 text-base lg:text-lg 2xl:text-xl font-bold flex text-center"
               >
-                {(quantityGrams / 1000).toFixed(1)} {t("products.kg")}
+                {(quantityGrams / 1000).toFixed(1)} {t("kg")}
               </motion.span>
               <button onClick={increment} className="px-1 lg:px-3">
                 <FaPlus className="text-secondary w-3 h-3 lg:w-5 lg:h-5" />
@@ -123,7 +123,7 @@ const ProductCard = ({ product, reverse = false }) => {
               onClick={handleBuy}
               className="border lg:border-4 border-secondary 2xl:text-lg px-1 lg:px-3 py-2 rounded-lg font-semibold hover:scale-110 transition-transform shadow-md"
             >
-              {t("products.btnBuy")}
+              {t("btnBuy")}
             </button>
           </div>
         </div>

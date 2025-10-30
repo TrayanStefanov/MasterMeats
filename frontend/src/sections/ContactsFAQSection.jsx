@@ -5,7 +5,8 @@ import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import FAQItem from "../components/FAQItem.jsx";
 
 const ContactsFAQSection = () => {
-  const { t } = useTranslation();
+  const { t: tCommon } = useTranslation("common");
+  const { t: tFaq } = useTranslation("faq");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -28,12 +29,12 @@ const ContactsFAQSection = () => {
   };
 
   // Contacts
-  const phone = t("contacts.phone.value");
-  const email = `${t("contacts.email.value1")}@${t("contacts.email.value2")}`;
-  const location = t("contacts.location.value");
+  const phone = tCommon("contacts.phone.value");
+  const email = `${tCommon("contacts.email.value1")}@${tCommon("contacts.email.value2")}`;
+  const location = tCommon("contacts.location.value");
 
   // FAQs
-  const faqsObj = t("faq.questions", { returnObjects: true });
+  const faqsObj = tFaq("questions", { returnObjects: true });
   const faqs = Object.values(faqsObj);
 
   return (
@@ -42,7 +43,7 @@ const ContactsFAQSection = () => {
         {/* Contacts */}
         <div>
           <h2 className="text-xl lg:text-2xl 2xl:text-3xl font-bold mb-6">
-            {t("contacts.title")}
+            {tCommon("contacts.title")}
           </h2>
           <ul className="space-y-4 mb-8 text-base lg:text-lg 2xl:text-xl text-primary">
             <li className="flex items-center gap-3">
@@ -68,7 +69,7 @@ const ContactsFAQSection = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder={t("contacts.form.name")}
+              placeholder={tCommon("form.name")}
               className="input input-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
               required
             />
@@ -77,7 +78,7 @@ const ContactsFAQSection = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder={t("contacts.form.email")}
+              placeholder={tCommon("form.email")}
               className="input input-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
               required
             />
@@ -86,14 +87,14 @@ const ContactsFAQSection = () => {
               name="subject"
               value={formData.subject}
               onChange={handleChange}
-              placeholder={t("contacts.form.subject")}
+              placeholder={tCommon("form.subject")}
               className="input input-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
             />
             <textarea
               name="message"
               value={formData.message}
               onChange={handleChange}
-              placeholder={t("contacts.form.message")}
+              placeholder={tCommon("form.message")}
               className="textarea textarea-bordered w-full border border-primary bg-accent/10 placeholder:text-primary"
               rows="4"
               required
@@ -102,7 +103,7 @@ const ContactsFAQSection = () => {
               type="submit"
               className="btn btn-accent text-lg lg:text-xl 2xl:text-2xl text-primary-content w-full"
             >
-              {t("contacts.form.btnSend")}
+              {tCommon("buttons.send")}
             </button>
           </form>
         </div>
@@ -110,7 +111,7 @@ const ContactsFAQSection = () => {
         {/* FAQ */}
         <div>
           <h2 className="text-xl lg:text-2xl 2xl:text-3xl font-bold mb-6">
-            {t("faq.title")}
+            {tFaq("title")}
           </h2>
           <div className="space-y-3">
             {faqs.map((faq, idx) => {

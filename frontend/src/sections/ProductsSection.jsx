@@ -6,7 +6,7 @@ import ProductCard from "../components/ProductCard.jsx";
 import { useProductStore } from "../stores/useProductStore.js";
 
 const ProductsSection = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("productsSection");
   const { products, fetchAllProducts, loading } = useProductStore();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const ProductsSection = () => {
     <section id="products" className="py-4">
       <div className="container mx-auto text-center mb-16">
         <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-accent px-6 lg:px-0 my-2">
-          {t("products.title")}
+          {t("title")}
         </h2>
         <div className="w-1/2 h-[3px] bg-accent mx-auto rounded-full"></div>
       </div>

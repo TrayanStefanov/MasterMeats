@@ -3,13 +3,14 @@ import { useCartStore } from "../stores/useCartStore";
 import { useTranslation } from "react-i18next";
 
 const CartItem = ({ item }) => {
-  const { t } = useTranslation();
+  const { t: tProduct } = useTranslation("productsSection");
+  const { t: tCommon } = useTranslation("common");
   const { removeFromCart, updateQuantity } = useCartStore();
 
   const keyBase = item.slug || item.name?.toLowerCase().replace(/\s+/g, "_") || item._id;
 
-  const title = t(`products.${keyBase}.title`, { defaultValue: item.title || "Unnamed Product" });
-  const description = t(`products.${keyBase}.description`, {
+  const title = tProduct(`${keyBase}.title`, { defaultValue: item.title || "Unnamed Product" });
+  const description = tProduct(`${keyBase}.description`, {
     defaultValue: item.description || "No description available.",
   });
 
@@ -57,7 +58,7 @@ const CartItem = ({ item }) => {
             className="inline-flex items-center gap-1 text-sm lg:text-base 2xl:text-lg font-medium text-accent hover:text-accent/80 hover:underline transition"
           >
             <FaTrash className="w-4 h-4" size={14} />
-            <span>{t("cart.removeItem")}</span>
+            <span>{tCommon("buttons.removeItem")}</span>
           </button>
         </div>
 
@@ -75,7 +76,7 @@ const CartItem = ({ item }) => {
             </button>
 
             <p className="text-primary-content text-base lg:text-lg 2xl:text-xl font-semibold">
-              {quantityKg.toFixed(1)} {t("cart.kg")}
+              {quantityKg.toFixed(1)} {tCommon("units.kg")}
             </p>
 
             <button

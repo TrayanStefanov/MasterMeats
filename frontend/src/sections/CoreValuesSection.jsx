@@ -12,8 +12,8 @@ import {
 } from "react-icons/gi";
 
 const CoreValuesSection = () => {
-  const { t } = useTranslation();
-  const rawValues = t("coreValues.values", { returnObjects: true });
+  const { t } = useTranslation("coreValuesSection");
+  const rawValues = t("values", { returnObjects: true });
   const values = Array.isArray(rawValues)
     ? rawValues
     : Object.values(rawValues);
@@ -36,7 +36,7 @@ const CoreValuesSection = () => {
       <div className="relative z-20 flex flex-col items-center w-full">
         <div className="text-center px-4 mt-12 mb-12 lg:mt-0">
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-emphasis-heading font-bold mb-2 text-accent">
-            {t("coreValues.title")}
+            {t("title")}
           </h2>
         </div>
 

@@ -4,14 +4,14 @@ import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 
 const LanguageSelector = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const [language, setLanguage] = useState(i18next.language || "en");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const languages = [
-    { code: "en", label: t("language.en.label") },
-    { code: "bg", label: t("language.bg.label") },
+    { code: "en", label: t("lang.en.label") },
+    { code: "bg", label: t("lang.bg.label") },
   ];
 
   const handleChange = (code) => {
