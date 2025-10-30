@@ -1,0 +1,29 @@
+{
+    "title": "Crafted with care and a focus on:",
+    "values": {
+        "1": {
+            "title": "Quality",
+            "subtitle": "Hand-selected cuts from trusted Bulgarian farms",
+            "description": "Every cut we offer is meticulously chosen and expertly crafted to ensure you receive only the finest, premium-quality meat.",
+            "image": "/quality.jpg"
+        },
+        "2": {
+            "title": "Taste",
+            "subtitle": "Authentic, rich, and unforgettable flavors",
+            "description": "Our meats are seasoned and prepared to deliver a consistent, rich, and full-bodied taste that delights with every bite.",
+            "image": "/taste.jpg"
+        },
+        "3": {
+            "title": "Freshness",
+            "subtitle": "Straight from farm to table",
+            "description": "We prioritize freshness at every stage, ensuring vibrant, wholesome meats that are ready to elevate your meals.",
+            "image": "/fresh.jpg"
+        },
+        "4": {
+            "title": "Health",
+            "subtitle": "Natural, wholesome, and nutritious",
+            "description": "Using traditional techniques and natural ingredients, we create meats that support your wellbeing without compromising on flavor.",
+            "image": "/health.jpg"
+        }
+    }
+}

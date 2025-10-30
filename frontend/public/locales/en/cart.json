@@ -1,0 +1,37 @@
+{
+    "title": "Your Cart",
+    "subtitle": "Review your cart and complete your order.",
+    "empty": {
+        "title": "Your cart is empty.",
+        "text": "Looks like you haven't added anything yet.",
+        "btnCTA": "Start Shopping"
+    },
+    "checkout": {
+        "title": "Order Summary",
+        "subtotal": "Original Price",
+        "discount": "Discount",
+        "coupon": "Coupon",
+        "total": "Total",
+        "btnCheckout": "Proceed to Checkout",
+        "loading": "Processing..."
+    },
+    "paymentSuccess": {
+        "title": "Payment Successful",
+        "subtitle": "Thank you for your order. It will be processed as soon as possible!",
+        "orderDetails": {
+            "title": "Order Details",
+            "orderId": "Order Number",
+            "deliveryDate": "Estimated Delivery Date",
+            "deliveryText": "7-10 business days",
+            "items": "Items:",
+            "total": "Total"
+        },
+        "btnClose": "Back"
+    },
+    "paymentCancel": {
+        "title": "Payment Failed",
+        "subtitle": "An error occurred during payment.",
+        "subtitle2": " Please try again.",
+        "btn": "Close"
+    }
+}

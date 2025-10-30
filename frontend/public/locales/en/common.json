@@ -1,0 +1,68 @@
+{
+  "buttons": {
+    "send": "Send",
+    "removeItem": "Remove",
+    "checkout": "Checkout",
+    "close": "Close",
+    "buy": "Add to Cart"
+  },
+  "form": {
+    "name": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "subject": "Subject",
+    "message": "Message"
+  },
+  "units": {
+    "grams": "g",
+    "kg": "kg",
+    "of": "of"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "tryAgain": "Try Again"
+  },
+  "logo": "/logo_en.png",
+  "login": "Login",
+  "logout": "Logout",
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About Us",
+    "contacts": "Contacts"
+  },
+  "lang": {
+    "bg": {
+      "label": "Bulgarian",
+      "code": "BG"
+    },
+    "en": {
+      "label": "English",
+      "code": "EN"
+    }
+  },
+  "contacts": {
+    "title": "Contact us",
+    "phone": {
+      "note": "Phone:",
+      "value": "+359-886-123-456"
+    },
+    "email": {
+      "note": "Email:",
+      "value1": "master",
+      "value2": "meatsbg"
+    },
+    "location": {
+      "note": "Location:",
+      "value": "Sofia, Bulgaria"
+    }
+  },
+  "socials": {
+    "slogan": "A taste for every palate",
+    "title": "Social Networks",
+    "linkedin": "https://www.linkedin.com/company/profit-back-ltd/"
+  }
+}

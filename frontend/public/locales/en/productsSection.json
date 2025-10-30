@@ -1,0 +1,29 @@
+{
+  "title": "Our Selection, Crafted Especially for You!",
+  "btnBuy": "Add to Cart",
+  "kg": "kg",
+  "elena_fillet_mix": {
+    "title": "Elena Fillet Mix",
+    "description": "An aroma and taste that unfolds with every bite – a flavor for true connoisseurs. A pinch of black pepper to tease the senses. Tender fillet that melts in your mouth. Dried for at least 15 days.",
+    "ingredients": "Pork loin, sweet red pepper, black pepper, savory, and fenugreek",
+    "badge": "New"
+  },
+  "elena_fillet_clasic": {
+    "title": "Elena Fillet",
+    "description": "A classic to the table. Fresh Bulgarian meat – pure loin, delicately seasoned only with savory, fenugreek, and time. A taste up to standard. Dried for at least 15 days.",
+    "ingredients": "Pork loin, savory, and fenugreek",
+    "badge": "Most Popular"
+  },
+  "pastarma": {
+    "title": "Pastarma (Cured Pork)",
+    "description": "True Bulgarian pride – aromatic pastarma with a rich red pepper flavor, cured with craftsmanship and respect for tradition. A pleasure in every bite. Dried for at least 15 days.",
+    "ingredients": "Pork loin and sweet red pepper",
+    "badge": ""
+  },
+  "pastarma_smoked": {
+    "title": "Pastarma Smoked",
+    "description": "Rich, smoky aroma and deep flavor that brings out the essence of tradition. Gently seasoned with smoked red pepper for a perfectly balanced taste. Dried for at least 15 days.",
+    "ingredients": "Pork loin with sweet and smoked red pepper",
+    "badge": "Smoked"
+  }
+}

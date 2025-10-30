@@ -1,0 +1,68 @@
+{
+  "buttons": {
+    "send": "Изпрати",
+    "removeItem": "Премахни",
+    "checkout": "Към плащането",
+    "close": "Затвори",
+    "buy": "Добави в количката"
+  },
+  "form": {
+    "name": "Име и фамилия",
+    "email": "Имейл",
+    "password": "Парола",
+    "confirmPassword": "Потвърдете паролата",
+    "subject": "Тема",
+    "message": "Съобщение"
+  },
+  "units": {
+    "grams": "гр.",
+    "kg": "кг.",
+    "of": "от"
+  },
+  "messages": {
+    "loading": "Зареждане...",
+    "error": "Грешка",
+    "success": "Успешно",
+    "tryAgain": "Опитайте отново"
+  },
+  "logo": "/logo_bg.png",
+  "login": "Вход",
+  "logout": "Изход",
+  "nav": {
+    "home": "Начало",
+    "products": "Продукти",
+    "about": "За нас",
+    "contacts": "Контакти"
+  },
+  "lang": {
+    "bg": {
+      "label": "Български",
+      "code": "БГ"
+    },
+    "en": {
+      "label": "Английски",
+      "code": "Анг"
+    }
+  },
+  "contacts": {
+    "title": "Свържи се с нас",
+    "phone": {
+      "note": "Телефон:",
+      "value": "+359-886-123-456"
+    },
+    "email": {
+      "note": "Имейл:",
+      "value1": "master",
+      "value2": "meatsbg"
+    },
+    "location": {
+      "note": "Локация:",
+      "value": "София, България"
+    }
+  },
+  "socials": {
+    "slogan": "Вкус за всяко небце",
+    "title": "Социални мрежи",
+    "linkedin": "https://www.linkedin.com/company/profit-back-ltd/"
+  }
+}
