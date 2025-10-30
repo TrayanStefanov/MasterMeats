@@ -12,8 +12,8 @@ const IRLReservationsTab = () => {
   const [mode, setMode] = useState("list"); // "list" | "create" | "edit"
   const [selectedReservation, setSelectedReservation] = useState(null);
 
-  const { t: tReservations } = useTranslation('admin/reservations');
-  const { t: tCommon } = useTranslation('admin/common');
+  const { t: tReservations } = useTranslation("admin/reservations");
+  const { t: tCommon } = useTranslation("admin/common");
 
   useEffect(() => {
     fetchFilteredReservations(); // fetch when loading this tab
@@ -55,7 +55,9 @@ const IRLReservationsTab = () => {
             className="flex flex-col gap-6"
           >
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-accent-content">{tReservations("tabs.irl")}</h2>
+              <h2 className="text-2xl font-bold text-accent-content">
+                {tReservations("tabs.irl")}
+              </h2>
               <button
                 onClick={handleCreate}
                 className="flex items-center gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
@@ -78,7 +80,7 @@ const IRLReservationsTab = () => {
           >
             <button
               onClick={handleBack}
-              className="mb-4 flex items-center gap-2 text-accent hover:underline"
+              className="mb-4 flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
             >
               <FaArrowLeft /> {tReservations("back")}
             </button>

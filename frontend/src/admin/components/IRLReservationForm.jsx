@@ -8,32 +8,33 @@ import ReservationItems from "./ReservationItems.jsx";
 import DeliveryDetails from "./DeliveryDetails.jsx";
 
 const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
-  const { createReservation, updateReservation, loading } = useReservationStore();
+  const { createReservation, updateReservation, loading } =
+    useReservationStore();
 
   const [client, setClient] = useState(
     reservation?.client || { name: "", phone: "", email: "", notes: "" }
   );
   const [products, setProducts] = useState(reservation?.products || []);
   const [details, setDetails] = useState({
-  dateOfDelivery: reservation?.dateOfDelivery || "",
-  notes: reservation?.notes || "",
-  completed: reservation?.completed || false,
-  amountDue: reservation?.amountDue ?? 0,
-  calculatedTotalAmmount: reservation?.calculatedTotalAmmount ?? 0,
-});
+    dateOfDelivery: reservation?.dateOfDelivery || "",
+    notes: reservation?.notes || "",
+    completed: reservation?.completed || false,
+    amountDue: reservation?.amountDue ?? 0,
+    calculatedTotalAmmount: reservation?.calculatedTotalAmmount ?? 0,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const reservationData = {
-  client,
-  products,
-  dateOfDelivery: details.dateOfDelivery,
-  notes: details.notes,
-  completed: details.completed,
-  amountDue: Number(details.amountDue),
-  calculatedTotalAmmount: Number(details.calculatedTotalAmmount),
-};
+      client,
+      products,
+      dateOfDelivery: details.dateOfDelivery,
+      notes: details.notes,
+      completed: details.completed,
+      amountDue: Number(details.amountDue),
+      calculatedTotalAmmount: Number(details.calculatedTotalAmmount),
+    };
 
     if (mode === "edit" && reservation?._id) {
       await updateReservation(reservation._id, reservationData);
@@ -57,10 +58,16 @@ const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
 
       <form
         onSubmit={handleSubmit}
-        className={`space-y-8 ${loading ? "opacity-75 pointer-events-none" : ""}`}
+        className={`space-y-8 ${
+          loading ? "opacity-75 pointer-events-none" : ""
+        }`}
       >
         <ClientForm client={client} setClient={setClient} />
-        <ReservationItems products={products} setProducts={setProducts} />
+        <ReservationItems
+          products={products}
+          setProducts={setProducts}
+          setDetails={setDetails}
+        />
         <DeliveryDetails details={details} setDetails={setDetails} />
 
         <button
