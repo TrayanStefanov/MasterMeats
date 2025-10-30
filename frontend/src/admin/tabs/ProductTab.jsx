@@ -5,18 +5,22 @@ import { FaPlusCircle, FaArrowLeft } from "react-icons/fa";
 import { useProductStore } from "../../stores/useProductStore";
 import ProductForm from "../components/ProductForm";
 import ProductsList from "../components/ProductsList";
+import { useTranslation } from "react-i18next";
 
 const ProductTab = () => {
   const { fetchAllProducts, products } = useProductStore();
   const [mode, setMode] = useState("list"); // "list" | "create" | "edit"
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const { t: tProducts } = useTranslation('admin/products');
+  const { t: tCommon } = useTranslation('admin/common');
+
   useEffect(() => {
     fetchAllProducts();
   }, [fetchAllProducts]);
 
   const handleEdit = (product) => {
-  // 🩹 Normalize image data
+  // Normalize image data
   const normalizedProduct = {
     ...product,
     images: product.images?.map((img) =>
@@ -59,12 +63,12 @@ const ProductTab = () => {
             className="flex flex-col gap-6"
           >
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-accent-content">Products</h2>
+              <h2 className="text-2xl font-bold text-accent-content">{tProducts('title')}</h2>
               <button
                 onClick={handleCreate}
                 className="flex items-center gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
               >
-                <FaPlusCircle /> Create Product
+                <FaPlusCircle /> {tCommon("buttons.createProduct")}
               </button>
             </div>
 
@@ -82,9 +86,10 @@ const ProductTab = () => {
           >
             <button
               onClick={handleBack}
-              className="mb-4 flex items-center gap-2 text-accent hover:underline"
+              className="mb-4 flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
+              
             >
-              <FaArrowLeft /> Back to Products
+              <FaArrowLeft /> {tProducts('back')}
             </button>
 
             <ProductForm

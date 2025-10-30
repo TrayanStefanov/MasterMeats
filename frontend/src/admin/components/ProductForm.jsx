@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaPlusCircle, FaSpinner, FaSave } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 import fetchLocales from "../../lib/fetchLocales.js";
 import { useProductStore } from "../../stores/useProductStore.js";
@@ -10,6 +11,10 @@ const categories = ["fillet", "loin", "ham"];
 
 const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
   const { createProduct, updateProduct, loading } = useProductStore();
+
+  const { t: tProducts } = useTranslation("admin/products");
+  const { t: tForms } = useTranslation("admin/forms");
+  const { t: tCommon } = useTranslation("admin/common");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -24,37 +29,36 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
   });
 
   useEffect(() => {
-  if (mode === "edit" && product) {
-    (async () => {
-      // Fetch translations from /public/locales
-      const locales = await fetchLocales(product.name);
+    if (mode === "edit" && product) {
+      (async () => {
+        const locales = await fetchLocales(product.name);
 
-      setFormData({
-        name: product.name || "",
-        pricePerKg: product.pricePerKg || "",
-        category: product.category || "",
-        stockInGrams: product.stockInGrams || "",
-        images: product.images || [],
-        title: {
-          en: locales.en.title || product.title?.en || "",
-          bg: locales.bg.title || product.title?.bg || "",
-        },
-        description: {
-          en: locales.en.description || product.description?.en || "",
-          bg: locales.bg.description || product.description?.bg || "",
-        },
-        ingredients: {
-          en: locales.en.ingredients || product.ingredients?.en || "",
-          bg: locales.bg.ingredients || product.ingredients?.bg || "",
-        },
-        badge: {
-          en: locales.en.badge || product.badge?.en || "",
-          bg: locales.bg.badge || product.badge?.bg || "",
-        },
-      });
-    })();
-  }
-}, [mode, product]);
+        setFormData({
+          name: product.name || "",
+          pricePerKg: product.pricePerKg || "",
+          category: product.category || "",
+          stockInGrams: product.stockInGrams || "",
+          images: product.images || [],
+          title: {
+            en: locales.en.title || product.title?.en || "",
+            bg: locales.bg.title || product.title?.bg || "",
+          },
+          description: {
+            en: locales.en.description || product.description?.en || "",
+            bg: locales.bg.description || product.description?.bg || "",
+          },
+          ingredients: {
+            en: locales.en.ingredients || product.ingredients?.en || "",
+            bg: locales.bg.ingredients || product.ingredients?.bg || "",
+          },
+          badge: {
+            en: locales.en.badge || product.badge?.en || "",
+            bg: locales.bg.badge || product.badge?.bg || "",
+          },
+        });
+      })();
+    }
+  }, [mode, product]);
 
   const handleChange = (field, value, lang = null) => {
     if (lang) {
@@ -99,7 +103,7 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     e.preventDefault();
 
     if (!formData.images.length) {
-      alert("Please upload at least one image.");
+      alert(tProducts("upload.alert"));
       return;
     }
 
@@ -135,8 +139,8 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     >
       <h2 className="text-2xl lg:text-3xl font-semibold text-secondary text-center mb-6">
         {mode === "edit"
-          ? `Editing: ${product?.name || "Product"}`
-          : "Create New Product"}
+          ? tProducts("editTitle", { name: product?.name || tProducts("list.name") })
+          : tProducts("createTitle")}
       </h2>
 
       <form
@@ -147,50 +151,62 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
       >
         {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            placeholder="Product name (internal key)"
-            value={formData.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20 focus:ring-2 focus:ring-accent outline-none"
-            required
-            disabled={mode === "edit"} // can't rename existing product
-          />
+          <div className="flex flex-col">
+            <label className="label">{tForms("product.nameLabel")}</label>
+            <input
+              type="text"
+              placeholder={tForms("product.namePlaceholder")}
+              value={formData.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              className="input"
+              required
+              disabled={mode === "edit"}
+            />
+          </div>
 
-          <input
-            type="number"
-            placeholder="Price per kg"
-            value={formData.pricePerKg}
-            onChange={(e) => handleChange("pricePerKg", e.target.value)}
-            className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20 focus:ring-2 focus:ring-accent outline-none"
-            step="0.01"
-            required
-          />
+          <div className="flex flex-col">
+            <label className="label">{tForms("product.priceLabel")}</label>
+            <input
+              type="number"
+              placeholder={tForms("product.pricePlaceholder")}
+              value={formData.pricePerKg}
+              onChange={(e) => handleChange("pricePerKg", e.target.value)}
+              className="input"
+              step="0.01"
+              required
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <select
-            value={formData.category}
-            onChange={(e) => handleChange("category", e.target.value)}
-            className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20 focus:ring-2 focus:ring-accent outline-none"
-            required
-          >
-            <option value="">Select category</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col">
+            <label className="label">{tForms("product.categoryLabel")}</label>
+            <select
+              value={formData.category}
+              onChange={(e) => handleChange("category", e.target.value)}
+              className="input"
+              required
+            >
+              <option value="">{tForms("product.categoryDropdown")}</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <input
-            type="number"
-            placeholder="Stock in grams"
-            value={formData.stockInGrams}
-            onChange={(e) => handleChange("stockInGrams", e.target.value)}
-            className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20 focus:ring-2 focus:ring-accent outline-none"
-            min="0"
-          />
+          <div className="flex flex-col">
+            <label className="label">{tForms("product.stock")}</label>
+            <input
+              type="number"
+              placeholder={tForms("product.stock")}
+              value={formData.stockInGrams}
+              onChange={(e) => handleChange("stockInGrams", e.target.value)}
+              className="input"
+              min="0"
+            />
+          </div>
         </div>
 
         {/* Images */}
@@ -203,87 +219,95 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
         {/* Translations */}
         <div className="border-t-4 border-accent-content/60 pt-6">
           <h3 className="text-2xl font-semibold text-secondary text-center mb-4">
-            Localized Information
+            {tForms("product.subtitle")}
           </h3>
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* English */}
             <div className="flex flex-col text-center gap-4">
               <h4 className="text-lg font-bold text-accent-content">
-                🇬🇧 English
+                {tForms("product.langs.en.title")}
               </h4>
+
+              <label className="label">{tForms("product.langs.en.titleLabel")}</label>
               <input
                 type="text"
-                placeholder="Title"
+                placeholder={tForms("product.langs.en.titlePlaceholder")}
                 value={formData.title.en}
                 onChange={(e) => handleChange("title", e.target.value, "en")}
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
+                className="input"
                 required
               />
+
+              <label className="label">{tForms("product.langs.en.ingredientsLabel")}</label>
               <input
                 type="text"
-                placeholder="Ingredients"
+                placeholder={tForms("product.langs.en.ingredientsPlaceholder")}
                 value={formData.ingredients.en}
-                onChange={(e) =>
-                  handleChange("ingredients", e.target.value, "en")
-                }
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
+                onChange={(e) => handleChange("ingredients", e.target.value, "en")}
+                className="input"
               />
+
+              <label className="label">{tForms("product.langs.en.badgeLabel")}</label>
               <input
                 type="text"
-                placeholder="Badge (e.g., New, Sale)"
+                placeholder={tForms("product.langs.en.badgePlaceholder")}
                 value={formData.badge.en}
                 onChange={(e) => handleChange("badge", e.target.value, "en")}
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
+                className="input"
               />
+
+              <label className="label">{tForms("product.langs.en.descriptionLabel")}</label>
               <textarea
-                placeholder="Description"
+                placeholder={tForms("product.langs.en.descriptionPlaceholder")}
                 value={formData.description.en}
-                onChange={(e) =>
-                  handleChange("description", e.target.value, "en")
-                }
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
-                rows="7"
+                onChange={(e) => handleChange("description", e.target.value, "en")}
+                className="input"
+                rows="6"
               />
             </div>
 
             {/* Bulgarian */}
             <div className="flex flex-col text-center gap-4">
               <h4 className="text-lg font-bold text-accent-content">
-                🇧🇬 Български
+                {tForms("product.langs.bg.title")}
               </h4>
+
+              <label className="label">{tForms("product.langs.bg.titleLabel")}</label>
               <input
                 type="text"
-                placeholder="Заглавие"
+                placeholder={tForms("product.langs.bg.titlePlaceholder")}
                 value={formData.title.bg}
                 onChange={(e) => handleChange("title", e.target.value, "bg")}
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
+                className="input"
                 required
               />
+
+              <label className="label">{tForms("product.langs.bg.ingredientsLabel")}</label>
               <input
                 type="text"
-                placeholder="Съставки"
+                placeholder={tForms("product.langs.bg.ingredientsPlaceholder")}
                 value={formData.ingredients.bg}
-                onChange={(e) =>
-                  handleChange("ingredients", e.target.value, "bg")
-                }
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
+                onChange={(e) => handleChange("ingredients", e.target.value, "bg")}
+                className="input"
               />
+
+              <label className="label">{tForms("product.langs.bg.badgeLabel")}</label>
               <input
                 type="text"
-                placeholder="Значка (напр. Ново, Промоция)"
+                placeholder={tForms("product.langs.bg.badgePlaceholder")}
                 value={formData.badge.bg}
                 onChange={(e) => handleChange("badge", e.target.value, "bg")}
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
+                className="input"
               />
+
+              <label className="label">{tForms("product.langs.bg.descriptionLabel")}</label>
               <textarea
-                placeholder="Описание"
+                placeholder={tForms("product.langs.bg.descriptionPlaceholder")}
                 value={formData.description.bg}
-                onChange={(e) =>
-                  handleChange("description", e.target.value, "bg")
-                }
-                className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
-                rows="7"
+                onChange={(e) => handleChange("description", e.target.value, "bg")}
+                className="input"
+                rows="6"
               />
             </div>
           </div>
@@ -298,12 +322,14 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
           {loading ? (
             <>
               <FaSpinner className="animate-spin" />
-              {mode === "edit" ? "Updating..." : "Creating..."}
+              {mode === "edit" ? tCommon("loading.updating") : tCommon("loading.creating")}
             </>
           ) : (
             <>
               {mode === "edit" ? <FaSave /> : <FaPlusCircle />}
-              {mode === "edit" ? "Update Product" : "Create Product"}
+              {mode === "edit"
+                ? tCommon("buttons.updateProduct")
+                : tCommon("buttons.createProduct")}
             </>
           )}
         </button>

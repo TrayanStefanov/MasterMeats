@@ -8,7 +8,9 @@ import { useProductStore } from "../../stores/useProductStore";
 
 const ProductsList = ({ onEdit }) => {
   const { products, fetchAllProducts, deleteProduct, loading } = useProductStore();
-  const { t } = useTranslation();
+  const { t : tAdminProducts} = useTranslation("admin/products");
+  const { t : tCommon} = useTranslation("admin/common");
+  const { t : tProducts} = useTranslation("productsSection");
 
   useEffect(() => {
     fetchAllProducts();
@@ -22,7 +24,7 @@ const ProductsList = ({ onEdit }) => {
   if (loading && products.length === 0) {
     return (
       <p className="text-center py-8 text-secondary/60">
-        {t("common.loading")}
+        {tCommon("loading.loading")}
       </p>
     );
   }
@@ -30,7 +32,7 @@ const ProductsList = ({ onEdit }) => {
   if (!products || products.length === 0) {
     return (
       <p className="text-center py-8 text-secondary/60">
-        {t("common.noProducts")}
+        {tAdminProducts("empty")}
       </p>
     );
   }
@@ -46,16 +48,16 @@ const ProductsList = ({ onEdit }) => {
         <thead className="bg-secondary/50 font-semibold text-primary uppercase tracking-wider">
           <tr>
             <th className="px-6 py-3 text-left text-xs">
-              {t("admin.product")}
+              {tAdminProducts("list.name")}
             </th>
             <th className="px-6 py-3 text-left text-xs">
-              {t("admin.pricePerKg")}
+              {tAdminProducts("list.price")}
             </th>
             <th className="px-6 py-3 text-left text-xs">
-              {t("admin.category")}
+              {tAdminProducts("list.category")}
             </th>
             <th className="px-6 py-3 text-right text-xs">
-              {t("admin.actions")}
+              {tAdminProducts("list.actions")}
             </th>
           </tr>
         </thead>
@@ -69,10 +71,10 @@ const ProductsList = ({ onEdit }) => {
                   product.image ||
                   "/placeholder.png";
 
-            const title = t(`products.${product.name}.title`, {
+            const title = tProducts(`${product.name}.title`, {
               defaultValue: product.title?.en || product.name,
             });
-            const description = t(`products.${product.name}.description`, {
+            const description = tProducts(`${product.name}.description`, {
               defaultValue: product.description?.en || "",
             });
 
@@ -109,25 +111,27 @@ const ProductsList = ({ onEdit }) => {
 
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-secondary/60">
-                    {product.category || t("admin.uncategorized")}
+                    {product.category}
                   </div>
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end gap-3">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-middle">
+                  <div className="flex justify-end items-center gap-3 h-full">
                   <button
                     onClick={() => onEdit(product)}
                     className="text-accent-content/60 hover:text-accent-content transition-colors"
-                    title={t("admin.editProduct")}
+                    title={tCommon("buttons.updateProduct")}
                   >
                     <FaEdit className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => deleteProduct(product._id)}
                     className="text-accent-content/60 hover:text-accent-content transition-colors"
-                    title={t("admin.deleteProduct")}
+                    title={tCommon("buttons.deleteProduct")}
                   >
                     <FaTrash className="h-5 w-5" />
                   </button>
+                  </div>
                 </td>
               </tr>
             );

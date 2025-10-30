@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaStore, FaGlobe } from "react-icons/fa";
-import IRLReservations from "../components/IRLReservations";
-import OnlineReservations from "../components/OnlineReservations";
+import OnlineReservationsTab from "./OnlineReservationsTab";
+import IRLReservationsTab from "./IRLReservationsTab";
 
 const ReservationsTab = () => {
   const [activeTab, setActiveTab] = useState("irl");
@@ -39,8 +39,8 @@ const ReservationsTab = () => {
 
       {/* Active content */}
       <div>
-        {activeTab === "irl" && <IRLReservations />}
-        {activeTab === "online" && <OnlineReservations />}
+        {activeTab === "irl" && <IRLReservationsTab />}
+        {activeTab === "online" && <OnlineReservationsTab />}
       </div>
     </motion.div>
   );

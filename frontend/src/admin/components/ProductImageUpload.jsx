@@ -1,6 +1,10 @@
 import { FaUpload, FaTrash } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const ProductImageUpload = ({ images = [], onChange, onRemove }) => {
+
+  const { t } = useTranslation('admin/products');
+
   return (
     <div className="space-y-3">
       <div className="flex items-center">
@@ -17,11 +21,11 @@ const ProductImageUpload = ({ images = [], onChange, onRemove }) => {
           className="cursor-pointer bg-accent/30 hover:bg-accent/50 px-4 py-2 rounded-md flex items-center gap-2 text-sm text-secondary border border-accent/40 transition-all"
         >
           <FaUpload className="w-4 h-4" />
-          Upload Images (max 5)
+          {t('upload.title')}
         </label>
         {images.length > 0 && (
           <span className="ml-3 text-sm text-secondary/70">
-            {images.length} image{images.length > 1 ? "s" : ""} selected.
+            {t("products.imagesSelected", { count: images.length })}
           </span>
         )}
       </div>

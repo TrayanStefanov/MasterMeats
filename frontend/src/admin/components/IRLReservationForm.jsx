@@ -4,7 +4,7 @@ import { FaPlusCircle, FaSpinner, FaSave } from "react-icons/fa";
 import { useReservationStore } from "../stores/useReservationStore.js";
 
 import ClientForm from "./ClientForm.jsx";
-import ReservationItem from "./ReservationItem.jsx";
+import ReservationItems from "./ReservationItems.jsx";
 import DeliveryDetails from "./DeliveryDetails.jsx";
 
 const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
@@ -60,7 +60,7 @@ const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
         className={`space-y-8 ${loading ? "opacity-75 pointer-events-none" : ""}`}
       >
         <ClientForm client={client} setClient={setClient} />
-        <ReservationItem products={products} setProducts={setProducts} />
+        <ReservationItems products={products} setProducts={setProducts} />
         <DeliveryDetails details={details} setDetails={setDetails} />
 
         <button

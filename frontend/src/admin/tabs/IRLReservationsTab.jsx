@@ -1,14 +1,19 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlusCircle, FaArrowLeft } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import { useReservationStore } from "../stores/useReservationStore";
-import IRLReservationsList from "./IRLReservationsList";
-import IRLReservationForm from "./IRLReservationForm";
+import IRLReservationsList from "../components/IRLReservationsList";
+import IRLReservationForm from "../components/IRLReservationForm";
 
 const IRLReservationsTab = () => {
   const { fetchFilteredReservations } = useReservationStore();
   const [mode, setMode] = useState("list"); // "list" | "create" | "edit"
   const [selectedReservation, setSelectedReservation] = useState(null);
+
+  const { t: tReservations } = useTranslation('admin/reservations');
+  const { t: tCommon } = useTranslation('admin/common');
 
   useEffect(() => {
     fetchFilteredReservations(); // fetch when loading this tab
@@ -50,12 +55,12 @@ const IRLReservationsTab = () => {
             className="flex flex-col gap-6"
           >
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-accent-content">IRL Reservations</h2>
+              <h2 className="text-2xl font-bold text-accent-content">{tReservations("tabs.irl")}</h2>
               <button
                 onClick={handleCreate}
                 className="flex items-center gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
               >
-                <FaPlusCircle /> Create Reservation
+                <FaPlusCircle /> {tCommon("buttons.createReservation")}
               </button>
             </div>
 
@@ -75,7 +80,7 @@ const IRLReservationsTab = () => {
               onClick={handleBack}
               className="mb-4 flex items-center gap-2 text-accent hover:underline"
             >
-              <FaArrowLeft /> Back to Reservations
+              <FaArrowLeft /> {tReservations("back")}
             </button>
 
             <IRLReservationForm
