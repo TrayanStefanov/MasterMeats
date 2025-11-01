@@ -13,10 +13,10 @@ export const getAllReservations = async (req, res) => {
       page = 1, // current page
       limit = 10, // results per page
     } = req.query;
-    
+
     // Build the filter
     let filter = {};
-    
+
     // Search by client name or phone
     if (search) {
       const matchingClients = await Client.find({
@@ -29,8 +29,10 @@ export const getAllReservations = async (req, res) => {
     }
 
     // Filter by completion
-    if (completed !== undefined) {
-      filter.completed = completed === "true";
+    if (completed === "true") {
+      filter.completed = true;
+    } else if (completed === "false") {
+      filter.completed = false;
     }
 
     // Filter by amount due
@@ -52,10 +54,10 @@ export const getAllReservations = async (req, res) => {
 
     // Total count for pagination info
     const totalCount = await Reservation.countDocuments(filter);
-    
+
     // Fetch paginated + filtered results
     let reservations = await Reservation.find(filter)
-    .populate("client", "name phone email")
+      .populate("client", "name phone email")
       .populate({
         path: "products.product",
         select: "name category pricePerKg",
