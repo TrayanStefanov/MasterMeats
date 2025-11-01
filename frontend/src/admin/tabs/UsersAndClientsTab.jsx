@@ -8,7 +8,7 @@ import UsersTab from "./UsersTab";
 import ClientsTab from "./ClientsTab";
 
 const ReservationsTab = () => {
-  const [activeTab, setActiveTab] = useState("irl");
+  const [activeTab, setActiveTab] = useState("clients");
   const { t: tUAC } = useTranslation("admin/usersAndClients");
 
   const tabs = [
