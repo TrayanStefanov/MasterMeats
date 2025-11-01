@@ -3,10 +3,9 @@ import { motion } from "framer-motion";
 import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
-
 import { useProductStore } from "../../stores/useProductStore.js";
 
-const ReservationItem = ({ products, setProducts }) => {
+const ReservationItem = ({ products, setProducts, setDetails }) => {
   const { products: allProducts, fetchAllProducts } = useProductStore();
   const { t: tCommon } = useTranslation("common");
   const { t: tACommon } = useTranslation("admin/common");
@@ -50,7 +49,10 @@ const ReservationItem = ({ products, setProducts }) => {
   };
 
   const decrement = (index) => {
-    handleQuantityChange(index, Math.max(0, products[index].quantityInGrams - 100));
+    handleQuantityChange(
+      index,
+      Math.max(0, products[index].quantityInGrams - 100)
+    );
   };
 
   const handleRemove = (index) => {
@@ -58,9 +60,16 @@ const ReservationItem = ({ products, setProducts }) => {
   };
 
   const totalAmount = products.reduce(
-  (acc, p) => acc + (p.priceAtReservation * (p.quantityInGrams / 1000)),
-  0
-);
+    (acc, p) => acc + p.priceAtReservation * (p.quantityInGrams / 1000),
+    0
+  );
+
+  useEffect(() => {
+    setDetails((prev) => ({
+      ...prev,
+      calculatedTotalAmmount: totalAmount,
+    }));
+  }, [totalAmount, setDetails]);
 
   return (
     <div className="border-t-4 border-accent-content/60 pt-6">
@@ -90,9 +99,7 @@ const ReservationItem = ({ products, setProducts }) => {
 
       {/* No Products */}
       {products.length === 0 ? (
-        <p className="text-center text-secondary/60">
-          {tReservation("empty")}
-        </p>
+        <p className="text-center text-secondary/60">{tReservation("empty")}</p>
       ) : (
         <div className="space-y-3">
           {products.map((p, i) => {
@@ -106,7 +113,9 @@ const ReservationItem = ({ products, setProducts }) => {
                 className="flex flex-col md:flex-row md:items-center md:justify-between bg-secondary/50 p-3 rounded-lg border border-accent/20"
               >
                 <div>
-                  <p className="font-semibold text-secondary">{localizedName}</p>
+                  <p className="font-semibold text-secondary">
+                    {localizedName}
+                  </p>
                   <p className="text-sm text-secondary/70">
                     €{p.priceAtReservation.toFixed(2)} / {tCommon("units.kg")}
                   </p>
@@ -116,6 +125,7 @@ const ReservationItem = ({ products, setProducts }) => {
                   {/* Quantity Controller */}
                   <div className="flex items-center gap-1 lg:gap-2 border border-white/30 rounded-md overflow-hidden">
                     <button
+                      type="button"
                       onClick={() => decrement(i)}
                       className="px-1 lg:px-3 py-1"
                     >
@@ -126,13 +136,19 @@ const ReservationItem = ({ products, setProducts }) => {
                       key={p.quantityInGrams}
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                      }}
                       className="p-1 text-base lg:text-lg 2xl:text-xl font-bold flex text-center"
                     >
-                      {(p.quantityInGrams / 1000).toFixed(1)} {tCommon("units.kg")}
+                      {(p.quantityInGrams / 1000).toFixed(1)}{" "}
+                      {tCommon("units.kg")}
                     </motion.span>
 
                     <button
+                      type="button"
                       onClick={() => increment(i)}
                       className="px-1 lg:px-3"
                     >
@@ -154,8 +170,8 @@ const ReservationItem = ({ products, setProducts }) => {
             );
           })}
           <p className="text-right font-semibold text-secondary mt-4">
-        {tForms("reservationItem.total")}: €{totalAmount.toFixed(2)}
-      </p>
+            {tForms("reservationItem.total")}: €{totalAmount.toFixed(2)}
+          </p>
         </div>
       )}
     </div>
