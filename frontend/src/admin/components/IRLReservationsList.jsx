@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useReservationStore } from "../stores/useReservationStore";
+import Pagination from "./Pagination";
 
 const IRLReservationsList = ({ onEdit }) => {
   const {
@@ -19,6 +20,9 @@ const IRLReservationsList = ({ onEdit }) => {
     loading,
     filters,
     setFilter,
+    currentPage,
+    totalPages,
+    totalCount,
   } = useReservationStore();
 
   const { t: tCommon } = useTranslation("admin/common");
@@ -91,7 +95,7 @@ const IRLReservationsList = ({ onEdit }) => {
         </h2>
 
         <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2 text-sm text-secondary cursor-pointer select-none">
+          <label className="flex items-center gap-2 text-sm text-primary cursor-pointer select-none">
             <input
               type="checkbox"
               checked={filters.completed === "true"}
@@ -330,6 +334,14 @@ const IRLReservationsList = ({ onEdit }) => {
           </tbody>
         </table>
       </div>
+      
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        showingCount={reservations.length}
+        onPageChange={(page) => fetchFilteredReservations(page)}
+      />
     </motion.div>
   );
 };
