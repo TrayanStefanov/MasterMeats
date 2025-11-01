@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaPlusCircle, FaSpinner, FaSave } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 import { useReservationStore } from "../stores/useReservationStore.js";
 
-import ClientForm from "./ClientForm.jsx";
+import ClientSearch from "./ClientSearch.jsx";
 import ReservationItems from "./ReservationItems.jsx";
 import DeliveryDetails from "./DeliveryDetails.jsx";
 
-const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
-  const { createReservation, updateReservation, loading } =
-    useReservationStore();
+const IRLReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
+  const { createReservation, updateReservation, loading } = useReservationStore();
 
   const [client, setClient] = useState(
     reservation?.client || { name: "", phone: "", email: "", notes: "" }
@@ -26,8 +26,13 @@ const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!client?._id) {
+      toast.error("Please select a client before saving.");
+      return;
+    }
+
     const reservationData = {
-      client,
+      client: client._id,
       products,
       dateOfDelivery: details.dateOfDelivery,
       notes: details.notes,
@@ -58,11 +63,9 @@ const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
 
       <form
         onSubmit={handleSubmit}
-        className={`space-y-8 ${
-          loading ? "opacity-75 pointer-events-none" : ""
-        }`}
+        className={`space-y-8 ${loading ? "opacity-75 pointer-events-none" : ""}`}
       >
-        <ClientForm client={client} setClient={setClient} />
+        <ClientSearch onSelect={setClient} selectedClient={client} />
         <ReservationItems
           products={products}
           setProducts={setProducts}
@@ -92,4 +95,4 @@ const ReservationForm = ({ mode = "create", reservation = null, onFinish }) => {
   );
 };
 
-export default ReservationForm;
+export default IRLReservationForm;
