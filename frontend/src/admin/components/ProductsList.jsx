@@ -45,7 +45,7 @@ const ProductsList = ({ onEdit }) => {
       transition={{ duration: 0.5 }}
     >
       <table className="min-w-full divide-y divide-accent-content">
-        <thead className="bg-secondary/50 font-semibold text-primary uppercase tracking-wider">
+        <thead className="bg-secondary/80 font-semibold text-primary uppercase tracking-wider">
           <tr>
             <th className="px-6 py-3 text-left text-xs">
               {tAdminProducts("list.name")}
@@ -62,7 +62,7 @@ const ProductsList = ({ onEdit }) => {
           </tr>
         </thead>
 
-        <tbody className="bg-accent/50 divide-y divide-accent-content">
+        <tbody className="bg-accent/70 divide-y divide-accent-content">
           {products.map((product) => {
             const firstImage =
               typeof product.images?.[0] === "string"
@@ -81,7 +81,7 @@ const ProductsList = ({ onEdit }) => {
             return (
               <tr
                 key={product._id}
-                className="hover:bg-accent/80 transition-colors"
+                className="hover:bg-accent/90 transition-colors"
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
