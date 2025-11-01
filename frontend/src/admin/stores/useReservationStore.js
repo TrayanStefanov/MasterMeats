@@ -49,14 +49,7 @@ export const useReservationStore = create((set, get) => ({
   createReservation: async (reservationData) => {
     set({ loading: true, error: null });
     try {
-      const clientStore = useClientStore.getState();
-      const client = await clientStore.createOrFindClient(reservationData.client);
-
-      // Replace client data with its ObjectId if it exists
-      const payload = {
-        ...reservationData,
-        client: client._id,
-      };
+      const payload = { ...reservationData };
 
       const res = await axios.post(`/api/reservations`, payload);
       set((state) => ({
@@ -64,6 +57,7 @@ export const useReservationStore = create((set, get) => ({
         loading: false,
       }));
       toast.success("Reservation created successfully!");
+      await get().fetchFilteredReservations();
       return res.data;
     } catch (error) {
       const message = error.response?.data?.message || "Failed to create reservation";
