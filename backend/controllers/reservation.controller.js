@@ -47,15 +47,10 @@ export const getAllReservations = async (req, res) => {
     if (sort === "deliveryDate") sortOption = { dateOfDelivery: 1 };
     else if (sort === "createdAt") sortOption = { createdAt: -1 };
 
-    // Convert page/limit to integers
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    // Total count for pagination info
-    const totalCount = await Reservation.countDocuments(filter);
-
-    // Fetch paginated + filtered results
     let reservations = await Reservation.find(filter)
       .populate("client", "name phone email")
       .populate({
@@ -63,8 +58,6 @@ export const getAllReservations = async (req, res) => {
         select: "name category pricePerKg",
       })
       .sort(sortOption)
-      .skip(skip)
-      .limit(limitNum)
       .exec();
     if (category || productId) {
       reservations = reservations.filter((res) =>
@@ -79,9 +72,10 @@ export const getAllReservations = async (req, res) => {
 
     // Pagination metadata
     const totalPages = Math.ceil(totalCount / limitNum);
+    const paginatedReservations = reservations.slice(skip, skip + limitNum);
 
     res.status(200).json({
-      reservations,
+      reservations: paginatedReservations,
       currentPage: pageNum,
       totalPages,
       totalCount,
