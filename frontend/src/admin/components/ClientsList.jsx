@@ -1,135 +1,271 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { useState, useEffect, Fragment } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaTrash, FaEdit, FaChevronDown ,FaEye} from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+
 import { useClientStore } from "../stores/useClientStore";
+import ReservationDetailsModal from "./ReservationDetailsModal";
+import Pagination from "./Pagination";
 
 const ClientsList = ({ onEdit }) => {
-  const { clients, fetchClients, deleteClient, loading, totalCount } = useClientStore();
+  const {
+    clients,
+    fetchClients,
+    deleteClient,
+    loading,
+    totalCount,
+    totalPages,
+    currentPage,
+    filters,
+  } = useClientStore();
+
+  // Translations
   const { t: tUAC } = useTranslation("admin/usersAndClients");
   const { t: tCommon } = useTranslation("admin/common");
+  const { t: tProducts } = useTranslation("productsSection");
+  const { t: tReservations } = useTranslation("admin/reservations");
+
+  const [expandedClient, setExpandedClient] = useState(null);
+  const [modalReservation, setModalReservation] = useState(null);
 
   // Fetch clients on mount and when language changes
   useEffect(() => {
-    fetchClients();
-
-    const handleLangChange = () => fetchClients();
+    fetchClients(currentPage);
+    const handleLangChange = () => fetchClients(currentPage);
     i18next.on("languageChanged", handleLangChange);
     return () => i18next.off("languageChanged", handleLangChange);
-  }, [fetchClients]);
+  }, [fetchClients, filters, currentPage]);
 
-  if (loading && clients.length === 0) {
+  if (loading && clients.length === 0)
     return (
       <p className="text-center py-8 text-secondary/60">
         {tCommon("loading.loading")}
       </p>
     );
-  }
 
-  if (!clients || clients.length === 0) {
+  if (!clients || clients.length === 0)
     return (
-      <p className="text-center py-8 text-secondary/60">
-        {tUAC("empty")}
-      </p>
+      <p className="text-center py-8 text-secondary/60">{tUAC("empty")}</p>
     );
-  }
 
   return (
-    <motion.div
-      className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-8"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <table className="min-w-full divide-y divide-accent-content">
-        <thead className="bg-secondary/80 font-semibold text-primary uppercase tracking-wider">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs">
-              {tUAC("list.name")}
-            </th>
-            <th className="px-6 py-3 text-left text-xs">
-              {tUAC("list.phone")}
-            </th>
-            <th className="px-6 py-3 text-left text-xs">
-              {tUAC("list.items")}
-            </th>
-            <th className="px-6 py-3 text-left text-xs">
-              {tUAC("list.total")}
-            </th>
-            <th className="px-6 py-3 text-left text-xs">
-              {tUAC("list.status")}
-            </th>
-            <th className="px-6 py-3 text-right text-xs">
-              {tUAC("list.actions")}
-            </th>
-          </tr>
-        </thead>
-
-        <tbody className="bg-accent/70 divide-y divide-accent-content">
-          {clients.map((client) => (
-            <tr
-              key={client._id}
-              className="hover:bg-accent/90 transition-colors"
-            >
-              <td className="px-6 py-4 whitespace-nowrap text-secondary">
-                {client.name}
-              </td>
-
-              <td className="px-6 py-4 whitespace-nowrap text-secondary/70">
-                {client.phone}
-              </td>
-
-              <td className="px-6 py-4 whitespace-nowrap text-secondary/70">
-                {client.itemsCount ?? "—"}
-              </td>
-
-              <td className="px-6 py-4 whitespace-nowrap text-secondary/70">
-                €{client.totalAmount?.toFixed(2) ?? "—"}
-              </td>
-
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    client.completed
-                      ? "bg-green-600/40 text-green-300"
-                      : "bg-yellow-600/40 text-yellow-200"
-                  }`}
-                >
-                  {client.completed
-                    ? tCommon("status.completed")
-                    : tCommon("status.pending")}
-                </span>
-              </td>
-
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-middle">
-                <div className="flex justify-end items-center gap-3 h-full">
-                  <button
-                    onClick={() => onEdit(client)}
-                    className="text-accent-content/60 hover:text-accent-content transition-colors"
-                    title={tCommon("buttons.updateClient")}
-                  >
-                    <FaEdit className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => deleteClient(client._id)}
-                    className="text-accent-content/60 hover:text-accent-content transition-colors"
-                    title={tCommon("buttons.deleteClient")}
-                  >
-                    <FaTrash className="h-5 w-5" />
-                  </button>
-                </div>
-              </td>
+    <>
+      <motion.div
+        className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <table className="min-w-full divide-y divide-accent-content">
+          <thead className="bg-secondary/80 font-semibold text-primary uppercase tracking-wider">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs">
+                {tUAC("list.name")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">Phone</th>
+              <th className="px-6 py-3 text-left text-xs">Orders</th>
+              <th className="px-6 py-3 text-left text-xs">Total Meat (g)</th>
+              <th className="px-6 py-3 text-left text-xs">Paid (€)</th>
+              <th className="px-6 py-3 text-left text-xs">Last Order</th>
+              <th className="px-6 py-3 text-right text-xs">
+                {tUAC("list.actions")}
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
 
-      <div className="p-4 text-sm text-secondary/70 text-right">
-        {tCommon("pagination.showing")} {clients.length} / {totalCount}{" "}
-        {tUAC("title").toLowerCase()}
-      </div>
-    </motion.div>
+          <tbody className="bg-accent/70 divide-y divide-accent-content">
+            {clients.map((client) => (
+              <Fragment key={client._id}>
+                <tr
+                  className="hover:bg-accent/90 transition-colors cursor-pointer"
+                  onClick={() =>
+                    setExpandedClient(
+                      expandedClient === client._id ? null : client._id
+                    )
+                  }
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-secondary">
+                    {client.name}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.phone}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.totalOrders ?? "—"}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.totalMeat ?? "—"}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    €{client.totalPaid?.toFixed(2) ?? "—"}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.lastOrder?.products?.length ? (
+                      <div className="space-y-1">
+                        {client.lastOrder.products.map((p, idx) => (
+                          <p key={idx} className="text-xs text-secondary/60">
+                            {tProducts(
+                              `${p.product?.key || p.product?.name}.title`,
+                              {
+                                defaultValue: p.product?.name || "—",
+                              }
+                            )}{" "}
+                            ({p.quantityInGrams} g)
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-secondary/40 italic">
+                        No orders
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <div className="flex justify-end items-center gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(client);
+                        }}
+                        className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteClient(client._id);
+                        }}
+                        className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      >
+                        <FaTrash />
+                      </button>
+                      <FaChevronDown
+                        className={`transition-transform ${expandedClient === client._id ? "rotate-180" : ""
+                          }`}
+                      />
+                    </div>
+                  </td>
+                </tr>
+
+                <AnimatePresence>
+                  {expandedClient === client._id && client.reservations && (
+                    <motion.tr
+                      key={`${client._id}-details`}
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      transition={{ duration: 0.25 }}
+                      className="bg-primary/40"
+                    >
+                      <td
+                        colSpan={7}
+                        className="px-8 py-6 text-sm text-secondary/80"
+                      >
+                        <p className="text-center text-secondary font-semibold text-base mb-4 border-b border-accent/40 pb-2">
+                          {tReservations("details.title", {
+                            defaultValue: "Order History",
+                          })}
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">
+                              {tReservations("details.items", {
+                                defaultValue: "Orders",
+                              })}
+                            </h4>
+                            <div className="space-y-2 bg-primary p-3 rounded-lg border border-accent/30">
+                              {client.reservations.map((r) => (
+                                <div
+                                  key={r._id}
+                                  className="flex justify-between items-center bg-gray-800/40 p-3 rounded-lg"
+                                >
+                                  <div>
+                                    <p className="text-secondary/70">
+                                      {new Date(
+                                        r.dateOfDelivery
+                                      ).toLocaleDateString()}{" "}
+                                      —{" "}
+                                      {r.completed ? (
+                                        <span className="text-green-400">
+                                          Completed
+                                        </span>
+                                      ) : (
+                                        <span className="text-yellow-400">
+                                          Pending
+                                        </span>
+                                      )}
+                                    </p>
+                                    <p className="text-xs text-secondary/50">
+                                      Total: €
+                                      {r.calculatedTotalAmmount?.toFixed(2) ??
+                                        "—"}
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setModalReservation(r);
+                                    }}
+                                    className="text-accent-content/70 hover:text-accent-content"
+                                  >
+                                    <FaEye />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <h4 className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">
+                              {tReservations("details.notes", {
+                                defaultValue: "Notes",
+                              })}
+                            </h4>
+                            <div className="bg-primary p-3 rounded-lg border border-accent/30 min-h-[100px]">
+                              {client.notes ? (
+                                <p className="text-secondary/70 leading-relaxed whitespace-pre-wrap">
+                                  {client.notes}
+                                </p>
+                              ) : (
+                                <p className="text-secondary/40 italic">
+                                  {tReservations("details.noNotes", {
+                                    defaultValue: "No notes provided.",
+                                  })}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Pagination footer */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          showingCount={clients.length}
+          onPageChange={(page) => fetchClients(page)}
+        />
+      </motion.div>
+
+      {modalReservation && (
+        <ReservationDetailsModal
+          reservation={modalReservation}
+          onClose={() => setModalReservation(null)}
+        />
+      )}
+    </>
   );
 };
 
