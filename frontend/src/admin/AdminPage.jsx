@@ -1,17 +1,19 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
-import { FaBoxOpen, FaChartBar } from "react-icons/fa";
+import { FaBoxOpen, FaChartBar, FaUsers } from "react-icons/fa";
 import { FiBox } from "react-icons/fi";
 import { useProductStore } from "../stores/useProductStore";
 
 const ProductTab = lazy(() => import("./tabs/ProductTab"));
 const ReservationsTab = lazy(() => import("./tabs/ReservationsTab"));
+const UsersAndClientsTab = lazy(() => import("./tabs/UsersAndClientsTab"));
 // const AnalyticsTab = lazy(() => import("./tabs/AnalyticsTab"));
 
 const tabs = [
   { id: "products", label: "Products", icon: <FaBoxOpen /> },
   { id: "reservations", label: "Reservations", icon: <FiBox /> },
   { id: "analytics", label: "Analytics", icon: <FaChartBar /> },
+  { id: "usersAndClients", label: "Users & Clients", icon: <FaUsers /> },
 ];
 
 const AdminPage = () => {
@@ -66,6 +68,7 @@ const AdminPage = () => {
               Analytics tab coming soon!
             </div>
           )}
+          {activeTab === "usersAndClients" && <UsersAndClientsTab />}
         </Suspense>
       </div>
     </div>
