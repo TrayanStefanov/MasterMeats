@@ -1,4 +1,5 @@
 import Client from "../models/client.model.js";
+import Reservation from "../models/reservation.model.js";
 
 export const getAllClients = async (req, res) => {
   try {
@@ -17,15 +18,57 @@ export const getAllClients = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     const totalCount = await Client.countDocuments(filter);
-
     const clients = await Client.find(filter)
       .sort({ [sort]: -1 })
       .skip(skip)
       .limit(limitNum)
-      .exec();
+      .lean();
+
+    // Enrich each client with reservation stats
+    const enrichedClients = await Promise.all(
+      clients.map(async (client) => {
+        const reservations = await Reservation.find({ client: client._id })
+          .populate("products.product", "name category pricePerKg")
+          .sort({ dateOfDelivery: -1 })
+          .lean();
+
+        const totalOrders = reservations.length;
+        const totalMeat = reservations.reduce(
+          (sum, r) =>
+            sum +
+            r.products.reduce(
+              (sub, p) => sub + (p.quantityInGrams || 0),
+              0
+            ),
+          0
+        );
+
+        const totalPaid = reservations
+          .filter((r) => r.completed)
+          .reduce((sum, r) => sum + (r.calculatedTotalAmmount || 0), 0);
+
+        const lastOrder = reservations[0] || null;
+
+        return {
+          ...client,
+          totalOrders,
+          totalMeat,
+          totalPaid,
+          lastOrder,
+          reservations: reservations.map((r) => ({
+            _id: r._id,
+            dateOfDelivery: r.dateOfDelivery,
+            completed: r.completed,
+            calculatedTotalAmmount: r.calculatedTotalAmmount,
+            products: r.products,
+            notes: r.notes,
+          })),
+        };
+      })
+    );
 
     res.status(200).json({
-      clients,
+      clients: enrichedClients,
       currentPage: pageNum,
       totalPages: Math.ceil(totalCount / limitNum),
       totalCount,
