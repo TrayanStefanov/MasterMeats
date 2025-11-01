@@ -17,12 +17,12 @@ const ClientForm = ({ client, setClient }) => {
         {/* Full Name */}
         <div className="flex flex-col">
           <label className="text-secondary text-sm mb-1">
-            {tForms("client.name")}
+            {tForms("client.nameLabel")}
           </label>
           <input
             type="text"
             placeholder={tForms("client.namePlaceholder")}
-            value={client.name}
+            value={client.name || ""}
             onChange={(e) => handleChange("name", e.target.value)}
             className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
             required
@@ -32,12 +32,12 @@ const ClientForm = ({ client, setClient }) => {
         {/* Phone Number */}
         <div className="flex flex-col">
           <label className="text-secondary text-sm mb-1">
-            {tForms("client.phone")}
+            {tForms("client.phoneLabel")}
           </label>
           <input
             type="text"
             placeholder={tForms("client.phonePlaceholder")}
-            value={client.phone}
+            value={client.phone || ""}
             onChange={(e) => handleChange("phone", e.target.value)}
             className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
             required
@@ -47,12 +47,12 @@ const ClientForm = ({ client, setClient }) => {
         {/* Email */}
         <div className="flex flex-col md:col-span-2">
           <label className="text-secondary text-sm mb-1">
-            {tForms("client.email")}
+            {tForms("client.emailLabel")}
           </label>
           <input
             type="email"
             placeholder={tForms("client.emailPlaceholder")}
-            value={client.email}
+            value={client.email || ""}
             onChange={(e) => handleChange("email", e.target.value)}
             className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
           />
@@ -65,7 +65,7 @@ const ClientForm = ({ client, setClient }) => {
           </label>
           <textarea
             placeholder={tForms("client.notesPlaceholder")}
-            value={client.notes}
+            value={client.notes || ""}
             onChange={(e) => handleChange("notes", e.target.value)}
             className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
             rows="3"
