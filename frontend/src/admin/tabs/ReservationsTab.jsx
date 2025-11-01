@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaStore, FaGlobe } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import OnlineReservationsTab from "./OnlineReservationsTab";
 import IRLReservationsTab from "./IRLReservationsTab";
 
 const ReservationsTab = () => {
   const [activeTab, setActiveTab] = useState("irl");
+  const { t: tReservations } = useTranslation("admin/reservations");
 
   const tabs = [
-    { id: "irl", label: "IRL Reservations", icon: <FaStore /> },
-    { id: "online", label: "Online Reservations", icon: <FaGlobe /> },
+    { id: "irl", label: tReservations("tabs.irl"), icon: <FaStore /> },
+    { id: "online", label: tReservations("tabs.online"), icon: <FaGlobe /> },
   ];
 
   return (
