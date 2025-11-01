@@ -10,11 +10,9 @@
     "list": {
         "name": "Client Name",
         "phone": "Phone:",
-        "items": "Items",
-        "total": "Total (€)",
-        "amountDue": "Due (€)",
-        "dateOfDelivery": "Delivery Date",
-        "status": "Status",
+        "items": "Last Reserved Items",
+        "total": "Total # of Reservations",
+        "status": "Last Reservation Status",
         "actions": "Actions"
     },
     "editTitle": "Edit Client",

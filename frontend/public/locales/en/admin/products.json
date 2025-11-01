@@ -3,7 +3,7 @@
     "empty": "No products found.",
     "back": "Back to Products",
     "list": {
-        "name": "Name",
+        "name": "Delicacy name",
         "category": "Category",
         "price": "Price",
         "actions": "Actions"

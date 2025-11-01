@@ -5,7 +5,7 @@
     },
     "filters": {
         "title": "Filters",
-        "completed": "Show incopleted",
+        "completed": "Show completed",
         "amountDue": "Hide zero amount due",
         "search": "Search by client name or email"
     },
