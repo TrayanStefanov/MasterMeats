@@ -3,7 +3,7 @@ import Reservation from "../models/reservation.model.js";
 
 export const getAllClients = async (req, res) => {
   try {
-    const { search, page = 1, limit = 10, sort = "createdAt" } = req.query;
+    const { search, page = 1, limit = 10, sort = "createdAt", tags } = req.query;
 
     const filter = {};
     if (search) {
@@ -11,6 +11,12 @@ export const getAllClients = async (req, res) => {
         { name: { $regex: search, $options: "i" } },
         { phone: { $regex: search, $options: "i" } },
       ];
+    }
+
+    // Filter by tags
+    if (tags) {
+      const tagList = tags.split(",").map((t) => t.trim());
+      filter.tags = { $in: tagList };
     }
 
     const pageNum = parseInt(page, 10);
@@ -94,7 +100,7 @@ export const getClientById = async (req, res) => {
 
 export const createClient = async (req, res) => {
   try {
-    const { name, phone, email, notes, user } = req.body;
+    const { name, phone, email, notes, user, tags = [] } = req.body;
 
     if (!name || !phone) {
       return res.status(400).json({ message: "Name and phone are required" });
@@ -112,6 +118,7 @@ export const createClient = async (req, res) => {
       email,
       notes,
       user,
+      tags,
     });
 
     res.status(201).json(client);
