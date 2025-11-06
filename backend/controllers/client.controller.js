@@ -66,7 +66,7 @@ export const getAllClients = async (req, res) => {
 
         const reservations = await Reservation.find(reservationFilter)
           .populate("products.product", "name category pricePerKg")
-          .sort({ dateOfDelivery: -1 })
+          .sort({ dateOfDelivery: 1 }) // ascending
           .lean();
 
         const totalOrders = reservations.length;
@@ -84,23 +84,42 @@ export const getAllClients = async (req, res) => {
           .filter((r) => r.completed)
           .reduce((sum, r) => sum + (r.calculatedTotalAmmount || 0), 0);
 
-        const lastOrder = reservations[0] || null;
+        // Find closest upcoming or latest past delivery
+        const today = new Date().setHours(0, 0, 0, 0);
+        let closestReservation = null;
+
+        const future = reservations.filter(
+          (r) => new Date(r.dateOfDelivery).setHours(0, 0, 0, 0) >= today
+        );
+
+        if (future.length > 0) {
+          closestReservation = future.reduce((a, b) =>
+            new Date(a.dateOfDelivery) < new Date(b.dateOfDelivery) ? a : b
+          );
+        } else if (reservations.length > 0) {
+          closestReservation = reservations.reduce((a, b) =>
+            new Date(a.dateOfDelivery) > new Date(b.dateOfDelivery) ? a : b
+          );
+        }
 
         return {
           ...client,
           totalOrders,
           totalMeat,
           totalPaid,
-          lastOrderDate: lastOrder?.dateOfDelivery || null,
-          lastOrder,
-          reservations: reservations.map((r) => ({
-            _id: r._id,
-            dateOfDelivery: r.dateOfDelivery,
-            completed: r.completed,
-            calculatedTotalAmmount: r.calculatedTotalAmmount,
-            products: r.products,
-            notes: r.notes,
-          })),
+          closestReservation,
+          lastOrderDate: closestReservation?.dateOfDelivery || null,
+          reservations: reservations
+            .slice()
+            .sort((a, b) => new Date(b.dateOfDelivery) - new Date(a.dateOfDelivery))
+            .map((r) => ({
+              _id: r._id,
+              dateOfDelivery: r.dateOfDelivery,
+              completed: r.completed,
+              calculatedTotalAmmount: r.calculatedTotalAmmount,
+              products: r.products,
+              notes: r.notes,
+            })),
         };
       })
     );
