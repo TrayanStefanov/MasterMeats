@@ -121,6 +121,7 @@ export default function ClientFilters() {
             <option value="today">{tUAC("filters.dateToday", { defaultValue: "Today" })}</option>
             <option value="tomorrow">{tUAC("filters.dateTomorrow", { defaultValue: "Tomorrow" })}</option>
             <option value="week">{tUAC("filters.dateWeek", { defaultValue: "This Week" })}</option>
+            <option value="past">{tUAC("filters.datePast", { defaultValue: "Past Dates" })}</option>
           </select>
         </div>
 

@@ -106,20 +106,25 @@ const ClientsList = ({ onEdit }) => {
                   }
                 >
                   {/* Client Name + Tags */}
-                  <td className="px-6 py-4 whitespace-nowrap text-secondary">
-                    <div>
-                      <p className="font-medium">{client.name}</p>
-                      {client.tags?.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
+                  <td className="px-6 py-4 text-secondary align-top">
+                    <div className="flex flex-col">
+                      <p className="font-semibold text-base">{client.name}</p>
+
+                      {client.tags?.length > 0 ? (
+                        <div className="flex flex-wrap gap-2 mt-2">
                           {client.tags.map((tag, idx) => (
                             <span
                               key={idx}
-                              className="bg-accent-content/10 text-xs text-accent-content px-2 py-0.5 rounded-full"
+                              className="bg-primary/60 text-primary-content text-xs font-medium px-2 py-0.5 rounded-full border border-accent/30"
                             >
-                              {tag}
+                              #{tag}
                             </span>
                           ))}
                         </div>
+                      ) : (
+                        <span className="text-secondary/40 italic text-xs mt-1">
+                          No tags
+                        </span>
                       )}
                     </div>
                   </td>
@@ -302,6 +307,7 @@ const ClientsList = ({ onEdit }) => {
           totalPages={totalPages}
           currentPage={currentPage}
           totalCount={totalCount}
+          onPageChange={(page) => fetchClients(page)}
         />
       </motion.div>
 
