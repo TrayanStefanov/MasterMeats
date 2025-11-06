@@ -69,7 +69,7 @@ export default function ClientFilters() {
   const clearAllTags = () => setFilter("tags", []);
 
   return (
-    <div className="min-w-[90%] mx-auto bg-primary/60 rounded-lg border border-accent/30 p-4 relative">
+    <div className="min-w-[90%] mx-auto bg-primary/60 rounded-lg border border-accent/30 p-4">
       <h2 className="text-accent-content text-2xl text-center mb-4">
         {tUAC("filters.title", { defaultValue: "Filters" })}
       </h2>
@@ -97,8 +97,8 @@ export default function ClientFilters() {
             {tUAC("filters.tags", { defaultValue: "Filter by Tags" })}
           </label>
 
-          <div className="flex items-center flex-wrap gap-2 bg-secondary border border-accent/30 rounded-md px-3 py-1.5 min-h-[42px] relative">
-            {filters.tags?.length > 0 ? (
+          <div className="flex items-center flex-wrap gap-2 bg-secondary border border-accent/30 rounded-md px-3 py-1.5 min-h-[42px]">
+            {filters.tags?.length > 0 &&
               filters.tags.map((tag, idx) => (
                 <span
                   key={idx}
@@ -112,12 +112,7 @@ export default function ClientFilters() {
                     <FaTimes />
                   </button>
                 </span>
-              ))
-            ) : (
-              <span className="text-primary/60 text-sm italic">
-                {tUAC("filters.noTags", { defaultValue: "No tag filters active" })}
-              </span>
-            )}
+              ))}
 
             <form onSubmit={handleAddTag} className="flex items-center gap-2 flex-1">
               <input
@@ -141,19 +136,25 @@ export default function ClientFilters() {
             )}
           </div>
 
-          {/* Tag suggestions dropdown */}
+          {/* Tag suggestions as pils */}
           {suggestions.length > 0 && (
-            <ul className="absolute top-full left-0 w-full bg-secondary border border-accent/40 rounded-b-lg mt-1 shadow-lg z-10 max-h-40 overflow-auto">
+            <div className="flex flex-wrap gap-2 mt-2">
               {suggestions.map((tag, idx) => (
-                <li
+                <button
                   key={idx}
-                  className="px-3 py-2 text-sm text-primary hover:bg-accent/30 cursor-pointer transition-colors"
                   onClick={() => addTag(tag)}
+                  className="bg-accent-content/20 hover:bg-accent-content/30 text-primary px-3 py-1 rounded-full text-xs transition-colors"
                 >
                   {tag}
-                </li>
+                </button>
               ))}
-            </ul>
+            </div>
+          )}
+
+          {(!filters.tags || filters.tags.length === 0) && suggestions.length === 0 && (
+            <p className="text-secondary/60 text-sm italic mt-2">
+              {tUAC("filters.noTags", { defaultValue: "No tag filters active" })}
+            </p>
           )}
         </div>
       </div>
