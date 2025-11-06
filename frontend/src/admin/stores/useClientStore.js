@@ -11,9 +11,10 @@ export const useClientStore = create((set, get) => ({
   error: null,
   filters: {
     search: "",
-    sort: "createdAt",
     limit: 10,
     tags: [],
+    status: "all", // "all" | "completed" | "pending"
+    dateRange: "all", // "all" | "today" | "tomorrow" | "week"
   },
   selectedClient: null,
   availableTags: [], 
@@ -24,35 +25,29 @@ export const useClientStore = create((set, get) => ({
 
     try {
       const queryObj = {
-        ...filters,
         page,
+        limit: filters.limit,
       };
 
-      if (filters.tags?.length) {
-        queryObj.tags = filters.tags.join(",");
-      }
+      if (filters.search) queryObj.search = filters.search;
+      if (filters.status !== "all") queryObj.status = filters.status;
+      if (filters.dateRange !== "all") queryObj.dateRange = filters.dateRange;
+      if (filters.tags?.length) queryObj.tags = filters.tags.join(",");
 
       const query = new URLSearchParams(queryObj).toString();
       const res = await axios.get(`/api/clients?${query}`);
 
-      // Derive additional UI-friendly fields
-      const clientsWithDerived = res.data.clients.map((c) => ({
-        ...c,
-        totalReservations: c.reservations?.length || 0,
-        lastOrder: c.reservations?.[0] || null,
-      }));
+      const { clients, totalCount, totalPages, currentPage } = res.data;
 
       const uniqueTags = [
-        ...new Set(
-          clientsWithDerived.flatMap((c) => c.tags || [])
-        ),
+        ...new Set(clients.flatMap((c) => c.tags || [])),
       ];
 
       set({
-        clients: clientsWithDerived,
-        currentPage: res.data.currentPage,
-        totalPages: res.data.totalPages,
-        totalCount: res.data.totalCount,
+        clients,
+        currentPage,
+        totalPages,
+        totalCount,
         loading: false,
         availableTags: uniqueTags,
       });
@@ -171,9 +166,10 @@ export const useClientStore = create((set, get) => ({
     set({
       filters: {
         search: "",
-        sort: "createdAt",
         limit: 10,
         tags: [],
+        status: "all",
+        dateRange: "all",
       },
     }),
 
