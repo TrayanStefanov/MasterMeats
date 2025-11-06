@@ -1,23 +1,40 @@
 {
-    "tabs": {
-        "users": "Users",
-        "clients": "Clients"
-    },
-    "filters": {
-        "title": "Filters",
-        "search": "Search by client name or phone"
-    },
-    "list": {
-        "name": "Client Name",
-        "phone": "Phone:",
-        "items": "Last Reserved Items",
-        "total": "Total # of Reservations",
-        "status": "Last Reservation Status",
-        "actions": "Actions"
-    },
-    "editTitle": "Edit Client",
-    "createTitle": "Create New Client",
-    "back": "Back to Clients",
-    "title": "Clients",
-    "empty": "No clients found."
+  "tabs": {
+    "users": "Users",
+    "clients": "Clients"
+  },
+  "filters": {
+    "title": "Filters",
+    "search": "Search by client name or phone"
+  },
+  "list": {
+    "name": "Client Name",
+    "phone": "Phone:",
+    "items": "Last Reserved Items",
+    "total": "Total # of Reservations",
+    "status": "Last Reservation Status",
+    "actions": "Actions"
+  },
+  "editTitle": "Edit Client",
+  "createTitle": "Create New Client",
+  "back": "Back to Clients",
+  "title": "Clients",
+  "empty": "No clients found.",
+
+  "details": {
+    "title": "Reservation History",
+    "reservations": "Reservations",
+    "items": "Reserved Items",
+    "notes": "Notes",
+    "noNotes": "No notes provided.",
+    "noReservations": "No reservations available.",
+    "noItems": "No items reserved.",
+    "date": "Date of Delivery",
+    "totalAmount": "Total Amount (€)",
+    "status": "Status",
+    "completed": "Completed",
+    "pending": "Pending",
+    "canceled": "Canceled",
+    "viewDetails": "View Details"
+  }
 }

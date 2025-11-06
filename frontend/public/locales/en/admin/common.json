@@ -26,6 +26,11 @@
         "pending": "Pending",
         "completed": "Completed",
         "cancelled": "Cancelled"
+    },
+    "notFound": {
+        "products": "No products found.",
+        "reservations": "No reservations found.",
+        "clients": "No clients found.",
+        "items": "No items found."
     }
-
 }
