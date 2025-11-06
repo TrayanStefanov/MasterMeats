@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaTrash, FaEdit, FaChevronDown, FaEye } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
-
 import { useClientStore } from "../stores/useClientStore";
 import ReservationDetailsModal from "./ReservationDetailsModal";
 import Pagination from "./Pagination";
@@ -23,23 +22,39 @@ const ClientsList = ({ onEdit }) => {
 
   const { t: tUAC } = useTranslation("admin/usersAndClients");
   const { t: tCommon } = useTranslation("admin/common");
-  const { t: tProducts } = useTranslation("productsSection");
   const { t: tReservations } = useTranslation("admin/reservations");
 
   const [expandedClient, setExpandedClient] = useState(null);
   const [modalReservation, setModalReservation] = useState(null);
 
-  // Fetch clients whenever filters or page changes
   useEffect(() => {
     fetchClients(currentPage);
   }, [filters, currentPage]);
 
-  // Refresh when language changes
   useEffect(() => {
     const handleLangChange = () => fetchClients(currentPage);
     i18next.on("languageChanged", handleLangChange);
     return () => i18next.off("languageChanged", handleLangChange);
   }, [fetchClients, currentPage]);
+
+  const getDeliveryLabel = (dateStr) => {
+    if (!dateStr) return null;
+    const today = new Date();
+    const delivery = new Date(dateStr);
+    const diffDays = Math.floor(
+      (delivery.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0)) /
+        (1000 * 60 * 60 * 24)
+    );
+    if (diffDays === 0)
+      return { label: "Today", color: "bg-green-500/80 text-white" };
+    if (diffDays === 1)
+      return { label: "Tomorrow", color: "bg-yellow-500/80 text-white" };
+    if (diffDays > 1 && diffDays <= 5)
+      return { label: "This Week", color: "bg-blue-500/80 text-white" };
+    if (diffDays < 0)
+      return { label: "Past", color: "bg-gray-500/60 text-white" };
+    return null;
+  };
 
   if (loading && clients.length === 0)
     return (
@@ -59,8 +74,9 @@ const ClientsList = ({ onEdit }) => {
   return (
     <>
       <ClientFilters />
+
       <motion.div
-        className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-6"
+        className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -68,24 +84,13 @@ const ClientsList = ({ onEdit }) => {
         <table className="min-w-full divide-y divide-accent-content">
           <thead className="bg-secondary/80 font-semibold text-primary uppercase tracking-wider">
             <tr>
-              <th className="px-6 py-3 text-left text-xs">
-                {tUAC("list.name")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs">
-                {tUAC("list.phone")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs">
-                {tUAC("list.items")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs">
-                {tUAC("list.total")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs">
-                {tUAC("list.status")}
-              </th>
-              <th className="px-6 py-3 text-right text-xs">
-                {tUAC("list.actions")}
-              </th>
+              <th className="px-6 py-3 text-left text-xs">{tUAC("list.name")}</th>
+              <th className="px-6 py-3 text-left text-xs">Phone</th>
+              <th className="px-6 py-3 text-left text-xs">Orders</th>
+              <th className="px-6 py-3 text-left text-xs">Total Meat (g)</th>
+              <th className="px-6 py-3 text-left text-xs">Paid (€)</th>
+              <th className="px-6 py-3 text-left text-xs">Delivery Date</th>
+              <th className="px-6 py-3 text-right text-xs">{tUAC("list.actions")}</th>
             </tr>
           </thead>
 
@@ -123,53 +128,36 @@ const ClientsList = ({ onEdit }) => {
                   <td className="px-6 py-4 text-secondary/70">
                     {client.phone || "—"}
                   </td>
-
-                  {/* Last Reserved Items */}
                   <td className="px-6 py-4 text-secondary/70">
-                    {client.lastOrder?.products?.length ? (
-                      <div className="space-y-1">
-                        {client.lastOrder.products.map((p, idx) => (
-                          <p key={idx} className="text-xs text-secondary/60">
-                            {tProducts(
-                              `${p.product?.key || p.product?.name}.title`,
-                              {
-                                defaultValue: p.product?.name || "—",
-                              }
-                            )}{" "}
-                            ({p.quantityInGrams} g)
-                          </p>
-                        ))}
+                    {client.totalOrders ?? "—"}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.totalMeat ?? "—"}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    €{client.totalPaid?.toFixed(2) ?? "—"}
+                  </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.closestReservation?.dateOfDelivery ? (
+                      <div className="flex items-center gap-2">
+                        <span>
+                          {new Date(
+                            client.closestReservation.dateOfDelivery
+                          ).toLocaleDateString()}
+                        </span>
+                        {(() => {
+                          const info = getDeliveryLabel(
+                            client.closestReservation.dateOfDelivery
+                          );
+                          return info ? (
+                            <span
+                              className={`px-2 py-0.5 text-xs rounded-full font-medium ${info.color}`}
+                            >
+                              {info.label}
+                            </span>
+                          ) : null;
+                        })()}
                       </div>
-                    ) : (
-                      <span className="text-secondary/40 italic">
-                        {tReservations("details.noItems", {
-                          defaultValue: "No items",
-                        })}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* Total # of Reservations */}
-                  <td className="px-6 py-4 text-secondary/70">
-                    {client.totalReservations ?? "—"}
-                  </td>
-
-                  {/* Last Reservation Status */}
-                  <td className="px-6 py-4 text-secondary/70">
-                    {client.lastOrder ? (
-                      client.lastOrder.completed ? (
-                        <span className="text-green-400">
-                          {tReservations("details.completed", {
-                            defaultValue: "Completed",
-                          })}
-                        </span>
-                      ) : (
-                        <span className="text-yellow-400">
-                          {tReservations("details.pending", {
-                            defaultValue: "Pending",
-                          })}
-                        </span>
-                      )
                     ) : (
                       <span className="text-secondary/40 italic">
                         {tReservations("details.noOrders", {
@@ -235,7 +223,7 @@ const ClientsList = ({ onEdit }) => {
                               })}
                             </h4>
                             <div className="space-y-2 bg-primary p-3 rounded-lg border border-accent/30">
-                              {client.reservations.map((r) => (
+                              {[...client.reservations].map((r) => (
                                 <div
                                   key={r._id}
                                   className="flex justify-between items-center bg-gray-800/40 p-3 rounded-lg"
@@ -310,13 +298,10 @@ const ClientsList = ({ onEdit }) => {
           </tbody>
         </table>
 
-        {/* Pagination footer */}
         <Pagination
-          currentPage={currentPage}
           totalPages={totalPages}
+          currentPage={currentPage}
           totalCount={totalCount}
-          showingCount={clients.length}
-          onPageChange={(page) => fetchClients(page)}
         />
       </motion.div>
 
