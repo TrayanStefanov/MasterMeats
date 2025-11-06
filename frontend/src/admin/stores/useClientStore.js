@@ -13,6 +13,7 @@ export const useClientStore = create((set, get) => ({
     search: "",
     sort: "createdAt",
     limit: 10,
+    tags: [],
   },
   selectedClient: null,
 
@@ -21,14 +22,27 @@ export const useClientStore = create((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const query = new URLSearchParams({
+      const queryObj = {
         ...filters,
         page,
-      }).toString();
+      };
 
+      if (filters.tags?.length) {
+        queryObj.tags = filters.tags.join(",");
+      }
+
+      const query = new URLSearchParams(queryObj).toString();
       const res = await axios.get(`/api/clients?${query}`);
+
+      // Derive additional UI-friendly fields
+      const clientsWithDerived = res.data.clients.map((c) => ({
+        ...c,
+        totalReservations: c.reservations?.length || 0,
+        lastOrder: c.reservations?.[0] || null,
+      }));
+
       set({
-        clients: res.data.clients,
+        clients: clientsWithDerived,
         currentPage: res.data.currentPage,
         totalPages: res.data.totalPages,
         totalCount: res.data.totalCount,
@@ -56,22 +70,6 @@ export const useClientStore = create((set, get) => ({
       const message =
         error.response?.data?.message || "Failed to create client";
       set({ loading: false, error: message });
-      toast.error(message);
-      throw error;
-    }
-  },
-
-  findOrCreateClient: async (clientData) => {
-    try {
-      // Try to find existing by phone
-      const res = await axios.get(`/api/clients?search=${clientData.phone}`);
-      const existing = res.data?.clients?.[0];
-      if (existing) return existing;
-
-      // Otherwise create
-      return await get().createClient(clientData);
-    } catch (error) {
-      const message = error.response?.data?.message || "Failed to create/find client";
       toast.error(message);
       throw error;
     }
@@ -125,6 +123,7 @@ export const useClientStore = create((set, get) => ({
         search: "",
         sort: "createdAt",
         limit: 10,
+        tags: [],
       },
     }),
 
