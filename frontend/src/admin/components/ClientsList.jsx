@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTrash, FaEdit, FaChevronDown ,FaEye} from "react-icons/fa";
+import { FaTrash, FaEdit, FaChevronDown, FaEye, FaTimes } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 
@@ -18,6 +18,7 @@ const ClientsList = ({ onEdit }) => {
     totalPages,
     currentPage,
     filters,
+    setFilter,
   } = useClientStore();
 
   // Translations
@@ -28,14 +29,42 @@ const ClientsList = ({ onEdit }) => {
 
   const [expandedClient, setExpandedClient] = useState(null);
   const [modalReservation, setModalReservation] = useState(null);
+  const [tagInput, setTagInput] = useState("");
 
-  // Fetch clients on mount and when language changes
+  // Fetch clients whenever filters or page changes
   useEffect(() => {
     fetchClients(currentPage);
+  }, [filters, currentPage]);
+
+  // Refresh when language changes
+  useEffect(() => {
     const handleLangChange = () => fetchClients(currentPage);
     i18next.on("languageChanged", handleLangChange);
     return () => i18next.off("languageChanged", handleLangChange);
-  }, [fetchClients, filters, currentPage]);
+  }, [fetchClients, currentPage]);
+
+  // Add tag to filter
+  const handleAddTag = (e) => {
+    e.preventDefault();
+    const newTag = tagInput.trim();
+    if (!newTag) return;
+    const currentTags = filters.tags || [];
+    if (!currentTags.includes(newTag)) {
+      setFilter("tags", [...currentTags, newTag]);
+    }
+    setTagInput("");
+  };
+
+  // Remove tag from filter
+  const handleRemoveTag = (tagToRemove) => {
+    setFilter(
+      "tags",
+      filters.tags.filter((t) => t !== tagToRemove)
+    );
+  };
+
+  // Reset tag filters
+  const clearAllTags = () => setFilter("tags", []);
 
   if (loading && clients.length === 0)
     return (
@@ -51,8 +80,58 @@ const ClientsList = ({ onEdit }) => {
 
   return (
     <>
+      <div className="max-w-6xl mx-auto mt-6 bg-primary/60 rounded-lg border border-accent/30 p-4">
+        <p className="text-secondary/70 text-sm font-semibold mb-2 uppercase">
+          {tUAC("filters.tags", { defaultValue: "Filter by Tags" })}
+        </p>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {filters.tags?.length > 0 ? (
+            filters.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="bg-accent-content/20 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1"
+              >
+                {tag}
+                <button
+                  onClick={() => handleRemoveTag(tag)}
+                  className="text-accent-content/70 hover:text-accent-content text-xs"
+                >
+                  <FaTimes />
+                </button>
+              </span>
+            ))
+          ) : (
+            <span className="text-secondary/40 text-sm italic">
+              {tUAC("filters.noTags", { defaultValue: "No tag filters active" })}
+            </span>
+          )}
+
+          <form onSubmit={handleAddTag} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder={tUAC("filters.addTagPlaceholder", {
+                defaultValue: "Add tag and press Enter...",
+              })}
+              className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-1 text-sm outline-none placeholder:text-secondary/50"
+            />
+          </form>
+
+          {filters.tags?.length > 0 && (
+            <button
+              onClick={clearAllTags}
+              className="text-xs text-accent-content/60 hover:text-accent-content ml-2"
+            >
+              {tCommon("clear", { defaultValue: "Clear" })}
+            </button>
+          )}
+        </div>
+      </div>
+
       <motion.div
-        className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-8"
+        className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -63,11 +142,18 @@ const ClientsList = ({ onEdit }) => {
               <th className="px-6 py-3 text-left text-xs">
                 {tUAC("list.name")}
               </th>
-              <th className="px-6 py-3 text-left text-xs">Phone</th>
-              <th className="px-6 py-3 text-left text-xs">Orders</th>
-              <th className="px-6 py-3 text-left text-xs">Total Meat (g)</th>
-              <th className="px-6 py-3 text-left text-xs">Paid (€)</th>
-              <th className="px-6 py-3 text-left text-xs">Last Order</th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tUAC("list.phone")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tUAC("list.items")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tUAC("list.total")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tUAC("list.status")}
+              </th>
               <th className="px-6 py-3 text-right text-xs">
                 {tUAC("list.actions")}
               </th>
@@ -85,21 +171,31 @@ const ClientsList = ({ onEdit }) => {
                     )
                   }
                 >
+                  {/* Client Name + Tags */}
                   <td className="px-6 py-4 whitespace-nowrap text-secondary">
-                    {client.name}
+                    <div>
+                      <p className="font-medium">{client.name}</p>
+                      {client.tags?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {client.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="bg-accent-content/10 text-xs text-accent-content px-2 py-0.5 rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </td>
+
+                  {/* Phone */}
                   <td className="px-6 py-4 text-secondary/70">
-                    {client.phone}
+                    {client.phone || "—"}
                   </td>
-                  <td className="px-6 py-4 text-secondary/70">
-                    {client.totalOrders ?? "—"}
-                  </td>
-                  <td className="px-6 py-4 text-secondary/70">
-                    {client.totalMeat ?? "—"}
-                  </td>
-                  <td className="px-6 py-4 text-secondary/70">
-                    €{client.totalPaid?.toFixed(2) ?? "—"}
-                  </td>
+
+                  {/* Last Reserved Items */}
                   <td className="px-6 py-4 text-secondary/70">
                     {client.lastOrder?.products?.length ? (
                       <div className="space-y-1">
@@ -117,7 +213,39 @@ const ClientsList = ({ onEdit }) => {
                       </div>
                     ) : (
                       <span className="text-secondary/40 italic">
-                        No orders
+                        {tReservations("details.noItems", {
+                          defaultValue: "No items",
+                        })}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Total # of Reservations */}
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.totalReservations ?? "—"}
+                  </td>
+
+                  {/* Last Reservation Status */}
+                  <td className="px-6 py-4 text-secondary/70">
+                    {client.lastOrder ? (
+                      client.lastOrder.completed ? (
+                        <span className="text-green-400">
+                          {tReservations("details.completed", {
+                            defaultValue: "Completed",
+                          })}
+                        </span>
+                      ) : (
+                        <span className="text-yellow-400">
+                          {tReservations("details.pending", {
+                            defaultValue: "Pending",
+                          })}
+                        </span>
+                      )
+                    ) : (
+                      <span className="text-secondary/40 italic">
+                        {tReservations("details.noOrders", {
+                          defaultValue: "No reservations",
+                        })}
                       </span>
                     )}
                   </td>
@@ -161,7 +289,7 @@ const ClientsList = ({ onEdit }) => {
                       className="bg-primary/40"
                     >
                       <td
-                        colSpan={7}
+                        colSpan={6}
                         className="px-8 py-6 text-sm text-secondary/80"
                       >
                         <p className="text-center text-secondary font-semibold text-base mb-4 border-b border-accent/40 pb-2">
@@ -191,11 +319,15 @@ const ClientsList = ({ onEdit }) => {
                                       —{" "}
                                       {r.completed ? (
                                         <span className="text-green-400">
-                                          Completed
+                                          {tReservations("details.completed", {
+                                            defaultValue: "Completed",
+                                          })}
                                         </span>
                                       ) : (
                                         <span className="text-yellow-400">
-                                          Pending
+                                          {tReservations("details.pending", {
+                                            defaultValue: "Pending",
+                                          })}
                                         </span>
                                       )}
                                     </p>
