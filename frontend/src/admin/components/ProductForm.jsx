@@ -236,7 +236,6 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 value={formData.title.en}
                 onChange={(e) => handleChange("title", e.target.value, "en")}
                 className="input"
-                required
               />
 
               <label className="label">{tForms("product.langs.en.ingredientsLabel")}</label>
@@ -280,7 +279,6 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 value={formData.title.bg}
                 onChange={(e) => handleChange("title", e.target.value, "bg")}
                 className="input"
-                required
               />
 
               <label className="label">{tForms("product.langs.bg.ingredientsLabel")}</label>
