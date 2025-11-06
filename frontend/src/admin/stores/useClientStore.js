@@ -16,7 +16,8 @@ export const useClientStore = create((set, get) => ({
     tags: [],
   },
   selectedClient: null,
-
+  availableTags: [], 
+  
   fetchClients: async (page = 1) => {
     const { filters } = get();
     set({ loading: true, error: null });
@@ -41,12 +42,19 @@ export const useClientStore = create((set, get) => ({
         lastOrder: c.reservations?.[0] || null,
       }));
 
+      const uniqueTags = [
+        ...new Set(
+          clientsWithDerived.flatMap((c) => c.tags || [])
+        ),
+      ];
+
       set({
         clients: clientsWithDerived,
         currentPage: res.data.currentPage,
         totalPages: res.data.totalPages,
         totalCount: res.data.totalCount,
         loading: false,
+        availableTags: uniqueTags,
       });
     } catch (error) {
       const message =
@@ -65,6 +73,15 @@ export const useClientStore = create((set, get) => ({
         loading: false,
       }));
       toast.success("Client created successfully!");
+
+      const allTags = [
+        ...new Set([
+          ...get().availableTags,
+          ...(res.data.tags || []),
+        ]),
+      ];
+      set({ availableTags: allTags });
+
       return res.data;
     } catch (error) {
       const message =
@@ -86,6 +103,14 @@ export const useClientStore = create((set, get) => ({
         loading: false,
       }));
       toast.success("Client updated successfully!");
+
+      const updatedTags = [
+        ...new Set([
+          ...get().availableTags,
+          ...(res.data.tags || []),
+        ]),
+      ];
+      set({ availableTags: updatedTags });
       return res.data;
     } catch (error) {
       const message =
@@ -99,16 +124,41 @@ export const useClientStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await axios.delete(`/api/clients/${clientId}`);
-      set((state) => ({
-        clients: state.clients.filter((c) => c._id !== clientId),
+      const remainingClients = get().clients.filter(
+        (c) => c._id !== clientId
+      );
+
+      const remainingTags = [
+        ...new Set(remainingClients.flatMap((c) => c.tags || [])),
+      ];
+
+      set({
+        clients: remainingClients,
         loading: false,
-      }));
+        availableTags: remainingTags,
+      });
+
       toast.success("Client deleted successfully!");
     } catch (error) {
       const message =
         error.response?.data?.message || "Failed to delete client";
       set({ loading: false, error: message });
       toast.error(message);
+    }
+  },
+
+  fetchAvailableTags: async () => {
+    try {
+      const res = await axios.get(`/api/clients/tags`);
+      set({ availableTags: res.data || [] });
+    } catch (error) {
+      console.warn("⚠️ Could not fetch available tags, using local fallback.");
+      toast.error("Could not fetch available tags", error);
+      // fallback: use currently loaded clients
+      const tagsFromClients = [
+        ...new Set(get().clients.flatMap((c) => c.tags || [])),
+      ];
+      set({ availableTags: tagsFromClients });
     }
   },
 
