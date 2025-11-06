@@ -1,12 +1,13 @@
 import { useState, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTrash, FaEdit, FaChevronDown, FaEye, FaTimes } from "react-icons/fa";
+import { FaTrash, FaEdit, FaChevronDown, FaEye } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 
 import { useClientStore } from "../stores/useClientStore";
 import ReservationDetailsModal from "./ReservationDetailsModal";
 import Pagination from "./Pagination";
+import ClientFilters from "./ClientFilters";
 
 const ClientsList = ({ onEdit }) => {
   const {
@@ -18,10 +19,8 @@ const ClientsList = ({ onEdit }) => {
     totalPages,
     currentPage,
     filters,
-    setFilter,
   } = useClientStore();
 
-  // Translations
   const { t: tUAC } = useTranslation("admin/usersAndClients");
   const { t: tCommon } = useTranslation("admin/common");
   const { t: tProducts } = useTranslation("productsSection");
@@ -29,7 +28,6 @@ const ClientsList = ({ onEdit }) => {
 
   const [expandedClient, setExpandedClient] = useState(null);
   const [modalReservation, setModalReservation] = useState(null);
-  const [tagInput, setTagInput] = useState("");
 
   // Fetch clients whenever filters or page changes
   useEffect(() => {
@@ -43,29 +41,6 @@ const ClientsList = ({ onEdit }) => {
     return () => i18next.off("languageChanged", handleLangChange);
   }, [fetchClients, currentPage]);
 
-  // Add tag to filter
-  const handleAddTag = (e) => {
-    e.preventDefault();
-    const newTag = tagInput.trim();
-    if (!newTag) return;
-    const currentTags = filters.tags || [];
-    if (!currentTags.includes(newTag)) {
-      setFilter("tags", [...currentTags, newTag]);
-    }
-    setTagInput("");
-  };
-
-  // Remove tag from filter
-  const handleRemoveTag = (tagToRemove) => {
-    setFilter(
-      "tags",
-      filters.tags.filter((t) => t !== tagToRemove)
-    );
-  };
-
-  // Reset tag filters
-  const clearAllTags = () => setFilter("tags", []);
-
   if (loading && clients.length === 0)
     return (
       <p className="text-center py-8 text-secondary/60">
@@ -75,61 +50,15 @@ const ClientsList = ({ onEdit }) => {
 
   if (!clients || clients.length === 0)
     return (
-      <p className="text-center py-8 text-secondary/60">{tUAC("empty")}</p>
+      <>
+        <ClientFilters />
+        <p className="text-center py-8 text-secondary/60">{tUAC("empty")}</p>
+      </>
     );
 
   return (
     <>
-      <div className="max-w-6xl mx-auto mt-6 bg-primary/60 rounded-lg border border-accent/30 p-4">
-        <p className="text-secondary/70 text-sm font-semibold mb-2 uppercase">
-          {tUAC("filters.tags", { defaultValue: "Filter by Tags" })}
-        </p>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {filters.tags?.length > 0 ? (
-            filters.tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="bg-accent-content/20 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1"
-              >
-                {tag}
-                <button
-                  onClick={() => handleRemoveTag(tag)}
-                  className="text-accent-content/70 hover:text-accent-content text-xs"
-                >
-                  <FaTimes />
-                </button>
-              </span>
-            ))
-          ) : (
-            <span className="text-secondary/40 text-sm italic">
-              {tUAC("filters.noTags", { defaultValue: "No tag filters active" })}
-            </span>
-          )}
-
-          <form onSubmit={handleAddTag} className="flex items-center gap-2">
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder={tUAC("filters.addTagPlaceholder", {
-                defaultValue: "Add tag and press Enter...",
-              })}
-              className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-1 text-sm outline-none placeholder:text-secondary/50"
-            />
-          </form>
-
-          {filters.tags?.length > 0 && (
-            <button
-              onClick={clearAllTags}
-              className="text-xs text-accent-content/60 hover:text-accent-content ml-2"
-            >
-              {tCommon("clear", { defaultValue: "Clear" })}
-            </button>
-          )}
-        </div>
-      </div>
-
+      <ClientFilters />
       <motion.div
         className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-6"
         initial={{ opacity: 0, y: 20 }}
