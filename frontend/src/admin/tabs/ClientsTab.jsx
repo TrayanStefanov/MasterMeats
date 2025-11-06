@@ -14,6 +14,7 @@ const ClientsTab = () => {
     phone: "",
     email: "",
     notes: "",
+    tags: [],
   });
 
   const { t: tUAC } = useTranslation("admin/usersAndClients");
@@ -30,14 +31,14 @@ const ClientsTab = () => {
   };
 
   const handleCreate = () => {
-    setClient({ name: "", phone: "", email: "", notes: "" });
+    setClient({ name: "", phone: "", email: "", notes: "", tags: [] });
     setMode("create");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleBack = async () => {
     setMode("list");
-    setClient({ name: "", phone: "", email: "", notes: "" });
+    setClient({ name: "", phone: "", email: "", notes: "", tags: [] });
     await fetchClients();
   };
 
