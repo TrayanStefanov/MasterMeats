@@ -6,10 +6,15 @@ export const getAllClients = async (req, res) => {
     const { search, page = 1, limit = 10, sort = "createdAt", tags } = req.query;
 
     const filter = {};
+
+    // Global fuzzy search across multiple fields
     if (search) {
+      const searchRegex = new RegExp(search, "i"); // case-insensitive partial
       filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
+        { name: searchRegex },
+        { phone: searchRegex },
+        { email: searchRegex },
+        { tags: { $elemMatch: { $regex: search, $options: "i" } } },
       ];
     }
 
