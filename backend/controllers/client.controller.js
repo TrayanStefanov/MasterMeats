@@ -3,7 +3,14 @@ import Reservation from "../models/reservation.model.js";
 
 export const getAllClients = async (req, res) => {
   try {
-    const { search, page = 1, limit = 10, sort = "createdAt", tags } = req.query;
+    const {
+      search,
+      page = 1,
+      limit = 10,
+      tags,
+      status, // "completed" | "pending"
+      dateRange, // "today" | "tomorrow" | "week"
+    } = req.query;
 
     const filter = {};
 
@@ -29,16 +36,35 @@ export const getAllClients = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     const totalCount = await Client.countDocuments(filter);
-    const clients = await Client.find(filter)
-      .sort({ [sort]: -1 })
-      .skip(skip)
-      .limit(limitNum)
-      .lean();
+    const clients = await Client.find(filter).lean();
+
+    // Define date filters
+    const now = new Date();
+    let start, end;
+    if (dateRange === "today") {
+      start = new Date(now.setHours(0, 0, 0, 0));
+      end = new Date(now.setHours(23, 59, 59, 999));
+    } else if (dateRange === "tomorrow") {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      start = new Date(tomorrow.setHours(0, 0, 0, 0));
+      end = new Date(tomorrow.setHours(23, 59, 59, 999));
+    } else if (dateRange === "week") {
+      const weekEnd = new Date();
+      weekEnd.setDate(now.getDate() + 7);
+      start = new Date(now.setHours(0, 0, 0, 0));
+      end = new Date(weekEnd.setHours(23, 59, 59, 999));
+    }
 
     // Enrich each client with reservation stats
     const enrichedClients = await Promise.all(
       clients.map(async (client) => {
-        const reservations = await Reservation.find({ client: client._id })
+        const reservationFilter = { client: client._id };
+        if (status === "completed") reservationFilter.completed = true;
+        if (status === "pending") reservationFilter.completed = false;
+        if (dateRange) reservationFilter.dateOfDelivery = { $gte: start, $lte: end };
+
+        const reservations = await Reservation.find(reservationFilter)
           .populate("products.product", "name category pricePerKg")
           .sort({ dateOfDelivery: -1 })
           .lean();
@@ -65,6 +91,7 @@ export const getAllClients = async (req, res) => {
           totalOrders,
           totalMeat,
           totalPaid,
+          lastOrderDate: lastOrder?.dateOfDelivery || null,
           lastOrder,
           reservations: reservations.map((r) => ({
             _id: r._id,
@@ -78,8 +105,20 @@ export const getAllClients = async (req, res) => {
       })
     );
 
+    // Sort clients by most urgent delivery (soonest delivery date first)
+    const sortedClients = enrichedClients.sort((a, b) => {
+      const aDate = a.lastOrderDate ? new Date(a.lastOrderDate) : null;
+      const bDate = b.lastOrderDate ? new Date(b.lastOrderDate) : null;
+      if (!aDate && !bDate) return 0;
+      if (!aDate) return 1;
+      if (!bDate) return -1;
+      return aDate - bDate; // earliest first
+    });
+
+    const paginatedClients = sortedClients.slice(skip, skip + limitNum);
+
     res.status(200).json({
-      clients: enrichedClients,
+      clients: paginatedClients,
       currentPage: pageNum,
       totalPages: Math.ceil(totalCount / limitNum),
       totalCount,
@@ -89,6 +128,17 @@ export const getAllClients = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const getAllTags = async (req, res) => {
+  try {
+    const tags = await Client.distinct("tags");
+    res.status(200).json({ tags });
+  } catch (error) {
+    console.error("Error fetching tags:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 
 export const getClientById = async (req, res) => {
   try {
