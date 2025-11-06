@@ -14,7 +14,7 @@ export default function ClientFilters() {
 
   // Load available tags once
   useEffect(() => {
-    if (fetchAvailableTags) fetchAvailableTags();
+    fetchAvailableTags?.();
   }, []);
 
   // Debounced search filter
@@ -91,8 +91,41 @@ export default function ClientFilters() {
           />
         </div>
 
+        {/* Status Filter */}
+        <div className="flex flex-col">
+          <label className="text-secondary/70 text-sm font-semibold mb-1">
+            {tUAC("filters.status", { defaultValue: "Status" })}
+          </label>
+          <select
+            value={filters.status}
+            onChange={(e) => setFilter("status", e.target.value)}
+            className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 text-sm outline-none w-full h-[42px]"
+          >
+            <option value="all">{tUAC("filters.statusAll", { defaultValue: "All" })}</option>
+            <option value="pending">{tUAC("filters.statusPending", { defaultValue: "Pending" })}</option>
+            <option value="completed">{tUAC("filters.statusCompleted", { defaultValue: "Completed" })}</option>
+          </select>
+        </div>
+
+        {/* Date Range Filter */}
+        <div className="flex flex-col">
+          <label className="text-secondary/70 text-sm font-semibold mb-1">
+            {tUAC("filters.dateRange", { defaultValue: "Delivery Date" })}
+          </label>
+          <select
+            value={filters.dateRange}
+            onChange={(e) => setFilter("dateRange", e.target.value)}
+            className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 text-sm outline-none w-full h-[42px]"
+          >
+            <option value="all">{tUAC("filters.dateAll", { defaultValue: "All Dates" })}</option>
+            <option value="today">{tUAC("filters.dateToday", { defaultValue: "Today" })}</option>
+            <option value="tomorrow">{tUAC("filters.dateTomorrow", { defaultValue: "Tomorrow" })}</option>
+            <option value="week">{tUAC("filters.dateWeek", { defaultValue: "This Week" })}</option>
+          </select>
+        </div>
+
         {/* Tags Field */}
-        <div className="flex flex-col relative">
+        <div className="flex flex-col relative md:col-span-3 mt-2 md:mt-0">
           <label className="text-secondary/70 text-sm font-semibold mb-1">
             {tUAC("filters.tags", { defaultValue: "Filter by Tags" })}
           </label>
@@ -136,7 +169,7 @@ export default function ClientFilters() {
             )}
           </div>
 
-          {/* Tag suggestions as pils */}
+          {/* Tag suggestions as pills */}
           {suggestions.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {suggestions.map((tag, idx) => (
