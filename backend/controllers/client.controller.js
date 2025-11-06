@@ -1,6 +1,7 @@
 import Client from "../models/client.model.js";
 import Reservation from "../models/reservation.model.js";
 
+
 export const getAllClients = async (req, res) => {
   try {
     const {
@@ -8,66 +9,83 @@ export const getAllClients = async (req, res) => {
       page = 1,
       limit = 10,
       tags,
-      status, // "completed" | "pending"
-      dateRange, // "today" | "tomorrow" | "week"
+      status,      // "completed" | "pending"
+      dateRange,   // "all" | "today" | "tomorrow" | "week" | "past"
     } = req.query;
-
-    const filter = {};
-
-    // Global fuzzy search across multiple fields
-    if (search) {
-      const searchRegex = new RegExp(search, "i"); // case-insensitive partial
-      filter.$or = [
-        { name: searchRegex },
-        { phone: searchRegex },
-        { email: searchRegex },
-        { tags: { $elemMatch: { $regex: search, $options: "i" } } },
-      ];
-    }
-
-    // Filter by tags
-    if (tags) {
-      const tagList = tags.split(",").map((t) => t.trim());
-      filter.tags = { $in: tagList };
-    }
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    const totalCount = await Client.countDocuments(filter);
+    const filter = {};
+
+    // Global fuzzy search across multiple fields
+    if (search) {
+      const regex = new RegExp(search, "i");
+      filter.$or = [
+        { name: regex },
+        { phone: regex },
+        { email: regex },
+        { tags: { $elemMatch: { $regex: search, $options: "i" } } },
+      ];
+    }
+
+    if (tags) {
+      const tagList = tags.split(",").map((t) => t.trim());
+      filter.tags = { $in: tagList };
+    }
+
     const clients = await Client.find(filter).lean();
 
     // Define date filters
     const now = new Date();
+    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+    const todayEnd = new Date(now.setHours(23, 59, 59, 999));
+
     let start, end;
-    if (dateRange === "today") {
-      start = new Date(now.setHours(0, 0, 0, 0));
-      end = new Date(now.setHours(23, 59, 59, 999));
-    } else if (dateRange === "tomorrow") {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      start = new Date(tomorrow.setHours(0, 0, 0, 0));
-      end = new Date(tomorrow.setHours(23, 59, 59, 999));
-    } else if (dateRange === "week") {
-      const weekEnd = new Date();
-      weekEnd.setDate(now.getDate() + 7);
-      start = new Date(now.setHours(0, 0, 0, 0));
-      end = new Date(weekEnd.setHours(23, 59, 59, 999));
+
+    switch (dateRange) {
+      case "today":
+        start = todayStart;
+        end = todayEnd;
+        break;
+      case "tomorrow":
+        start = new Date(todayStart);
+        start.setDate(start.getDate() + 1);
+        end = new Date(todayEnd);
+        end.setDate(end.getDate() + 1);
+        break;
+      case "week":
+        start = todayStart;
+        end = new Date(todayEnd);
+        end.setDate(end.getDate() + 7);
+        break;
+      case "past":
+        start = new Date(0); // earliest date possible
+        end = new Date(todayStart);
+        break;
+      default:
+        start = null;
+        end = null;
     }
 
     // Enrich each client with reservation stats
     const enrichedClients = await Promise.all(
       clients.map(async (client) => {
         const reservationFilter = { client: client._id };
+
+        // Apply filters
         if (status === "completed") reservationFilter.completed = true;
         if (status === "pending") reservationFilter.completed = false;
-        if (dateRange) reservationFilter.dateOfDelivery = { $gte: start, $lte: end };
+        if (start && end) reservationFilter.dateOfDelivery = { $gte: start, $lte: end };
+        if (dateRange === "past") reservationFilter.dateOfDelivery = { $lt: todayStart };
 
         const reservations = await Reservation.find(reservationFilter)
           .populate("products.product", "name category pricePerKg")
           .sort({ dateOfDelivery: 1 }) // ascending
           .lean();
+
+        if (reservations.length === 0) return null; // Skip clients with no matching reservations
 
         const totalOrders = reservations.length;
         const totalMeat = reservations.reduce(
@@ -86,20 +104,17 @@ export const getAllClients = async (req, res) => {
 
         // Find closest upcoming or latest past delivery
         const today = new Date().setHours(0, 0, 0, 0);
-        let closestReservation = null;
-
         const future = reservations.filter(
           (r) => new Date(r.dateOfDelivery).setHours(0, 0, 0, 0) >= today
         );
 
+        let closestReservation = null;
         if (future.length > 0) {
           closestReservation = future.reduce((a, b) =>
             new Date(a.dateOfDelivery) < new Date(b.dateOfDelivery) ? a : b
           );
-        } else if (reservations.length > 0) {
-          closestReservation = reservations.reduce((a, b) =>
-            new Date(a.dateOfDelivery) > new Date(b.dateOfDelivery) ? a : b
-          );
+        } else {
+          closestReservation = reservations[reservations.length - 1] || null;
         }
 
         return {
@@ -125,13 +140,14 @@ export const getAllClients = async (req, res) => {
     );
 
     // Sort clients by most urgent delivery (soonest delivery date first)
-    const sortedClients = enrichedClients.sort((a, b) => {
+    const filteredClients = enrichedClients.filter(Boolean);
+    const sortedClients = filteredClients.sort((a, b) => {
       const aDate = a.lastOrderDate ? new Date(a.lastOrderDate) : null;
       const bDate = b.lastOrderDate ? new Date(b.lastOrderDate) : null;
       if (!aDate && !bDate) return 0;
       if (!aDate) return 1;
       if (!bDate) return -1;
-      return aDate - bDate; // earliest first
+      return aDate - bDate;
     });
 
     const paginatedClients = sortedClients.slice(skip, skip + limitNum);
@@ -139,12 +155,15 @@ export const getAllClients = async (req, res) => {
     res.status(200).json({
       clients: paginatedClients,
       currentPage: pageNum,
-      totalPages: Math.ceil(totalCount / limitNum),
-      totalCount,
+      totalPages: Math.ceil(filteredClients.length / limitNum),
+      totalCount: filteredClients.length,
     });
   } catch (error) {
     console.error("Error fetching clients:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
