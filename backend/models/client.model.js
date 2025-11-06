@@ -7,6 +7,7 @@ const clientSchema = new mongoose.Schema(
         email: { type: String },
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // If there is a user.
         notes: { type: String },
+        tags: [{ type: String, trim: true }],
     },
     { timestamps: true }
 );
