@@ -37,23 +37,19 @@ const ClientsList = ({ onEdit }) => {
     return () => i18next.off("languageChanged", handleLangChange);
   }, [fetchClients, currentPage]);
 
-  const getDeliveryLabel = (dateStr) => {
-    if (!dateStr) return null;
-    const today = new Date();
-    const delivery = new Date(dateStr);
-    const diffDays = Math.floor(
-      (delivery.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0)) /
-        (1000 * 60 * 60 * 24)
-    );
-    if (diffDays === 0)
-      return { label: "Today", color: "bg-green-500/80 text-white" };
-    if (diffDays === 1)
-      return { label: "Tomorrow", color: "bg-yellow-500/80 text-white" };
-    if (diffDays > 1 && diffDays <= 5)
-      return { label: "This Week", color: "bg-blue-500/80 text-white" };
-    if (diffDays < 0)
-      return { label: "Past", color: "bg-gray-500/60 text-white" };
-    return null;
+  const getStatusBadgeColor = (status) => {
+    switch (status) {
+      case "Completed":
+        return "bg-green-500/80 text-white";
+      case "Pending":
+        return "bg-yellow-500/80 text-white";
+      case "Active":
+        return "bg-blue-500/80 text-white";
+      case "Delivered - Unpaid":
+        return "bg-red-500/80 text-white";
+      default:
+        return "bg-gray-500/60 text-white";
+    }
   };
 
   if (loading && clients.length === 0)
@@ -86,10 +82,8 @@ const ClientsList = ({ onEdit }) => {
             <tr>
               <th className="px-6 py-3 text-left text-xs">{tUAC("list.name")}</th>
               <th className="px-6 py-3 text-left text-xs">Phone</th>
-              <th className="px-6 py-3 text-left text-xs">Orders</th>
-              <th className="px-6 py-3 text-left text-xs">Total Meat (g)</th>
               <th className="px-6 py-3 text-left text-xs">Paid (€)</th>
-              <th className="px-6 py-3 text-left text-xs">Delivery Date</th>
+              <th className="px-6 py-3 text-left text-xs">Status</th>
               <th className="px-6 py-3 text-right text-xs">{tUAC("list.actions")}</th>
             </tr>
           </thead>
@@ -129,46 +123,25 @@ const ClientsList = ({ onEdit }) => {
                     </div>
                   </td>
 
-                  {/* Phone */}
                   <td className="px-6 py-4 text-secondary/70">
                     {client.phone || "—"}
                   </td>
                   <td className="px-6 py-4 text-secondary/70">
-                    {client.totalOrders ?? "—"}
-                  </td>
-                  <td className="px-6 py-4 text-secondary/70">
-                    {client.totalMeat ?? "—"}
-                  </td>
-                  <td className="px-6 py-4 text-secondary/70">
                     €{client.totalPaid?.toFixed(2) ?? "—"}
                   </td>
+
+                  {/* ✅ Order Status (from backend) */}
                   <td className="px-6 py-4 text-secondary/70">
-                    {client.closestReservation?.dateOfDelivery ? (
-                      <div className="flex items-center gap-2">
-                        <span>
-                          {new Date(
-                            client.closestReservation.dateOfDelivery
-                          ).toLocaleDateString()}
-                        </span>
-                        {(() => {
-                          const info = getDeliveryLabel(
-                            client.closestReservation.dateOfDelivery
-                          );
-                          return info ? (
-                            <span
-                              className={`px-2 py-0.5 text-xs rounded-full font-medium ${info.color}`}
-                            >
-                              {info.label}
-                            </span>
-                          ) : null;
-                        })()}
-                      </div>
-                    ) : (
-                      <span className="text-secondary/40 italic">
-                        {tReservations("details.noOrders", {
-                          defaultValue: "No reservations",
-                        })}
+                    {client.orderStatus ? (
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full font-medium ${getStatusBadgeColor(
+                          client.orderStatus
+                        )}`}
+                      >
+                        {client.orderStatus}
                       </span>
+                    ) : (
+                      <span className="text-secondary/40">—</span>
                     )}
                   </td>
 
@@ -193,8 +166,9 @@ const ClientsList = ({ onEdit }) => {
                         <FaTrash />
                       </button>
                       <FaChevronDown
-                        className={`transition-transform ${expandedClient === client._id ? "rotate-180" : ""
-                          }`}
+                        className={`transition-transform ${
+                          expandedClient === client._id ? "rotate-180" : ""
+                        }`}
                       />
                     </div>
                   </td>
@@ -211,7 +185,7 @@ const ClientsList = ({ onEdit }) => {
                       className="bg-primary/40"
                     >
                       <td
-                        colSpan={6}
+                        colSpan={7}
                         className="px-8 py-6 text-sm text-secondary/80"
                       >
                         <p className="text-center text-secondary font-semibold text-base mb-4 border-b border-accent/40 pb-2">
@@ -307,6 +281,7 @@ const ClientsList = ({ onEdit }) => {
           totalPages={totalPages}
           currentPage={currentPage}
           totalCount={totalCount}
+          showingCount={clients.length}
           onPageChange={(page) => fetchClients(page)}
         />
       </motion.div>
