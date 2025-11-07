@@ -51,12 +51,12 @@ const DeliveryDetails = ({ details, setDetails }) => {
         <div className="flex items-center gap-2 mt-7">
           <input
             type="checkbox"
-            checked={details.completed}
-            onChange={(e) => handleChange("completed", e.target.checked)}
+            checked={details.delivered || false}
+            onChange={(e) => handleChange("delivered", e.target.checked)}
             className="accent-accent h-5 w-5"
           />
           <label className="text-secondary">
-            {tForms("delivery.completed")}
+            {tForms("delivery.delivered")}
           </label>
         </div>
 
