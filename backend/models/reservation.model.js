@@ -19,7 +19,7 @@ const reservationSchema = new mongoose.Schema(
                 priceAtReservation: { type: Number, required: true, min: 0 },
             },
         ],
-        calculatedTotalAmmount: {
+        calculatedTotalAmount: {
             type: Number,
             required: true,
             default: 0,
@@ -32,6 +32,7 @@ const reservationSchema = new mongoose.Schema(
             min: 0,
         },
         dateOfDelivery: { type: Date, default: Date.now, required: true },
+        delivered: { type: Boolean, default: false },
         completed: { type: Boolean, default: false },
         notes: { type: String, trim: true },
     },
@@ -39,6 +40,7 @@ const reservationSchema = new mongoose.Schema(
 );
 
 reservationSchema.index({ dateOfDelivery: 1 });
+reservationSchema.index({ delivered: 1 });
 reservationSchema.index({ completed: 1 });
 
 const Reservation = mongoose.model("Reservation", reservationSchema);
