@@ -11,10 +11,8 @@ export const useReservationStore = create((set, get) => ({
   error: null,
   filters: {
     search: "",
-    category: "",
-    productId: "",
-    completed: "",
-    amountDue: "",
+    products: [],
+    statusFilter: "", // new: "", "completed", "deliveredNotPaid", "paidNotDelivered"
     sort: "deliveryDate",
     limit: 10,
   },
@@ -25,12 +23,20 @@ export const useReservationStore = create((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const query = new URLSearchParams({
-        ...filters,
-        page,
-      }).toString();
+      const params = new URLSearchParams();
+      params.append("page", page);
+      params.append("limit", filters.limit);
+      params.append("sort", filters.sort);
 
-      const res = await axios.get(`/api/reservations?${query}`);
+      if (filters.search) params.append("search", filters.search.trim());
+      if (filters.products?.length)
+        params.append("products", filters.products.join(","));
+
+      if (filters.statusFilter)
+        params.append("statusFilter", filters.statusFilter);
+
+      const res = await axios.get(`/api/reservations?${params.toString()}`);
+
       set({
         reservations: res.data.reservations,
         currentPage: res.data.currentPage,
@@ -39,7 +45,8 @@ export const useReservationStore = create((set, get) => ({
         loading: false,
       });
     } catch (error) {
-      const message = error.response?.data?.message || "Failed to fetch reservations";
+      const message =
+        error.response?.data?.message || "Failed to fetch reservations";
       set({ loading: false, error: message });
       toast.error(message);
     }
@@ -48,18 +55,13 @@ export const useReservationStore = create((set, get) => ({
   createReservation: async (reservationData) => {
     set({ loading: true, error: null });
     try {
-      const payload = { ...reservationData };
-
-      const res = await axios.post(`/api/reservations`, payload);
-      set((state) => ({
-        reservations: [res.data, ...state.reservations],
-        loading: false,
-      }));
+      const res = await axios.post(`/api/reservations`, reservationData);
       toast.success("Reservation created successfully!");
       await get().fetchFilteredReservations();
       return res.data;
     } catch (error) {
-      const message = error.response?.data?.message || "Failed to create reservation";
+      const message =
+        error.response?.data?.message || "Failed to create reservation";
       set({ loading: false, error: message });
       toast.error(message);
     }
@@ -81,7 +83,8 @@ export const useReservationStore = create((set, get) => ({
       toast.success("Reservation updated successfully!");
       return res.data;
     } catch (error) {
-      const message = error.response?.data?.message || "Failed to update reservation";
+      const message =
+        error.response?.data?.message || "Failed to update reservation";
       set({ loading: false, error: message });
       toast.error(message);
     }
@@ -97,25 +100,25 @@ export const useReservationStore = create((set, get) => ({
       }));
       toast.success("Reservation deleted successfully!");
     } catch (error) {
-      const message = error.response?.data?.message || "Failed to delete reservation";
+      const message =
+        error.response?.data?.message || "Failed to delete reservation";
       set({ loading: false, error: message });
       toast.error(message);
     }
   },
 
-  setFilter: (key, value) =>
+  setFilter: (key, value) => {
     set((state) => ({
       filters: { ...state.filters, [key]: value },
-    })),
+    }));
+  },
 
   resetFilters: () =>
     set({
       filters: {
         search: "",
-        category: "",
-        productId: "",
-        completed: "",
-        amountDue: "",
+        products: [],
+        statusFilter: "",
         sort: "deliveryDate",
         limit: 10,
       },
