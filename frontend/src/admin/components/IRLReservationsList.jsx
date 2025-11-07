@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useReservationStore } from "../stores/useReservationStore";
 import Pagination from "./Pagination";
+import ReservationFilters from "./ReservationFilters";
 
 const IRLReservationsList = ({ onEdit }) => {
   const {
@@ -19,7 +20,6 @@ const IRLReservationsList = ({ onEdit }) => {
     deleteReservation,
     loading,
     filters,
-    setFilter,
     currentPage,
     totalPages,
     totalCount,
@@ -38,32 +38,17 @@ const IRLReservationsList = ({ onEdit }) => {
     return () => i18next.off("languageChanged", handleLangChange);
   }, [fetchFilteredReservations]);
 
-  // ✅ Toggle row expansion
+  useEffect(() => {
+    fetchFilteredReservations();
+  }, [filters]);
+
   const toggleExpand = (id) => {
     setExpandedRows((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  // ✅ COMPLETED TOGGLE FIX
-  const handleToggleCompleted = async (e) => {
-    const showOnlyCompleted = e.target.checked ? "true" : "";
-    setFilter("completed", showOnlyCompleted);
-    await fetchFilteredReservations();
-  };
-
-  // ✅ Amount due filter unchanged
-  const handleToggleAmountDue = async (e) => {
-    const hideZero = e.target.checked ? "nonzero" : "";
-    setFilter("amountDue", hideZero);
-    await fetchFilteredReservations();
-  };
-
-  // ✅ Apply amountDue filter locally
-  const filteredReservations =
-    filters.amountDue === "nonzero"
-      ? reservations.filter((r) => (r.amountDue || 0) > 0)
-      : reservations;
+  const filteredReservations = reservations;
 
   if (loading && reservations.length === 0) {
     return (
@@ -75,9 +60,12 @@ const IRLReservationsList = ({ onEdit }) => {
 
   if (!filteredReservations || filteredReservations.length === 0) {
     return (
-      <p className="text-center py-8 text-secondary/60">
-        {tReservations("empty")}
-      </p>
+      <div className="max-w-6xl mx-auto mt-8">
+        <ReservationFilters />
+        <p className="text-center py-8 text-secondary/60">
+          {tReservations("empty")}
+        </p>
+      </div>
     );
   }
 
@@ -88,36 +76,12 @@ const IRLReservationsList = ({ onEdit }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Filter Bar */}
-      <div className="flex flex-wrap justify-between items-center gap-4 px-6 py-3 bg-secondary/80 border-b border-accent-content">
-        <h2 className="text-lg font-semibold text-primary">
-          {tReservations("filters.title")}
-        </h2>
-
-        <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2 text-sm text-primary cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={filters.completed === "true"}
-              onChange={handleToggleCompleted}
-              className="checkbox checkbox-sm checkbox-accent"
-            />
-            <span>{tReservations("filters.completed")}</span>
-          </label>
-
-          <label className="flex items-center gap-2 text-sm text-primary cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={filters.amountDue === "nonzero"}
-              onChange={handleToggleAmountDue}
-              className="checkbox checkbox-sm checkbox-accent"
-            />
-            <span>{tReservations("filters.amountDue")}</span>
-          </label>
-        </div>
+      {/* Filters */}
+      <div className="p-4 border-b border-accent-content bg-secondary/60">
+        <ReservationFilters />
       </div>
 
-      {/* ✅ Reservations table */}
+      {/*Reservations Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-accent-content">
           <thead className="bg-secondary/60 font-semibold text-primary uppercase tracking-wider">
@@ -211,12 +175,29 @@ const IRLReservationsList = ({ onEdit }) => {
 
                     <td className="px-6 py-4 text-sm align-middle">
                       {res.completed ? (
+                        <span className="text-blue-400 font-semibold">
+                          {tCommon(
+                            "status.completedDelivered",
+                            "Paid & Delivered"
+                          )}
+                        </span>
+                      ) : res.delivered && res.amountDue > 0 ? (
+                        <span className="text-yellow-400 font-semibold">
+                          {tCommon(
+                            "status.deliveredNotPaid",
+                            "Delivered (Not Paid)"
+                          )}
+                        </span>
+                      ) : res.amountDue === 0 && !res.delivered ? (
                         <span className="text-green-400 font-semibold">
-                          {tCommon("status.completed")}
+                          {tCommon(
+                            "status.paidNotDelivered",
+                            "Paid (Not Delivered)"
+                          )}
                         </span>
                       ) : (
-                        <span className="text-yellow-400 font-semibold">
-                          {tCommon("status.pending")}
+                        <span className="text-red-400 font-semibold">
+                          {tCommon("status.pending", "Pending")}
                         </span>
                       )}
                     </td>
@@ -334,7 +315,6 @@ const IRLReservationsList = ({ onEdit }) => {
           </tbody>
         </table>
       </div>
-      
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
