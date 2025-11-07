@@ -4,17 +4,15 @@ import Client from "../models/client.model.js";
 export const getAllReservations = async (req, res) => {
   try {
     const {
-      search, // client name or phone
+      search,       // client name or phone
       category,
       productId,
-      completed,
-      amountDue,
-      sort, // deliveryDate, createdAt, etc.
-      page = 1, // current page
-      limit = 10, // results per page
+      statusFilter, // new single status filter
+      sort,
+      page = 1,
+      limit = 10,
     } = req.query;
 
-    // Build the filter
     let filter = {};
 
     // Search by client name or phone
@@ -28,18 +26,20 @@ export const getAllReservations = async (req, res) => {
       filter.client = { $in: matchingClients.map((c) => c._id) };
     }
 
-    // Filter by completion
-    if (completed === "true") {
+    // Status filters (mutually exclusive)
+    if (statusFilter === "completed") {
       filter.completed = true;
-    } else if (completed === "false") {
-      filter.completed = false;
-    }
+    } else if (statusFilter === "deliveredNotPaid") {
+      filter.$and = [
+        { delivered: true },
+        { amountDue: { $gt: 0 } }
+      ];
 
-    // Filter by amount due
-    if (amountDue === "none") {
-      filter.amountDue = { $lte: 0 };
-    } else if (amountDue === "some") {
-      filter.amountDue = { $gt: 0 };
+    } else if (statusFilter === "paidNotDelivered") {
+      filter.$and = [
+        { completed: false },
+        { amountDue: 0 }
+      ];
     }
 
     // Sorting options
@@ -51,7 +51,7 @@ export const getAllReservations = async (req, res) => {
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    let reservations = await Reservation.find(filter)
+    let allReservations = await Reservation.find(filter)
       .populate("client", "name phone email")
       .populate({
         path: "products.product",
@@ -59,8 +59,9 @@ export const getAllReservations = async (req, res) => {
       })
       .sort(sortOption)
       .exec();
+
     if (category || productId) {
-      reservations = reservations.filter((res) =>
+      allReservations = allReservations.filter((res) =>
         res.products?.some((p) => {
           const prod = p.product || {};
           if (category && prod.category !== category) return false;
@@ -70,9 +71,9 @@ export const getAllReservations = async (req, res) => {
       );
     }
 
-    // Pagination metadata
+    const totalCount = allReservations.length;
     const totalPages = Math.ceil(totalCount / limitNum);
-    const paginatedReservations = reservations.slice(skip, skip + limitNum);
+    const paginatedReservations = allReservations.slice(skip, skip + limitNum);
 
     res.status(200).json({
       reservations: paginatedReservations,
@@ -86,15 +87,14 @@ export const getAllReservations = async (req, res) => {
   }
 };
 
+
 export const getReservationById = async (req, res) => {
   try {
     const { id } = req.params;
+
     const reservation = await Reservation.findById(id)
       .populate("client", "name phone email")
-      .populate({
-        path: "products.product",
-        select: "name category pricePerKg",
-      });
+      .populate("products.product", "name category pricePerKg");
 
     if (!reservation) {
       return res.status(404).json({ message: "Reservation not found" });
@@ -114,32 +114,38 @@ export const createReservation = async (req, res) => {
       products,
       amountDue,
       dateOfDelivery,
-      completed = false,
+      delivered = false,
+      completed, // optional override
       notes,
     } = req.body;
-
 
     if (!client || !products?.length) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const calculatedTotalAmmount = products.reduce(
+    const calculatedTotalAmount = products.reduce(
       (sum, p) => sum + (p.priceAtReservation * (p.quantityInGrams || 0)) / 1000,
       0
     );
 
     const numericAmountDue =
       amountDue === undefined || amountDue === null || amountDue === ""
-        ? calculatedTotalAmmount
+        ? calculatedTotalAmount
         : Number(amountDue);
+
+    const derivedCompleted =
+      completed !== undefined
+        ? completed
+        : delivered && numericAmountDue === 0;
 
     const reservation = await Reservation.create({
       client,
       products,
-      calculatedTotalAmmount: calculatedTotalAmmount,
+      calculatedTotalAmount,
       amountDue: numericAmountDue,
       dateOfDelivery: dateOfDelivery || new Date(),
-      completed,
+      delivered,
+      completed: derivedCompleted,
       notes,
     });
 
@@ -161,16 +167,24 @@ export const updateReservation = async (req, res) => {
     const updates = req.body;
 
     if (updates.products) {
-      const calculatedTotalAmmount = updates.products.reduce(
+      const calculatedTotalAmount = updates.products.reduce(
         (sum, p) => sum + (p.priceAtReservation * (p.quantityInGrams || 0)) / 1000,
         0
       );
-
-      updates.calculatedTotalAmmount = calculatedTotalAmmount;
+      updates.calculatedTotalAmount = calculatedTotalAmount;
 
       if (updates.amountDue === undefined || updates.amountDue === null) {
-        updates.amountDue = calculatedTotalAmmount;
+        updates.amountDue = calculatedTotalAmount;
       }
+    }
+
+    if (typeof updates.delivered !== "undefined" || typeof updates.amountDue !== "undefined") {
+      const reservation = await Reservation.findById(id);
+      if (!reservation) return res.status(404).json({ message: "Reservation not found" });
+
+      const delivered = updates.delivered ?? reservation.delivered;
+      const amountDue = updates.amountDue ?? reservation.amountDue;
+      updates.completed = delivered && amountDue === 0;
     }
 
     const reservation = await Reservation.findByIdAndUpdate(id, updates, {
