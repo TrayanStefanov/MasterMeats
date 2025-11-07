@@ -4,7 +4,12 @@ import { useTranslation } from "react-i18next";
 import { useClientStore } from "../stores/useClientStore";
 
 export default function ClientFilters() {
-  const { filters, setFilter, availableTags = [], fetchAvailableTags } = useClientStore();
+  const {
+    filters,
+    setFilter,
+    availableTags = [],
+    fetchAvailableTags,
+  } = useClientStore();
   const { t: tUAC } = useTranslation("admin/usersAndClients");
   const { t: tCommon } = useTranslation("admin/common");
 
@@ -101,27 +106,11 @@ export default function ClientFilters() {
             onChange={(e) => setFilter("status", e.target.value)}
             className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 text-sm outline-none w-full h-[42px]"
           >
-            <option value="all">{tUAC("filters.statusAll", { defaultValue: "All" })}</option>
-            <option value="pending">{tUAC("filters.statusPending", { defaultValue: "Pending" })}</option>
-            <option value="completed">{tUAC("filters.statusCompleted", { defaultValue: "Completed" })}</option>
-          </select>
-        </div>
-
-        {/* Date Range Filter */}
-        <div className="flex flex-col">
-          <label className="text-secondary/70 text-sm font-semibold mb-1">
-            {tUAC("filters.dateRange", { defaultValue: "Delivery Date" })}
-          </label>
-          <select
-            value={filters.dateRange}
-            onChange={(e) => setFilter("dateRange", e.target.value)}
-            className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 text-sm outline-none w-full h-[42px]"
-          >
-            <option value="all">{tUAC("filters.dateAll", { defaultValue: "All Dates" })}</option>
-            <option value="today">{tUAC("filters.dateToday", { defaultValue: "Today" })}</option>
-            <option value="tomorrow">{tUAC("filters.dateTomorrow", { defaultValue: "Tomorrow" })}</option>
-            <option value="week">{tUAC("filters.dateWeek", { defaultValue: "This Week" })}</option>
-            <option value="past">{tUAC("filters.datePast", { defaultValue: "Past Dates" })}</option>
+            <option value="all">All</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Delivered-unpaid">Delivered - Unpaid</option>
+            <option value="Completed">Completed</option>
           </select>
         </div>
 
@@ -148,7 +137,10 @@ export default function ClientFilters() {
                 </span>
               ))}
 
-            <form onSubmit={handleAddTag} className="flex items-center gap-2 flex-1">
+            <form
+              onSubmit={handleAddTag}
+              className="flex items-center gap-2 flex-1"
+            >
               <input
                 type="text"
                 value={tagInput}
@@ -185,11 +177,14 @@ export default function ClientFilters() {
             </div>
           )}
 
-          {(!filters.tags || filters.tags.length === 0) && suggestions.length === 0 && (
-            <p className="text-secondary/60 text-sm italic mt-2">
-              {tUAC("filters.noTags", { defaultValue: "No tag filters active" })}
-            </p>
-          )}
+          {(!filters.tags || filters.tags.length === 0) &&
+            suggestions.length === 0 && (
+              <p className="text-secondary/60 text-sm italic mt-2">
+                {tUAC("filters.noTags", {
+                  defaultValue: "No tag filters active",
+                })}
+              </p>
+            )}
         </div>
       </div>
     </div>
