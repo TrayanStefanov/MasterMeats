@@ -18,9 +18,9 @@ const IRLReservationForm = ({ mode = "create", reservation = null, onFinish }) =
   const [details, setDetails] = useState({
     dateOfDelivery: reservation?.dateOfDelivery || "",
     notes: reservation?.notes || "",
-    completed: reservation?.completed || false,
     amountDue: reservation?.amountDue ?? 0,
     calculatedTotalAmmount: reservation?.calculatedTotalAmmount ?? 0,
+    delivered: reservation?.delivered || false, 
   });
 
   const handleSubmit = async (e) => {
@@ -36,9 +36,9 @@ const IRLReservationForm = ({ mode = "create", reservation = null, onFinish }) =
       products,
       dateOfDelivery: details.dateOfDelivery,
       notes: details.notes,
-      completed: details.completed,
       amountDue: Number(details.amountDue),
       calculatedTotalAmmount: Number(details.calculatedTotalAmmount),
+      delivered: details.delivered, // Pass delivered, backend derives completed
     };
 
     if (mode === "edit" && reservation?._id) {
