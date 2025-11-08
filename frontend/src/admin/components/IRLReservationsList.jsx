@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaTrash,
@@ -30,17 +30,40 @@ const IRLReservationsList = ({ onEdit }) => {
   const { t: tProducts } = useTranslation("productsSection");
 
   const [expandedRows, setExpandedRows] = useState([]);
+  const prevFilters = useRef(filters);
 
-  useEffect(() => {
-    fetchFilteredReservations();
-    const handleLangChange = () => fetchFilteredReservations();
-    i18next.on("languageChanged", handleLangChange);
-    return () => i18next.off("languageChanged", handleLangChange);
-  }, [fetchFilteredReservations]);
 
-  useEffect(() => {
+  function deepEqual(a, b) {
+  if (a === b) return true;
+  if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  for (const key of keysA) {
+    if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
+  }
+  return true;
+}
+
+useEffect(() => {
+  const handleLangChange = () => fetchFilteredReservations();
+ // fetch on mount
+  fetchFilteredReservations();
+
+  i18next.on("languageChanged", handleLangChange);
+  return () => {
+    i18next.off("languageChanged", handleLangChange);
+  };
+}, [fetchFilteredReservations]);
+
+// Only refetch if filters actually changed check via deep compare)
+useEffect(() => {
+  if (!deepEqual(prevFilters.current, filters)) {
     fetchFilteredReservations();
-  }, [filters]);
+    prevFilters.current = { ...filters };
+  }
+}, [filters, fetchFilteredReservations]);
+
 
   const toggleExpand = (id) => {
     setExpandedRows((prev) =>
@@ -154,7 +177,7 @@ const IRLReservationsList = ({ onEdit }) => {
                     </td>
 
                     <td className="px-6 py-4 text-sm text-secondary/60 align-middle">
-                      €{res.calculatedTotalAmmount?.toFixed(2) || "0.00"}
+                      €{res.calculatedTotalAmount?.toFixed(2) || "0.00"}
                     </td>
 
                     <td className="px-6 py-4 text-sm font-medium align-middle">
