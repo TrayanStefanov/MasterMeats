@@ -5,13 +5,12 @@ import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useProductStore } from "../../stores/useProductStore.js";
 
-const ReservationItem = ({ products, setProducts, setDetails }) => {
+const ReservationItems = ({ products, setProducts, setDetails }) => {
   const { products: allProducts, fetchAllProducts } = useProductStore();
-  const { t: tCommon } = useTranslation("common");
-  const { t: tACommon } = useTranslation("admin/common");
+  const { t: tCommon } = useTranslation("admin/common");
   const { t: tReservation } = useTranslation("admin/reservations");
-  const { t: tProducts } = useTranslation("productsSection");
   const { t: tForms } = useTranslation("admin/forms");
+  const { t: tProducts } = useTranslation("productsSection"); // added
 
   useEffect(() => {
     fetchAllProducts();
@@ -29,7 +28,7 @@ const ReservationItem = ({ products, setProducts, setDetails }) => {
       ...prev,
       {
         product: product._id,
-        name: product.name,
+        productKey: product.name,
         priceAtReservation: product.pricePerKg,
         quantityInGrams: 0,
       },
@@ -103,10 +102,6 @@ const ReservationItem = ({ products, setProducts, setDetails }) => {
       ) : (
         <div className="space-y-3">
           {products.map((p, i) => {
-            const localizedName = tProducts(`${p.name}.title`, {
-              defaultValue: p.name,
-            });
-
             return (
               <div
                 key={i}
@@ -114,7 +109,9 @@ const ReservationItem = ({ products, setProducts, setDetails }) => {
               >
                 <div>
                   <p className="font-semibold text-secondary">
-                    {localizedName}
+                    {tProducts(`${p.productKey}.title`, {
+                      defaultValue: p.productKey,
+                    })}
                   </p>
                   <p className="text-sm text-secondary/70">
                     €{p.priceAtReservation.toFixed(2)} / {tCommon("units.kg")}
@@ -161,7 +158,10 @@ const ReservationItem = ({ products, setProducts, setDetails }) => {
                     type="button"
                     onClick={() => handleRemove(i)}
                     className="text-accent-content/70 hover:text-accent-content transition"
-                    title={tACommon("buttons.deleteProduct")}
+                    title={
+                      tCommon("buttons.deleteReservation") ||
+                      "Delete Reservation"
+                    }
                   >
                     <FaTrash className="w-5 h-5" />
                   </button>
@@ -178,4 +178,4 @@ const ReservationItem = ({ products, setProducts, setDetails }) => {
   );
 };
 
-export default ReservationItem;
+export default ReservationItems;
