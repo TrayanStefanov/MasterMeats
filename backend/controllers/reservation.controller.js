@@ -1,6 +1,7 @@
 import Reservation from "../models/reservation.model.js";
 import Client from "../models/client.model.js";
 import mongoose from "mongoose";
+import { getReservationStatus } from "../lib/statusHelper.js";
 
 export const getAllReservations = async (req, res) => {
   try {
@@ -31,17 +32,6 @@ export const getAllReservations = async (req, res) => {
       matchStage.client = { $in: matchingClients.map((c) => c._id) };
     }
 
-    // Status filters (mutually exclusive)
-    if (statusFilter === "completed") {
-      matchStage.completed = true;
-    } else if (statusFilter === "deliveredNotPaid") {
-      matchStage.$and = [{ delivered: true }, { amountDue: { $gt: 0 } }];
-    } else if (statusFilter === "paidNotDelivered") {
-      matchStage.$and = [{ completed: false }, { amountDue: 0 }];
-    } else if (statusFilter === "reserved") {
-      matchStage.$and = [{ delivered: false }, { amountDue: { $gt: 0 } },];
-    }
-
     const productIds = products
       ? products.split(",").map((id) => new mongoose.Types.ObjectId(id))
       : [];
@@ -49,8 +39,6 @@ export const getAllReservations = async (req, res) => {
     // Aggregation pipeline
     const pipeline = [
       { $match: matchStage },
-
-      // Populate client
       {
         $lookup: {
           from: "clients",
@@ -60,8 +48,6 @@ export const getAllReservations = async (req, res) => {
         },
       },
       { $unwind: "$client" },
-
-      // Populate products.product
       {
         $lookup: {
           from: "products",
@@ -70,8 +56,6 @@ export const getAllReservations = async (req, res) => {
           as: "populatedProducts",
         },
       },
-
-      // Merge populated product data into the embedded array
       {
         $addFields: {
           products: {
@@ -106,19 +90,19 @@ export const getAllReservations = async (req, res) => {
       // Filter by category or product IDs if provided
       ...(category || productIds.length > 0
         ? [
-          {
-            $match: {
-              products: {
-                $elemMatch: {
-                  ...(category ? { "product.category": category } : {}),
-                  ...(productIds.length > 0
-                    ? { "product._id": { $in: productIds } }
-                    : {}),
+            {
+              $match: {
+                products: {
+                  $elemMatch: {
+                    ...(category ? { "product.category": category } : {}),
+                    ...(productIds.length > 0
+                      ? { "product._id": { $in: productIds } }
+                      : {}),
+                  },
                 },
               },
             },
-          },
-        ]
+          ]
         : []),
 
       // Sort
@@ -134,16 +118,36 @@ export const getAllReservations = async (req, res) => {
       { $limit: limitNum },
     ];
 
-    const reservations = await Reservation.aggregate(pipeline);
+    let reservations = await Reservation.aggregate(pipeline);
 
-    //  Count total (without pagination)
+    // Compute reservation status using helper
+    reservations = reservations.map((r) => ({
+      ...r,
+      status: getReservationStatus(r),
+    }));
+
+    // Apply JS-level statusFilter if provided
+    if (statusFilter) {
+      reservations = reservations.filter((r) => r.status === statusFilter);
+    }
+
+    // Count total (without pagination)
     const totalCountPipeline = pipeline.filter(
       (stage) => !("$skip" in stage || "$limit" in stage)
     );
-    totalCountPipeline.push({ $count: "total" });
 
-    const totalCountResult = await Reservation.aggregate(totalCountPipeline);
-    const totalCount = totalCountResult[0]?.total || 0;
+    let totalCountResult = await Reservation.aggregate(totalCountPipeline);
+    totalCountResult = totalCountResult.map((r) => ({
+      ...r,
+      status: getReservationStatus(r),
+    }));
+
+    // Apply statusFilter to totalCount as well
+    if (statusFilter) {
+      totalCountResult = totalCountResult.filter((r) => r.status === statusFilter);
+    }
+
+    const totalCount = totalCountResult.length;
     const totalPages = Math.ceil(totalCount / limitNum);
 
     res.status(200).json({
