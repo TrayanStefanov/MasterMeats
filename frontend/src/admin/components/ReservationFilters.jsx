@@ -9,6 +9,7 @@ export default function ReservationFilters() {
   const { products: allProducts, fetchAllProducts } = useProductStore();
   const { t: tReservation } = useTranslation("admin/reservations");
   const { t: tCommon } = useTranslation("admin/common");
+  const { t: tProducts } = useTranslation("productsSection");
 
   const [searchInput, setSearchInput] = useState(filters.search || "");
   const [productSearch, setProductSearch] = useState("");
@@ -27,22 +28,28 @@ export default function ReservationFilters() {
     return () => clearTimeout(handler);
   }, [searchInput]);
 
-  // Filter product suggestions by input
   useEffect(() => {
-    if (!productSearch.trim()) {
-      setProductSuggestions([]);
-      return;
-    }
-    const input = productSearch.toLowerCase();
-    const matches = allProducts
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(input) &&
-          !(filters.products || []).includes(p._id)
-      )
-      .slice(0, 6);
-    setProductSuggestions(matches);
-  }, [productSearch, allProducts, filters.products]);
+  if (!productSearch.trim()) {
+    setProductSuggestions([]);
+    return;
+  }
+
+  const input = productSearch.toLowerCase();
+
+  //  Search by both Mongo key AND localized title
+  const matches = allProducts
+    .filter((p) => {
+      const mongoName = p.name?.toLowerCase() || "";
+      const localizedName = tProducts(`${p.name}.title`, p.name).toLowerCase();
+      return (
+        (mongoName.includes(input) || localizedName.includes(input)) &&
+        !(filters.products || []).includes(p._id)
+      );
+    })
+    .slice(0, 6);
+
+  setProductSuggestions(matches);
+}, [productSearch, allProducts, filters.products, tProducts]);
 
   // Add or remove product filter
   const toggleProduct = (productId) => {
@@ -97,6 +104,7 @@ export default function ReservationFilters() {
               { key: "completed", label: "Completed" },
               { key: "deliveredNotPaid", label: "Delivered but Not Paid" },
               { key: "paidNotDelivered", label: "Paid but Not Delivered" },
+              { key: "reserved", label: "Reserved" },
             ].map((filterOption) => {
               const isActive = filters.statusFilter === filterOption.key;
               return (
@@ -133,12 +141,15 @@ export default function ReservationFilters() {
             {filters.products?.length > 0 &&
               filters.products.map((productId) => {
                 const p = allProducts.find((x) => x._id === productId);
+                const localizedName = p
+                  ? tProducts(`${p.name}.title`, p.name)
+                  : "Unknown";
                 return (
                   <span
                     key={productId}
                     className="bg-accent-content/20 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1"
                   >
-                    {p?.name || "Unknown"}
+                    {localizedName}
                     <button
                       onClick={() => toggleProduct(productId)}
                       className="text-accent-content/70 hover:text-accent-content text-xs"
@@ -173,15 +184,18 @@ export default function ReservationFilters() {
 
           {productSuggestions.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {productSuggestions.map((p) => (
-                <button
-                  key={p._id}
-                  onClick={() => toggleProduct(p._id)}
-                  className="bg-accent-content/20 hover:bg-accent-content/30 text-primary px-3 py-1 rounded-full text-xs transition-colors flex items-center gap-1"
-                >
-                  <FaPlus className="w-3 h-3" /> {p.name}
-                </button>
-              ))}
+              {productSuggestions.map((p) => {
+                const localizedName = tProducts(`${p.name}.title`, p.name);
+                return (
+                  <button
+                    key={p._id}
+                    onClick={() => toggleProduct(p._id)}
+                    className="bg-accent-content/20 hover:bg-accent-content/30 text-primary px-3 py-1 rounded-full text-xs transition-colors flex items-center gap-1"
+                  >
+                    <FaPlus className="w-3 h-3" /> {localizedName}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
