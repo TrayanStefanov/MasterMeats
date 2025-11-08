@@ -41,12 +41,12 @@ const ClientsList = ({ onEdit }) => {
     switch (status) {
       case "Completed":
         return "bg-green-500/80 text-white";
-      case "Pending":
-        return "bg-yellow-500/80 text-white";
-      case "Active":
+      case "Reserved":
         return "bg-blue-500/80 text-white";
-      case "Delivered - Unpaid":
-        return "bg-red-500/80 text-white";
+      case "In progress":
+        return "bg-yellow-500/80 text-white";
+      case "None":
+        return "bg-gray-500/60 text-white";
       default:
         return "bg-gray-500/60 text-white";
     }
