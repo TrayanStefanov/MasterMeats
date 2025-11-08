@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaTrash,
@@ -19,7 +19,6 @@ const IRLReservationsList = ({ onEdit }) => {
     fetchFilteredReservations,
     deleteReservation,
     loading,
-    filters,
     currentPage,
     totalPages,
     totalCount,
@@ -30,40 +29,15 @@ const IRLReservationsList = ({ onEdit }) => {
   const { t: tProducts } = useTranslation("productsSection");
 
   const [expandedRows, setExpandedRows] = useState([]);
-  const prevFilters = useRef(filters);
 
-
-  function deepEqual(a, b) {
-  if (a === b) return true;
-  if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
-  if (keysA.length !== keysB.length) return false;
-  for (const key of keysA) {
-    if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
-  }
-  return true;
-}
-
-useEffect(() => {
-  const handleLangChange = () => fetchFilteredReservations();
- // fetch on mount
-  fetchFilteredReservations();
-
-  i18next.on("languageChanged", handleLangChange);
-  return () => {
-    i18next.off("languageChanged", handleLangChange);
-  };
-}, [fetchFilteredReservations]);
-
-// Only refetch if filters actually changed check via deep compare)
-useEffect(() => {
-  if (!deepEqual(prevFilters.current, filters)) {
+  useEffect(() => {
+    // Fetch on mount
     fetchFilteredReservations();
-    prevFilters.current = { ...filters };
-  }
-}, [filters, fetchFilteredReservations]);
 
+    const handleLangChange = () => fetchFilteredReservations();
+    i18next.on("languageChanged", handleLangChange);
+    return () => i18next.off("languageChanged", handleLangChange);
+  }, [fetchFilteredReservations]);
 
   const toggleExpand = (id) => {
     setExpandedRows((prev) =>
@@ -71,7 +45,20 @@ useEffect(() => {
     );
   };
 
-  const filteredReservations = reservations;
+  const getStatusBadgeColor = (status) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-500/80 text-white";
+      case "deliveredNotPaid":
+        return "bg-yellow-500/80 text-white";
+      case "paidNotDelivered":
+        return "bg-blue-500/80 text-white";
+      case "reserved":
+        return "bg-red-500/80 text-white";
+      default:
+        return "bg-gray-500/60 text-white";
+    }
+  };
 
   if (loading && reservations.length === 0) {
     return (
@@ -81,7 +68,7 @@ useEffect(() => {
     );
   }
 
-  if (!filteredReservations || filteredReservations.length === 0) {
+  if (!reservations || reservations.length === 0) {
     return (
       <div className="max-w-6xl mx-auto mt-8">
         <ReservationFilters />
@@ -94,18 +81,16 @@ useEffect(() => {
 
   return (
     <motion.div
-      className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-8"
+      className="shadow-xl rounded-md overflow-hidden max-w-6xl mx-auto mt-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       {/* Filters */}
-      <div className="p-4 border-b border-accent-content bg-secondary/60">
-        <ReservationFilters />
-      </div>
+      <ReservationFilters />
 
-      {/*Reservations Table */}
-      <div className="overflow-x-auto">
+      {/* Reservations Table */}
+      <div className="overflow-x-auto mt-4">
         <table className="min-w-full divide-y divide-accent-content">
           <thead className="bg-secondary/60 font-semibold text-primary uppercase tracking-wider">
             <tr>
@@ -134,17 +119,14 @@ useEffect(() => {
           </thead>
 
           <tbody className="bg-accent/70 divide-y divide-accent-content">
-            {filteredReservations.map((res) => {
+            {reservations.map((res) => {
               const isExpanded = expandedRows.includes(res._id);
               const firstProduct = res.products?.[0];
               const remainingCount = (res.products?.length || 0) - 1;
 
               return (
-                <>
-                  <tr
-                    key={res._id}
-                    className="hover:bg-accent/90 transition-colors"
-                  >
+                <React.Fragment key={res._id}>
+                  <tr className="hover:bg-accent/90 transition-colors">
                     <td className="px-6 py-4 text-sm text-secondary align-middle">
                       {res.client?.name}
                       {isExpanded && res.client?.phone && (
@@ -162,7 +144,9 @@ useEffect(() => {
                               firstProduct.product?.key ||
                               firstProduct.product?.name
                             }.title`,
-                            { defaultValue: firstProduct.product?.name || "—" }
+                            {
+                              defaultValue: firstProduct.product?.name || "—",
+                            }
                           )}{" "}
                           ({firstProduct.quantityInGrams} g) — €
                           {firstProduct.priceAtReservation?.toFixed(2) ||
@@ -196,33 +180,14 @@ useEffect(() => {
                       {new Date(res.dateOfDelivery).toLocaleDateString()}
                     </td>
 
-                    <td className="px-6 py-4 text-sm align-middle">
-                      {res.completed ? (
-                        <span className="text-blue-400 font-semibold">
-                          {tCommon(
-                            "status.completedDelivered",
-                            "Paid & Delivered"
-                          )}
-                        </span>
-                      ) : res.delivered && res.amountDue > 0 ? (
-                        <span className="text-yellow-400 font-semibold">
-                          {tCommon(
-                            "status.deliveredNotPaid",
-                            "Delivered (Not Paid)"
-                          )}
-                        </span>
-                      ) : res.amountDue === 0 && !res.delivered ? (
-                        <span className="text-green-400 font-semibold">
-                          {tCommon(
-                            "status.paidNotDelivered",
-                            "Paid (Not Delivered)"
-                          )}
-                        </span>
-                      ) : (
-                        <span className="text-red-400 font-semibold">
-                          {tCommon("status.pending", "Pending")}
-                        </span>
-                      )}
+                    <td className="px-6 py-4 text-sm align-middle text-center text-nowrap">
+                      <span
+                        className={`px-2 py-0.5 rounded-full font-medium ${getStatusBadgeColor(
+                          res.status
+                        )}`}
+                      >
+                        {tCommon(`reservationStatus.${res.status}`)}
+                      </span>
                     </td>
 
                     <td className="px-6 py-4 text-right text-sm font-medium align-middle">
@@ -270,6 +235,7 @@ useEffect(() => {
                           colSpan={7}
                           className="px-8 py-6 text-sm text-secondary/80"
                         >
+                          {/* Details section */}
                           <p className="text-center text-secondary font-semibold text-base mb-4 border-b border-accent/40 pb-2">
                             {tReservations("details.title", {
                               defaultValue: "Reservation Details",
@@ -332,12 +298,13 @@ useEffect(() => {
                       </motion.tr>
                     )}
                   </AnimatePresence>
-                </>
+                </React.Fragment>
               );
             })}
           </tbody>
         </table>
       </div>
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
