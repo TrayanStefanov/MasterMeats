@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 const ReservationDetailsModal = ({ reservation, onClose }) => {
   const { t: tReservations } = useTranslation("admin/reservations");
   const { t: tProducts } = useTranslation("productsSection");
+  const { t: tCommon } = useTranslation("admin/common");
 
   if (!reservation) return null;
 
@@ -33,38 +34,58 @@ const ReservationDetailsModal = ({ reservation, onClose }) => {
 
           {/* Title */}
           <h3 className="text-center text-secondary font-semibold text-lg mb-4 border-b border-accent/40 pb-2">
-            {tReservations("details.title", { defaultValue: "Reservation Details" })}
+            {tReservations("details.title", {
+              defaultValue: "Reservation Details",
+            })}
           </h3>
 
           {/* Date + Status */}
           <div className="flex justify-between items-center mb-4">
             <p className="text-secondary/70">
-              <strong>{tReservations("details.date", { defaultValue: "Date" })}:</strong>{" "}
+              <strong>
+                {tReservations("details.reservationDate", {
+                  defaultValue: "Date",
+                })}
+                :
+              </strong>{" "}
               {new Date(reservation.dateOfDelivery).toLocaleDateString()}
             </p>
             <p className="text-secondary/70">
-              <strong>{tReservations("details.status", { defaultValue: "Status" })}:</strong>{" "}
-              {reservation.completed ? (
-                <span className="text-green-400 font-semibold">
-                  {tReservations("details.completed", { defaultValue: "Completed" })}
-                </span>
-              ) : (
-                <span className="text-yellow-400 font-semibold">
-                  {tReservations("details.pending", { defaultValue: "Pending" })}
-                </span>
-              )}
+              <strong>
+                {tCommon("status.status", { defaultValue: "Status" })}:
+              </strong>{" "}
+              <span
+                className={`font-semibold rounded-md px-2 py-1 ${
+                  reservation.status === "completed"
+                    ? "bg-green-500/80 text-white"
+                    : reservation.status === "reserved"
+                    ? "bg-blue-500/80 text-white"
+                    : reservation.status === "deliveredNotPaid"
+                    ? "bg-red-500/80 text-white"
+                    : reservation.status === "paidNotDelivered"
+                    ? "bg-yellow-500/80 text-white"
+                    : "text-secondary/50"
+                }`}
+              >
+                {tCommon(`status.${reservation.status}`, {
+                  defaultValue: reservation.status,
+                })}
+              </span>
             </p>
           </div>
 
           {/* Products List */}
           <div>
             <h4 className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">
-              {tReservations("details.items", { defaultValue: "Products" })}
+              {tReservations("details.itemList", { defaultValue: "Products" })}
             </h4>
             <div className="space-y-1 bg-primary p-3 rounded-lg border border-accent/30">
               {reservation.products?.length ? (
                 reservation.products.map((p, i) => (
-                  <div key={i} className="flex justify-between text-secondary/70 text-sm">
+                  <div
+                    key={i}
+                    className="flex justify-between text-secondary/70 text-sm"
+                  >
                     <span>
                       {tProducts(`${p.product?.name}.title`, {
                         defaultValue: p.product?.name || "—",
@@ -78,7 +99,9 @@ const ReservationDetailsModal = ({ reservation, onClose }) => {
                 ))
               ) : (
                 <p className="text-secondary/40 italic">
-                  {tReservations("details.noProducts", { defaultValue: "No products" })}
+                  {tReservations("details.noProducts", {
+                    defaultValue: "No products",
+                  })}
                 </p>
               )}
             </div>
@@ -96,7 +119,9 @@ const ReservationDetailsModal = ({ reservation, onClose }) => {
                 </p>
               ) : (
                 <p className="text-secondary/40 italic">
-                  {tReservations("details.noNotes", { defaultValue: "No notes provided." })}
+                  {tReservations("details.noNotes", {
+                    defaultValue: "No notes provided.",
+                  })}
                 </p>
               )}
             </div>
@@ -105,8 +130,13 @@ const ReservationDetailsModal = ({ reservation, onClose }) => {
           {/* Totals */}
           <div className="mt-4 text-secondary/70 text-sm border-t border-accent/30 pt-3">
             <p>
-              <strong>{tReservations("details.total", { defaultValue: "Total" })}:</strong>{" "}
-              €{reservation.calculatedTotalAmmount?.toFixed(2) ?? "—"}
+              <strong>
+                {tReservations("details.totalAmount", {
+                  defaultValue: "Total",
+                })}
+                :
+              </strong>{" "}
+              €{reservation.calculatedTotalAmount?.toFixed(2) ?? "—"}
             </p>
           </div>
         </motion.div>
