@@ -9,18 +9,18 @@ export const getReservationStatus = (reservation) => {
 
 // Compute client-level status from reservations
 export const getClientStatus = (reservations = []) => {
-  if (!reservations.length) return "None";
+  if (!reservations.length) return "none";
 
   const allCompleted = reservations.every((r) => r.status === "completed");
-  if (allCompleted) return "Completed";
+  if (allCompleted) return "completed";
 
   const allReserved = reservations.every((r) => r.status === "reserved");
-  if (allReserved) return "Reserved";
+  if (allReserved) return "reserved";
 
   const hasInProgress = reservations.some(
     (r) => r.status === "deliveredNotPaid" || r.status === "paidNotDelivered"
   );
-  if (hasInProgress) return "In Progress";
+  if (hasInProgress) return "inProcess";
 
   return "None";
 };
