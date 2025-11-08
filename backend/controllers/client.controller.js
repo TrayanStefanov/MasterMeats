@@ -1,169 +1,205 @@
 import Client from "../models/client.model.js";
 import Reservation from "../models/reservation.model.js";
 
-
 export const getAllClients = async (req, res) => {
   try {
     const {
       search,
+      tags,
+      status = "all",
+      hideCompletedOnly = false,
       page = 1,
       limit = 10,
-      tags,
-      status,      // "completed" | "pending"
-      dateRange,   // "all" | "today" | "tomorrow" | "week" | "past"
     } = req.query;
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    const filter = {};
-
+    const clientMatch = {};
     // Global fuzzy search across multiple fields
     if (search) {
       const regex = new RegExp(search, "i");
-      filter.$or = [
+      clientMatch.$or = [
         { name: regex },
         { phone: regex },
         { email: regex },
         { tags: { $elemMatch: { $regex: search, $options: "i" } } },
       ];
     }
-
     if (tags) {
       const tagList = tags.split(",").map((t) => t.trim());
-      filter.tags = { $in: tagList };
+      clientMatch.tags = { $in: tagList };
     }
 
-    const clients = await Client.find(filter).lean();
+    // Aggregation pipeline for clients
+    const pipeline = [
+      { $match: clientMatch },
+      // Lookup reservations
+      {
+        $lookup: {
+          from: "reservations",
+          let: { clientId: "$_id" },
+          pipeline: [{ $match: { $expr: { $eq: ["$client", "$$clientId"] } } }],
+          as: "reservations",
+        },
+      },
+      // Compute totals and orderStatus
+      {
+        $addFields: {
+          totalPaid: {
+            $sum: {
+              $map: {
+                input: "$reservations",
+                as: "r",
+                in: {
+                  $cond: [
+                    "$$r.completed",
+                    {
+                      $subtract: [
+                        "$$r.calculatedTotalAmmount",
+                        "$$r.amountDue",
+                      ],
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+          },
+          totalAmountDue: { $sum: "$reservations.amountDue" },
+          totalOrders: { $size: "$reservations" },
+          orderStatus: {
+            $switch: {
+              branches: [
+                {
+                  case: {
+                    $gt: [
+                      {
+                        $size: {
+                          $filter: {
+                            input: "$reservations",
+                            as: "r",
+                            cond: {
+                              $and: [
+                                { $gt: ["$$r.amountDue", 0] },
+                                { $eq: ["$$r.completed", false] },
+                              ],
+                            },
+                          },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                  then: "Active",
+                },
+                {
+                  case: {
+                    $gt: [
+                      {
+                        $size: {
+                          $filter: {
+                            input: "$reservations",
+                            as: "r",
+                            cond: {
+                              $and: [
+                                { $eq: ["$$r.amountDue", 0] },
+                                { $eq: ["$$r.completed", false] },
+                              ],
+                            },
+                          },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                  then: "Pending",
+                },
+                {
+                  case: {
+                    $gt: [
+                      {
+                        $size: {
+                          $filter: {
+                            input: "$reservations",
+                            as: "r",
+                            cond: {
+                              $and: [
+                                { $gt: ["$$r.amountDue", 0] },
+                                { $eq: ["$$r.completed", true] },
+                              ],
+                            },
+                          },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                  then: "Delivered-unpaid",
+                },
+                {
+                  case: {
+                    $eq: [
+                      { $size: "$reservations" },
+                      {
+                        $size: {
+                          $filter: {
+                            input: "$reservations",
+                            as: "r",
+                            cond: { $eq: ["$$r.completed", true] },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                  then: "Completed",
+                },
+              ],
+              default: "none",
+            },
+          },
+        },
+      },
+      // Apply status/hideCompletedOnly filter
+      ...(status !== "all" ? [{ $match: { orderStatus: status } }] : []),
+      ...(hideCompletedOnly
+        ? [{ $match: { orderStatus: { $ne: "Completed" } } }]
+        : []),
+      // Pagination
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limitNum },
+    ];
 
-    // Define date filters
-    const now = new Date();
-    const todayStart = new Date(now.setHours(0, 0, 0, 0));
-    const todayEnd = new Date(now.setHours(23, 59, 59, 999));
+    const clients = await Client.aggregate(pipeline);
 
-    let start, end;
+    // Total count for pagination
+    const countPipeline = [
+      ...pipeline.filter((stage) => !stage.$skip && !stage.$limit),
+      { $count: "totalCount" },
+    ];
+    const countResult = await Client.aggregate(countPipeline);
+    const totalCount = countResult[0]?.totalCount || 0;
+    const totalPages = Math.ceil(totalCount / limitNum);
 
-    switch (dateRange) {
-      case "today":
-        start = todayStart;
-        end = todayEnd;
-        break;
-      case "tomorrow":
-        start = new Date(todayStart);
-        start.setDate(start.getDate() + 1);
-        end = new Date(todayEnd);
-        end.setDate(end.getDate() + 1);
-        break;
-      case "week":
-        start = todayStart;
-        end = new Date(todayEnd);
-        end.setDate(end.getDate() + 7);
-        break;
-      case "past":
-        start = new Date(0); // earliest date possible
-        end = new Date(todayStart);
-        break;
-      default:
-        start = null;
-        end = null;
-    }
+    // Aggregate all distinct tags across **all clients** (for filters in frontend)
+    const tagsAggregation = await Client.aggregate([
+      { $unwind: "$tags" },
+      { $group: { _id: null, allTags: { $addToSet: "$tags" } } },
+    ]);
+    const availableTags = tagsAggregation[0]?.allTags || [];
 
-    // Enrich each client with reservation stats
-    const enrichedClients = await Promise.all(
-      clients.map(async (client) => {
-        const reservationFilter = { client: client._id };
-
-        // Apply filters
-        if (status === "completed") reservationFilter.completed = true;
-        if (status === "pending") reservationFilter.completed = false;
-        if (start && end) reservationFilter.dateOfDelivery = { $gte: start, $lte: end };
-        if (dateRange === "past") reservationFilter.dateOfDelivery = { $lt: todayStart };
-
-        const reservations = await Reservation.find(reservationFilter)
-          .populate("products.product", "name category pricePerKg")
-          .sort({ dateOfDelivery: 1 }) // ascending
-          .lean();
-
-        if (reservations.length === 0) return null; // Skip clients with no matching reservations
-
-        const totalOrders = reservations.length;
-        const totalMeat = reservations.reduce(
-          (sum, r) =>
-            sum +
-            r.products.reduce(
-              (sub, p) => sub + (p.quantityInGrams || 0),
-              0
-            ),
-          0
-        );
-
-        const totalPaid = reservations
-          .filter((r) => r.completed)
-          .reduce((sum, r) => sum + (r.calculatedTotalAmmount || 0), 0);
-
-        // Find closest upcoming or latest past delivery
-        const today = new Date().setHours(0, 0, 0, 0);
-        const future = reservations.filter(
-          (r) => new Date(r.dateOfDelivery).setHours(0, 0, 0, 0) >= today
-        );
-
-        let closestReservation = null;
-        if (future.length > 0) {
-          closestReservation = future.reduce((a, b) =>
-            new Date(a.dateOfDelivery) < new Date(b.dateOfDelivery) ? a : b
-          );
-        } else {
-          closestReservation = reservations[reservations.length - 1] || null;
-        }
-
-        return {
-          ...client,
-          totalOrders,
-          totalMeat,
-          totalPaid,
-          closestReservation,
-          lastOrderDate: closestReservation?.dateOfDelivery || null,
-          reservations: reservations
-            .slice()
-            .sort((a, b) => new Date(b.dateOfDelivery) - new Date(a.dateOfDelivery))
-            .map((r) => ({
-              _id: r._id,
-              dateOfDelivery: r.dateOfDelivery,
-              completed: r.completed,
-              calculatedTotalAmmount: r.calculatedTotalAmmount,
-              products: r.products,
-              notes: r.notes,
-            })),
-        };
-      })
-    );
-
-    // Sort clients by most urgent delivery (soonest delivery date first)
-    const filteredClients = enrichedClients.filter(Boolean);
-    const sortedClients = filteredClients.sort((a, b) => {
-      const aDate = a.lastOrderDate ? new Date(a.lastOrderDate) : null;
-      const bDate = b.lastOrderDate ? new Date(b.lastOrderDate) : null;
-      if (!aDate && !bDate) return 0;
-      if (!aDate) return 1;
-      if (!bDate) return -1;
-      return aDate - bDate;
-    });
-
-    const paginatedClients = sortedClients.slice(skip, skip + limitNum);
-
-    res.status(200).json({
-      clients: paginatedClients,
+    res.json({
+      clients,
+      totalCount,
+      totalPages,
       currentPage: pageNum,
-      totalPages: Math.ceil(filteredClients.length / limitNum),
-      totalCount: filteredClients.length,
+      availableTags, 
     });
   } catch (error) {
     console.error("Error fetching clients:", error);
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Failed to fetch clients", error: error.message });
   }
 };
 
@@ -254,4 +290,3 @@ export const deleteClient = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
