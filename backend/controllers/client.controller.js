@@ -1,5 +1,5 @@
 import Client from "../models/client.model.js";
-import Reservation from "../models/reservation.model.js";
+import { getReservationStatus, getClientStatus } from "../lib/statusHelper.js";
 
 export const getAllClients = async (req, res) => {
   try {
@@ -44,143 +44,54 @@ export const getAllClients = async (req, res) => {
           as: "reservations",
         },
       },
-      // Compute totals and orderStatus
-      {
-        $addFields: {
-          totalPaid: {
-            $sum: {
-              $map: {
-                input: "$reservations",
-                as: "r",
-                in: {
-                  $cond: [
-                    "$$r.completed",
-                    {
-                      $subtract: [
-                        "$$r.calculatedTotalAmmount",
-                        "$$r.amountDue",
-                      ],
-                    },
-                    0,
-                  ],
-                },
-              },
-            },
-          },
-          totalAmountDue: { $sum: "$reservations.amountDue" },
-          totalOrders: { $size: "$reservations" },
-          orderStatus: {
-            $switch: {
-              branches: [
-                {
-                  case: {
-                    $gt: [
-                      {
-                        $size: {
-                          $filter: {
-                            input: "$reservations",
-                            as: "r",
-                            cond: {
-                              $and: [
-                                { $gt: ["$$r.amountDue", 0] },
-                                { $eq: ["$$r.completed", false] },
-                              ],
-                            },
-                          },
-                        },
-                      },
-                      0,
-                    ],
-                  },
-                  then: "Active",
-                },
-                {
-                  case: {
-                    $gt: [
-                      {
-                        $size: {
-                          $filter: {
-                            input: "$reservations",
-                            as: "r",
-                            cond: {
-                              $and: [
-                                { $eq: ["$$r.amountDue", 0] },
-                                { $eq: ["$$r.completed", false] },
-                              ],
-                            },
-                          },
-                        },
-                      },
-                      0,
-                    ],
-                  },
-                  then: "Pending",
-                },
-                {
-                  case: {
-                    $gt: [
-                      {
-                        $size: {
-                          $filter: {
-                            input: "$reservations",
-                            as: "r",
-                            cond: {
-                              $and: [
-                                { $gt: ["$$r.amountDue", 0] },
-                                { $eq: ["$$r.completed", true] },
-                              ],
-                            },
-                          },
-                        },
-                      },
-                      0,
-                    ],
-                  },
-                  then: "Delivered-unpaid",
-                },
-                {
-                  case: {
-                    $eq: [
-                      { $size: "$reservations" },
-                      {
-                        $size: {
-                          $filter: {
-                            input: "$reservations",
-                            as: "r",
-                            cond: { $eq: ["$$r.completed", true] },
-                          },
-                        },
-                      },
-                    ],
-                  },
-                  then: "Completed",
-                },
-              ],
-              default: "none",
-            },
-          },
-        },
-      },
-      // Apply status/hideCompletedOnly filter
-      ...(status !== "all" ? [{ $match: { orderStatus: status } }] : []),
-      ...(hideCompletedOnly
-        ? [{ $match: { orderStatus: { $ne: "Completed" } } }]
-        : []),
-      // Pagination
       { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limitNum },
     ];
 
-    const clients = await Client.aggregate(pipeline);
+    let clients = await Client.aggregate(pipeline);
 
-    // Total count for pagination
-    const countPipeline = [
-      ...pipeline.filter((stage) => !stage.$skip && !stage.$limit),
-      { $count: "totalCount" },
-    ];
-    const countResult = await Client.aggregate(countPipeline);
-    const totalCount = countResult[0]?.totalCount || 0;
+    // Compute reservation statuses and client-level status
+    clients = clients.map((client) => {
+      const reservationsWithStatus = client.reservations.map((r) => ({
+        ...r,
+        status: getReservationStatus(r),
+      }));
+
+      const totalPaid = reservationsWithStatus.reduce((sum, r) => {
+        if (r.status === "completed") {
+          const paidAmount = (r.calculatedTotalAmmount || 0) - (r.amountDue || 0);
+          return sum + paidAmount;
+        }
+        return sum;
+      }, 0);
+
+
+      const orderStatus = getClientStatus(reservationsWithStatus);
+
+      return {
+        ...client,
+        reservations: reservationsWithStatus,
+        totalPaid,
+        orderStatus,
+      };
+    });
+
+    // Apply client-level status filter if needed
+    let filteredClients = clients;
+    if (status !== "all") {
+      filteredClients = clients.filter(
+        (c) => c.orderStatus.toLowerCase() === status.toLowerCase()
+      );
+    }
+    if (hideCompletedOnly) {
+      filteredClients = filteredClients.filter(
+        (c) => c.orderStatus.toLowerCase() !== "completed"
+      );
+    }
+
+    // Get total count without pagination
+    const totalCount = await Client.countDocuments(clientMatch);
     const totalPages = Math.ceil(totalCount / limitNum);
 
     // Aggregate all distinct tags across **all clients** (for filters in frontend)
@@ -191,11 +102,11 @@ export const getAllClients = async (req, res) => {
     const availableTags = tagsAggregation[0]?.allTags || [];
 
     res.json({
-      clients,
+      clients: filteredClients,
       totalCount,
       totalPages,
       currentPage: pageNum,
-      availableTags, 
+      availableTags,
     });
   } catch (error) {
     console.error("Error fetching clients:", error);
