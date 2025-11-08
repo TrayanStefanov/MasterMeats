@@ -8,12 +8,15 @@
         "emailLabel": "Email(optional)",
         "emailPlaceholder": "example@example.com",
         "notesLabel": "Notes(optional)",
-        "notesPlaceholder": "Additional notes..."
+        "notesPlaceholder": "Additional notes...",
+        "tagsLabel": "Tags",
+        "noTags": "No tags added yet",
+        "tagsPlaceholder": "Add tags..."
     },
     "delivery": {
         "title": "Delivery Details",
         "dateOfDelivery": "Date of Delivery",
-        "completed": "Mark as Completed",
+        "delivered": "Mark as Delivered",
         "total": "Total Amount",
         "amountDue": "Amount Due",
         "notesLabel": "Notes(optional)",
@@ -33,7 +36,14 @@
         "priceLabel": "Price per kg",
         "pricePlaceholder": "0.00",
         "categoryLabel": "Product Category",
-        "categoryDropdown": "Select Category",
+        "categoryDropdown": {
+            "title": "Select Category",
+            "categories": {
+                "fillet": "Fillet",
+                "neck": "Neck",
+                "ham": "Ham"
+            }
+        },
         "stock": "Stock in grams(optional)",
         "subtitle": "Localization Info",
         "langs": {

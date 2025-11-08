@@ -1,4 +1,5 @@
 {
+    "title": "Admin Dashboard",
     "buttons": {
         "createProduct": "Create Product",
         "updateProduct": "Update Product",
@@ -10,6 +11,11 @@
         "createReservation": "Create Reservation",
         "deleteReservation": "Delete Reservation"
     },
+    "units": {
+        "grams": "g",
+        "kg": "kg",
+        "of": "of"
+    },
     "loading": {
         "loading": "Loading...",
         "updating": "Updating...",
@@ -20,17 +26,28 @@
     "tabs": {
         "products": "Products",
         "reservations": "Reservations",
-        "analytics": "Analytics"
+        "analytics": "Analytics",
+        "usersAndClients": "Users & Clients"
     },
     "status": {
+        "status": "Status",
         "pending": "Pending",
         "completed": "Completed",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "inProcess": "In Process",
+        "reserved": "Reserved",
+        "none": "None",
+        "deliveredNotPaid": "Delivered (Not Paid)",
+        "paidNotDelivered": "Paid (Not Delivered)"
     },
     "notFound": {
         "products": "No products found.",
         "reservations": "No reservations found.",
         "clients": "No clients found.",
         "items": "No items found."
+    },
+    "searchClient": {
+        "title": "Search by client name or phone",
+        "placeholder": "e.g. John Doe, +359888888888"
     }
 }
