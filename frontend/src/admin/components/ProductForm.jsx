@@ -2,17 +2,16 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaPlusCircle, FaSpinner, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 import fetchLocales from "../../lib/fetchLocales.js";
 import { useProductStore } from "../../stores/useProductStore.js";
 import ProductImageUpload from "./ProductImageUpload.jsx";
 
-const categories = ["fillet", "loin", "ham"];
-
 const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
   const { createProduct, updateProduct, loading } = useProductStore();
 
-  const { t: tProducts } = useTranslation("admin/products");
+  const { t: tAdminProducts } = useTranslation("admin/products");
   const { t: tForms } = useTranslation("admin/forms");
   const { t: tCommon } = useTranslation("admin/common");
 
@@ -27,6 +26,8 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     ingredients: { en: "", bg: "" },
     badge: { en: "", bg: "" },
   });
+
+  const [localizedTitle, setLocalizedTitle] = useState("");
 
   useEffect(() => {
     if (mode === "edit" && product) {
@@ -56,9 +57,19 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
             bg: locales.bg.badge || product.badge?.bg || "",
           },
         });
+
+        const lang = i18next.language;
+        setLocalizedTitle(locales[lang]?.title || product.title?.[lang] || product.name);
       })();
     }
   }, [mode, product]);
+
+  useEffect(() => {
+    if (mode === "edit" && product && formData.title) {
+      const lang = i18next.language;
+      setLocalizedTitle(formData.title[lang] || product.title?.[lang] || product.name);
+    }
+  }, [formData.title, mode, product]);
 
   const handleChange = (field, value, lang = null) => {
     if (lang) {
@@ -103,7 +114,7 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     e.preventDefault();
 
     if (!formData.images.length) {
-      alert(tProducts("upload.alert"));
+      alert(tAdminProducts("upload.alert"));
       return;
     }
 
@@ -130,6 +141,7 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     if (typeof onFinish === "function") onFinish();
   };
 
+  // 🖋️ Render
   return (
     <motion.div
       className="p-8 max-w-4xl mx-auto"
@@ -139,15 +151,13 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     >
       <h2 className="text-2xl lg:text-3xl font-semibold text-secondary text-center mb-6">
         {mode === "edit"
-          ? tProducts("editTitle", { name: product?.name || tProducts("list.name") })
-          : tProducts("createTitle")}
+          ? tAdminProducts("editTitle", { name: localizedTitle || product?.name || "Product" })
+          : tAdminProducts("createTitle")}
       </h2>
 
       <form
         onSubmit={handleSubmit}
-        className={`space-y-6 ${
-          loading ? "opacity-75 pointer-events-none" : ""
-        }`}
+        className={`space-y-6 ${loading ? "opacity-75 pointer-events-none" : ""}`}
       >
         {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -187,10 +197,12 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
               className="input"
               required
             >
-              <option value="">{tForms("product.categoryDropdown")}</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+              <option value="">{tForms("product.categoryDropdown.title")}</option>
+              {Object.keys(
+                tForms("product.categoryDropdown.categories", { returnObjects: true })
+              ).map((key) => (
+                <option key={key} value={key}>
+                  {tForms(`product.categoryDropdown.categories.${key}`)}
                 </option>
               ))}
             </select>
@@ -320,7 +332,9 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
           {loading ? (
             <>
               <FaSpinner className="animate-spin" />
-              {mode === "edit" ? tCommon("loading.updating") : tCommon("loading.creating")}
+              {mode === "edit"
+                ? tCommon("loading.updating")
+                : tCommon("loading.creating")}
             </>
           ) : (
             <>
