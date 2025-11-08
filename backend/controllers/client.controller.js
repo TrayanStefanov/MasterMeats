@@ -40,7 +40,18 @@ export const getAllClients = async (req, res) => {
         $lookup: {
           from: "reservations",
           let: { clientId: "$_id" },
-          pipeline: [{ $match: { $expr: { $eq: ["$client", "$$clientId"] } } }],
+          pipeline: [
+            { $match: { $expr: { $eq: ["$client", "$$clientId"] } } },
+            // Populate product details
+            {
+              $lookup: {
+                from: "products",
+                localField: "products.product",
+                foreignField: "_id",
+                as: "productsData",
+              },
+            },
+          ],
           as: "reservations",
         },
       },
@@ -51,16 +62,32 @@ export const getAllClients = async (req, res) => {
 
     let clients = await Client.aggregate(pipeline);
 
-    // Compute reservation statuses and client-level status
+    // Compute reservation statuses, client-level status and merge product info
     clients = clients.map((client) => {
-      const reservationsWithStatus = client.reservations.map((r) => ({
-        ...r,
-        status: getReservationStatus(r),
-      }));
+      const reservationsWithStatus = client.reservations.map((r) => {
+        const status = getReservationStatus(r);
+
+        // Merge populated product info into reservation.products
+        const productsWithInfo = r.products.map((p) => {
+          const productData = r.productsData.find(
+            (pd) => pd._id.toString() === p.product.toString()
+          );
+          return {
+            ...p,
+            product: productData || { name: p.product }, // fallback if missing
+          };
+        });
+
+        return {
+          ...r,
+          status,
+          products: productsWithInfo,
+        };
+      });
 
       const totalPaid = reservationsWithStatus.reduce((sum, r) => {
         if (r.status === "completed") {
-          const paidAmount = (r.calculatedTotalAmmount || 0) - (r.amountDue || 0);
+          const paidAmount = (r.calculatedTotalAmount || 0) - (r.amountDue || 0);
           return sum + paidAmount;
         }
         return sum;
@@ -94,7 +121,7 @@ export const getAllClients = async (req, res) => {
     const totalCount = await Client.countDocuments(clientMatch);
     const totalPages = Math.ceil(totalCount / limitNum);
 
-    // Aggregate all distinct tags across **all clients** (for filters in frontend)
+    // Aggregate all distinct tags across *all clients* (for filters in frontend)
     const tagsAggregation = await Client.aggregate([
       { $unwind: "$tags" },
       { $group: { _id: null, allTags: { $addToSet: "$tags" } } },
