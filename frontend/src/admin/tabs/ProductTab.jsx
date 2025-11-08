@@ -63,10 +63,10 @@ const ProductTab = () => {
             className="flex flex-col gap-6"
           >
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-accent-content">{tProducts('title')}</h2>
+              <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-accent-content">{tProducts('title')}</h2>
               <button
                 onClick={handleCreate}
-                className="flex items-center gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
+                className="flex items-center text-base lg:text-xl xl:text-2xl  gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
               >
                 <FaPlusCircle /> {tCommon("buttons.createProduct")}
               </button>

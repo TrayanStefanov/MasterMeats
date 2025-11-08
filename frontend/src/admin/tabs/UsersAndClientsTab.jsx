@@ -29,7 +29,7 @@ const ReservationsTab = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-colors ${
+            className={`flex items-center text-base lg:text-lg xl:text-xl gap-2 px-4 py-2 rounded-xl font-semibold transition-colors ${
               activeTab === tab.id
                 ? "bg-accent text-accent-content shadow-md"
                 : "bg-secondary/50 text-secondary-content hover:bg-secondary/70"
