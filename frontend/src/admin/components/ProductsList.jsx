@@ -7,10 +7,11 @@ import i18next from "i18next";
 import { useProductStore } from "../../stores/useProductStore";
 
 const ProductsList = ({ onEdit }) => {
-  const { products, fetchAllProducts, deleteProduct, loading } = useProductStore();
-  const { t : tAdminProducts} = useTranslation("admin/products");
-  const { t : tCommon} = useTranslation("admin/common");
-  const { t : tProducts} = useTranslation("productsSection");
+  const { products, fetchAllProducts, deleteProduct, loading } =
+    useProductStore();
+  const { t: tAdminProducts } = useTranslation("admin/products");
+  const { t: tCommon } = useTranslation("admin/common");
+  const { t: tProducts } = useTranslation("productsSection");
 
   useEffect(() => {
     fetchAllProducts();
@@ -111,26 +112,32 @@ const ProductsList = ({ onEdit }) => {
 
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-secondary/60">
-                    {product.category}
+                    {tAdminProducts(
+                      "admin/forms:product.categoryDropdown.categories." +
+                        product.category,
+                      {
+                        defaultValue: product.category,
+                      }
+                    )}
                   </div>
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-middle">
                   <div className="flex justify-end items-center gap-3 h-full">
-                  <button
-                    onClick={() => onEdit(product)}
-                    className="text-accent-content/60 hover:text-accent-content transition-colors"
-                    title={tCommon("buttons.updateProduct")}
-                  >
-                    <FaEdit className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => deleteProduct(product._id)}
-                    className="text-accent-content/60 hover:text-accent-content transition-colors"
-                    title={tCommon("buttons.deleteProduct")}
-                  >
-                    <FaTrash className="h-5 w-5" />
-                  </button>
+                    <button
+                      onClick={() => onEdit(product)}
+                      className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      title={tCommon("buttons.updateProduct")}
+                    >
+                      <FaEdit className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => deleteProduct(product._id)}
+                      className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      title={tCommon("buttons.deleteProduct")}
+                    >
+                      <FaTrash className="h-5 w-5" />
+                    </button>
                   </div>
                 </td>
               </tr>

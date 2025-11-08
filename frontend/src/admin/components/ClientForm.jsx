@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useClientStore } from "../stores/useClientStore";
 import { useTranslation } from "react-i18next";
 
-const ClientForm = ({ client, setClient }) => {
+const ClientForm = ({ client, setClient, mode }) => {
   const { t: tForms } = useTranslation("admin/forms");
+  const {t: tUAC} = useTranslation("admin/usersAndClients");
   const { clients } = useClientStore();
 
   const [tagInput, setTagInput] = useState("");
@@ -60,8 +61,8 @@ const ClientForm = ({ client, setClient }) => {
 
   return (
     <div className="border-t-4 border-accent-content/60 pt-6" ref={wrapperRef}>
-      <h3 className="text-2xl font-semibold text-secondary text-center mb-4">
-        {tForms("client.title")}
+      <h3 className="text-2xl lg:text-3xl font-semibold text-secondary text-center mb-4">
+        {mode === "edit" ? tUAC("editTitle") : tUAC("createTitle")}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

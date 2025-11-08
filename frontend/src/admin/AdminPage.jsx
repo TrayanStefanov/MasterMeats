@@ -2,6 +2,8 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { FaBoxOpen, FaChartBar, FaUsers } from "react-icons/fa";
 import { FiBox } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
+
 import { useProductStore } from "../stores/useProductStore";
 
 const ProductTab = lazy(() => import("./tabs/ProductTab"));
@@ -9,16 +11,18 @@ const ReservationsTab = lazy(() => import("./tabs/ReservationsTab"));
 const UsersAndClientsTab = lazy(() => import("./tabs/UsersAndClientsTab"));
 // const AnalyticsTab = lazy(() => import("./tabs/AnalyticsTab"));
 
-const tabs = [
-  { id: "products", label: "Products", icon: <FaBoxOpen /> },
-  { id: "reservations", label: "Reservations", icon: <FiBox /> },
-  { id: "analytics", label: "Analytics", icon: <FaChartBar /> },
-  { id: "usersAndClients", label: "Users & Clients", icon: <FaUsers /> },
-];
 
 const AdminPage = () => {
+  const { t: tCommon } = useTranslation("admin/common");
+  const tabs = [
+    { id: "products", label: tCommon("tabs.products"), icon: <FaBoxOpen /> },
+    { id: "reservations", label: tCommon("tabs.reservations"), icon: <FiBox /> },
+    { id: "analytics", label: tCommon("tabs.analytics"), icon: <FaChartBar /> },
+    { id: "usersAndClients", label: tCommon("tabs.usersAndClients"), icon: <FaUsers /> },
+  ];
   const [activeTab, setActiveTab] = useState("products");
   const { fetchAllProducts } = useProductStore();
+  
 
   useEffect(() => {
     fetchAllProducts();
@@ -32,7 +36,7 @@ const AdminPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        Admin Dashboard
+        {tCommon("title")}
       </motion.h1>
 
       <div className="flex gap-4 mb-8 flex-wrap justify-center">

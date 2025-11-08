@@ -23,6 +23,7 @@ const ClientsList = ({ onEdit }) => {
   const { t: tUAC } = useTranslation("admin/usersAndClients");
   const { t: tCommon } = useTranslation("admin/common");
   const { t: tReservations } = useTranslation("admin/reservations");
+  const { t: tForms } = useTranslation("admin/forms");
 
   const [expandedClient, setExpandedClient] = useState(null);
   const [modalReservation, setModalReservation] = useState(null);
@@ -39,13 +40,13 @@ const ClientsList = ({ onEdit }) => {
 
   const getStatusBadgeColor = (status) => {
     switch (status) {
-      case "Completed":
+      case "completed":
         return "bg-green-500/80 text-white";
-      case "Reserved":
+      case "reserved":
         return "bg-blue-500/80 text-white";
-      case "In progress":
+      case "inProcess":
         return "bg-yellow-500/80 text-white";
-      case "None":
+      case "none":
         return "bg-gray-500/60 text-white";
       default:
         return "bg-gray-500/60 text-white";
@@ -80,11 +81,15 @@ const ClientsList = ({ onEdit }) => {
         <table className="min-w-full divide-y divide-accent-content">
           <thead className="bg-secondary/80 font-semibold text-primary uppercase tracking-wider">
             <tr>
-              <th className="px-6 py-3 text-left text-xs">{tUAC("list.name")}</th>
+              <th className="px-6 py-3 text-left text-xs">
+                {tUAC("list.name")}
+              </th>
               <th className="px-6 py-3 text-left text-xs">Phone</th>
               <th className="px-6 py-3 text-left text-xs">Paid (€)</th>
               <th className="px-6 py-3 text-left text-xs">Status</th>
-              <th className="px-6 py-3 text-right text-xs">{tUAC("list.actions")}</th>
+              <th className="px-6 py-3 text-right text-xs">
+                {tUAC("list.actions")}
+              </th>
             </tr>
           </thead>
 
@@ -117,7 +122,7 @@ const ClientsList = ({ onEdit }) => {
                         </div>
                       ) : (
                         <span className="text-secondary/40 italic text-xs mt-1">
-                          No tags
+                          {tForms("client.noTags")}
                         </span>
                       )}
                     </div>
@@ -134,11 +139,13 @@ const ClientsList = ({ onEdit }) => {
                   <td className="px-6 py-4 text-secondary/70">
                     {client.orderStatus ? (
                       <span
-                        className={`px-2 py-0.5 text-xs rounded-full font-medium ${getStatusBadgeColor(
+                        className={`px-2 py-1 text-xs rounded-lg font-medium ${getStatusBadgeColor(
                           client.orderStatus
                         )}`}
                       >
-                        {client.orderStatus}
+                        {tCommon(`status.${client.orderStatus}`, {
+                          defaultValue: client.orderStatus,
+                        })}
                       </span>
                     ) : (
                       <span className="text-secondary/40">—</span>
@@ -189,7 +196,7 @@ const ClientsList = ({ onEdit }) => {
                         className="px-8 py-6 text-sm text-secondary/80"
                       >
                         <p className="text-center text-secondary font-semibold text-base mb-4 border-b border-accent/40 pb-2">
-                          {tReservations("details.title", {
+                          {tUAC("details.title", {
                             defaultValue: "Order History",
                           })}
                         </p>
@@ -197,7 +204,7 @@ const ClientsList = ({ onEdit }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <h4 className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">
-                              {tReservations("details.items", {
+                              {tUAC("details.items", {
                                 defaultValue: "Orders",
                               })}
                             </h4>
@@ -213,23 +220,27 @@ const ClientsList = ({ onEdit }) => {
                                         r.dateOfDelivery
                                       ).toLocaleDateString()}{" "}
                                       —{" "}
-                                      {r.completed ? (
-                                        <span className="text-green-400">
-                                          {tReservations("details.completed", {
-                                            defaultValue: "Completed",
-                                          })}
-                                        </span>
-                                      ) : (
-                                        <span className="text-yellow-400">
-                                          {tReservations("details.pending", {
-                                            defaultValue: "Pending",
-                                          })}
-                                        </span>
-                                      )}
+                                      <span
+                                        className={`font-semibold rounded-md px-2 py-1 ${
+                                          r.status === "completed"
+                                            ? "bg-green-500/80 text-white"
+                                            : r.status === "reserved"
+                                            ? "bg-blue-500/80 text-white"
+                                            : r.status === "deliveredNotPaid"
+                                            ? "bg-red-500/80 text-white"
+                                            : r.status === "paidNotDelivered"
+                                            ? "bg-yellow-500/80 text-white"
+                                            : "text-secondary/50"
+                                        }`}
+                                      >
+                                        {tCommon(`status.${r.status}`, {
+                                          defaultValue: r.status,
+                                        })}
+                                      </span>
                                     </p>
-                                    <p className="text-xs text-secondary/50">
-                                      Total: €
-                                      {r.calculatedTotalAmmount?.toFixed(2) ??
+                                    <p className="text-xs text-secondary/50 mt-2">
+                                      {tReservations("details.totalAmount")}
+                                      {r.calculatedTotalAmount?.toFixed(2) ??
                                         "—"}
                                     </p>
                                   </div>
@@ -249,7 +260,7 @@ const ClientsList = ({ onEdit }) => {
 
                           <div>
                             <h4 className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">
-                              {tReservations("details.notes", {
+                              {tUAC("details.notes", {
                                 defaultValue: "Notes",
                               })}
                             </h4>
@@ -260,7 +271,7 @@ const ClientsList = ({ onEdit }) => {
                                 </p>
                               ) : (
                                 <p className="text-secondary/40 italic">
-                                  {tReservations("details.noNotes", {
+                                  {tUAC("details.noNotes", {
                                     defaultValue: "No notes provided.",
                                   })}
                                 </p>

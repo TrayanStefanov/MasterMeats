@@ -25,7 +25,7 @@ const ProductImageUpload = ({ images = [], onChange, onRemove }) => {
         </label>
         {images.length > 0 && (
           <span className="ml-3 text-sm text-secondary/70">
-            {t("products.imagesSelected", { count: images.length })}
+            {t("upload.imagesSelected", { count: images.length })}
           </span>
         )}
       </div>

@@ -50,11 +50,11 @@ const IRLReservationsList = ({ onEdit }) => {
       case "completed":
         return "bg-green-500/80 text-white";
       case "deliveredNotPaid":
-        return "bg-yellow-500/80 text-white";
-      case "paidNotDelivered":
-        return "bg-blue-500/80 text-white";
-      case "reserved":
         return "bg-red-500/80 text-white";
+      case "paidNotDelivered":
+        return "bg-yellow-500/80 text-white";
+      case "reserved":
+        return "bg-blue-500/80 text-white";
       default:
         return "bg-gray-500/60 text-white";
     }
@@ -186,7 +186,7 @@ const IRLReservationsList = ({ onEdit }) => {
                           res.status
                         )}`}
                       >
-                        {tCommon(`reservationStatus.${res.status}`)}
+                        {tCommon(`status.${res.status}`)}
                       </span>
                     </td>
 

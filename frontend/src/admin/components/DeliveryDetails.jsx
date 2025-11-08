@@ -17,13 +17,13 @@ const DeliveryDetails = ({ details, setDetails }) => {
 
   return (
     <div className="border-t-4 border-accent-content/60 pt-6">
-      <h3 className="text-2xl font-semibold text-secondary text-center mb-4">
+      <h3 className="text-lg lg:text-xl xl:text-2xl font-semibold text-secondary text-center mb-4">
         {tForms("delivery.title")}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col">
-          <label className="text-secondary text-sm mb-1">
+          <label className="text-secondary indent-2 text-sm lg:text-lg mb-1">
             {tForms("delivery.dateOfDelivery")}
           </label>
           <input
@@ -36,7 +36,7 @@ const DeliveryDetails = ({ details, setDetails }) => {
         </div>
 
         <div className="flex flex-col">
-          <label className="text-secondary text-sm mb-1">
+          <label className="text-secondary  indent-2 text-sm lg:text-lg mb-1">
             {tForms("delivery.amountDue")} (€)
           </label>
           <input
@@ -55,20 +55,20 @@ const DeliveryDetails = ({ details, setDetails }) => {
             onChange={(e) => handleChange("delivered", e.target.checked)}
             className="accent-accent h-5 w-5"
           />
-          <label className="text-secondary">
+          <label className="text-secondary indent-2 text-sm lg:text-lg">
             {tForms("delivery.delivered")}
           </label>
         </div>
 
         <div className="flex flex-col md:col-span-2">
-          <label className="text-secondary text-sm mb-1">
+          <label className="text-secondary indent-2 text-sm lg:text-lg mb-1">
             {tForms("delivery.notesLabel")}
           </label>
           <textarea
             placeholder={tForms("delivery.notesPlaceholder")}
             value={details.notes}
             onChange={(e) => handleChange("notes", e.target.value)}
-            className="w-full p-3 rounded-md bg-secondary text-primary border border-accent/20"
+            className="w-full p-3 rounded-md bg-secondary text-primary placeholder:text-primary/60 border border-accent/20"
             rows="3"
           />
         </div>

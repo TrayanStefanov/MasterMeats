@@ -83,13 +83,13 @@ export default function ClientFilters() {
         {/* Search Field */}
         <div className="flex flex-col">
           <label className="text-secondary/70 indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
-            {tUAC("filters.searchLabel", { defaultValue: "Search Clients" })}
+            {tCommon("searchClient.title", { defaultValue: "Search Clients" })}
           </label>
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder={tUAC("filters.searchPlaceholder", {
+            placeholder={tCommon("searchClient.placeholder", {
               defaultValue: "Search by name, phone, or email...",
             })}
             className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 text-sm outline-none placeholder:text-primary/50 w-full h-[42px]"
@@ -99,7 +99,7 @@ export default function ClientFilters() {
         {/* Status Quick Filters */}
         <div className="flex flex-col">
           <label className="text-secondary/70 indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
-            {tUAC("filters.status", { defaultValue: "Status" })}
+            {tUAC("filters.statusTitle", { defaultValue: "Status" })}
           </label>
 
           <div className="flex flex-wrap gap-2 mt-1">
@@ -114,7 +114,7 @@ export default function ClientFilters() {
               },
               {
                 key: "InProgress",
-                label: tCommon("status.pending", "In progress"),
+                label: tCommon("status.inProcess", "In progress"),
               },
               { key: "None", label: tCommon("status.none", "None") },
             ].map((filterOption) => {
@@ -128,7 +128,7 @@ export default function ClientFilters() {
                       isActive ? "all" : filterOption.key // "all" deselects
                     )
                   }
-                  className={`px-3 py-1 rounded-full text-sm lg:text-base transition-colors font-semibold ${
+                  className={`px-3 py-1 rounded-lg text-sm lg:text-base transition-colors font-semibold ${
                     isActive
                       ? "bg-accent-content text-primary"
                       : "bg-secondary text-primary/70 hover:bg-secondary/70"
@@ -144,7 +144,7 @@ export default function ClientFilters() {
         {/* Tags Field */}
         <div className="flex flex-col relative md:col-span-3 mt-2 md:mt-0">
           <label className="text-secondary/70 indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
-            {tUAC("filters.tags", { defaultValue: "Filter by Tags" })}
+            {tUAC("filters.tagsFilter.title", { defaultValue: "Filter by Tags" })}
           </label>
 
           <div className="flex items-center flex-wrap gap-2 bg-secondary border border-accent/30 rounded-md px-3 py-1.5 min-h-[42px]">
@@ -172,7 +172,7 @@ export default function ClientFilters() {
                 type="text"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                placeholder={tUAC("filters.addTagPlaceholder", {
+                placeholder={tUAC("filters.tagsFilter.placeholder", {
                   defaultValue: "Add tag and press Enter...",
                 })}
                 className="bg-transparent text-primary outline-none text-xs lg:text-lg px-1 w-full placeholder:text-primary/50"
@@ -207,7 +207,7 @@ export default function ClientFilters() {
           {(!filters.tags || filters.tags.length === 0) &&
             suggestions.length === 0 && (
               <p className="text-secondary/60 indent-2 text-sm italic mt-2">
-                {tUAC("filters.noTags", {
+                {tUAC("filters.tagsFilter.empty", {
                   defaultValue: "No tag filters active",
                 })}
               </p>

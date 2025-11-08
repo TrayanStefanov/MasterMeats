@@ -2,6 +2,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaPlusCircle, FaSpinner, FaSave } from "react-icons/fa";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+
 import { useReservationStore } from "../stores/useReservationStore.js";
 
 import ClientSearch from "./ClientSearch.jsx";
@@ -22,6 +24,9 @@ const IRLReservationForm = ({ mode = "create", reservation = null, onFinish }) =
     calculatedTotalAmmount: reservation?.calculatedTotalAmmount ?? 0,
     delivered: reservation?.delivered || false, 
   });
+  
+  const {t: tReservations} = useTranslation("admin/reservations");
+  const {t: tCommon} = useTranslation("admin/common");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +63,7 @@ const IRLReservationForm = ({ mode = "create", reservation = null, onFinish }) =
       transition={{ duration: 0.6 }}
     >
       <h2 className="text-2xl lg:text-3xl font-semibold text-secondary text-center mb-6">
-        {mode === "edit" ? "Edit Reservation" : "Create New Reservation"}
+        {mode === "edit" ? tReservations("editTitle") : tReservations("createTitle")}
       </h2>
 
       <form
@@ -81,12 +86,12 @@ const IRLReservationForm = ({ mode = "create", reservation = null, onFinish }) =
           {loading ? (
             <>
               <FaSpinner className="animate-spin" />
-              {mode === "edit" ? "Updating..." : "Creating..."}
+              {mode === "edit" ? tCommon("loading.updating") : tCommon("loading.creating")}
             </>
           ) : (
             <>
               {mode === "edit" ? <FaSave /> : <FaPlusCircle />}
-              {mode === "edit" ? "Update Reservation" : "Create Reservation"}
+              {mode === "edit" ? tCommon("buttons.updateReservation") : tCommon("buttons.createReservation")}
             </>
           )}
         </button>
