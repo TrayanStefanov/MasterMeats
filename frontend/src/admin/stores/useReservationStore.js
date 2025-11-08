@@ -12,7 +12,7 @@ export const useReservationStore = create((set, get) => ({
   filters: {
     search: "",
     products: [],
-    statusFilter: "", // new: "", "completed", "deliveredNotPaid", "paidNotDelivered"
+    statusFilter: "", // new: "", "completed", "deliveredNotPaid", "paidNotDelivered", "reserved"
     sort: "deliveryDate",
     limit: 10,
   },
@@ -108,9 +108,12 @@ export const useReservationStore = create((set, get) => ({
   },
 
   setFilter: (key, value) => {
-    set((state) => ({
-      filters: { ...state.filters, [key]: value },
-    }));
+    set((state) => {
+      const newFilters = { ...state.filters, [key]: value };
+      return { filters: newFilters };
+    });
+    // Immediately fetch new data whenever a filter changes
+    get().fetchFilteredReservations(1); // reset to page 1
   },
 
   resetFilters: () =>
