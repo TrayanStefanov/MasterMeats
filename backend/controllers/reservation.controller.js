@@ -1,19 +1,24 @@
 import Reservation from "../models/reservation.model.js";
 import Client from "../models/client.model.js";
+import mongoose from "mongoose";
 
 export const getAllReservations = async (req, res) => {
   try {
     const {
-      search,       // client name or phone
+      search,
       category,
-      productId,
-      statusFilter, // new single status filter
-      sort,
+      products,
+      statusFilter,
+      sort = "deliveryDate",
       page = 1,
       limit = 10,
     } = req.query;
 
-    let filter = {};
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const matchStage = {};
 
     // Search by client name or phone
     if (search) {
@@ -23,60 +28,126 @@ export const getAllReservations = async (req, res) => {
           { phone: { $regex: search, $options: "i" } },
         ],
       }).select("_id");
-      filter.client = { $in: matchingClients.map((c) => c._id) };
+      matchStage.client = { $in: matchingClients.map((c) => c._id) };
     }
 
     // Status filters (mutually exclusive)
     if (statusFilter === "completed") {
-      filter.completed = true;
+      matchStage.completed = true;
     } else if (statusFilter === "deliveredNotPaid") {
-      filter.$and = [
-        { delivered: true },
-        { amountDue: { $gt: 0 } }
-      ];
-
+      matchStage.$and = [{ delivered: true }, { amountDue: { $gt: 0 } }];
     } else if (statusFilter === "paidNotDelivered") {
-      filter.$and = [
-        { completed: false },
-        { amountDue: 0 }
-      ];
+      matchStage.$and = [{ completed: false }, { amountDue: 0 }];
+    } else if (statusFilter === "reserved") {
+      matchStage.$and = [{ delivered: false }, { amountDue: { $gt: 0 } },];
     }
 
-    // Sorting options
-    let sortOption = {};
-    if (sort === "deliveryDate") sortOption = { dateOfDelivery: 1 };
-    else if (sort === "createdAt") sortOption = { createdAt: -1 };
+    const productIds = products
+      ? products.split(",").map((id) => new mongoose.Types.ObjectId(id))
+      : [];
 
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
+    // Aggregation pipeline
+    const pipeline = [
+      { $match: matchStage },
 
-    let allReservations = await Reservation.find(filter)
-      .populate("client", "name phone email")
-      .populate({
-        path: "products.product",
-        select: "name category pricePerKg",
-      })
-      .sort(sortOption)
-      .exec();
+      // Populate client
+      {
+        $lookup: {
+          from: "clients",
+          localField: "client",
+          foreignField: "_id",
+          as: "client",
+        },
+      },
+      { $unwind: "$client" },
 
-    if (category || productId) {
-      allReservations = allReservations.filter((res) =>
-        res.products?.some((p) => {
-          const prod = p.product || {};
-          if (category && prod.category !== category) return false;
-          if (productId && prod._id.toString() !== productId) return false;
-          return true;
-        })
-      );
-    }
+      // Populate products.product
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "populatedProducts",
+        },
+      },
 
-    const totalCount = allReservations.length;
+      // Merge populated product data into the embedded array
+      {
+        $addFields: {
+          products: {
+            $map: {
+              input: "$products",
+              as: "p",
+              in: {
+                $mergeObjects: [
+                  "$$p",
+                  {
+                    product: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: "$populatedProducts",
+                            as: "popProd",
+                            cond: { $eq: ["$$popProd._id", "$$p.product"] },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      { $project: { populatedProducts: 0 } },
+
+      // Filter by category or product IDs if provided
+      ...(category || productIds.length > 0
+        ? [
+          {
+            $match: {
+              products: {
+                $elemMatch: {
+                  ...(category ? { "product.category": category } : {}),
+                  ...(productIds.length > 0
+                    ? { "product._id": { $in: productIds } }
+                    : {}),
+                },
+              },
+            },
+          },
+        ]
+        : []),
+
+      // Sort
+      {
+        $sort:
+          sort === "createdAt"
+            ? { createdAt: -1 }
+            : { dateOfDelivery: 1 }, // default
+      },
+
+      // Pagination
+      { $skip: skip },
+      { $limit: limitNum },
+    ];
+
+    const reservations = await Reservation.aggregate(pipeline);
+
+    //  Count total (without pagination)
+    const totalCountPipeline = pipeline.filter(
+      (stage) => !("$skip" in stage || "$limit" in stage)
+    );
+    totalCountPipeline.push({ $count: "total" });
+
+    const totalCountResult = await Reservation.aggregate(totalCountPipeline);
+    const totalCount = totalCountResult[0]?.total || 0;
     const totalPages = Math.ceil(totalCount / limitNum);
-    const paginatedReservations = allReservations.slice(skip, skip + limitNum);
 
     res.status(200).json({
-      reservations: paginatedReservations,
+      reservations,
       currentPage: pageNum,
       totalPages,
       totalCount,
