@@ -74,15 +74,15 @@ export default function ClientFilters() {
   const clearAllTags = () => setFilter("tags", []);
 
   return (
-    <div className="min-w-[90%] mx-auto bg-primary/60 rounded-lg border border-accent/30 p-4">
-      <h2 className="text-accent-content text-2xl text-center mb-4">
+    <div className="min-w-[90%] mx-auto rounded-md border-4 border-accent-content/60 p-4">
+      <h2 className="text-accent-content text-2xl xl:text-3xl 2xl:text-4xl text-center font-bold mb-4">
         {tUAC("filters.title", { defaultValue: "Filters" })}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Search Field */}
         <div className="flex flex-col">
-          <label className="text-secondary/70 text-sm font-semibold mb-1">
+          <label className="text-secondary/70 indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
             {tUAC("filters.searchLabel", { defaultValue: "Search Clients" })}
           </label>
           <input
@@ -96,27 +96,54 @@ export default function ClientFilters() {
           />
         </div>
 
-        {/* Status Filter */}
+        {/* Status Quick Filters */}
         <div className="flex flex-col">
-          <label className="text-secondary/70 text-sm font-semibold mb-1">
+          <label className="text-secondary/70 indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
             {tUAC("filters.status", { defaultValue: "Status" })}
           </label>
-          <select
-            value={filters.status}
-            onChange={(e) => setFilter("status", e.target.value)}
-            className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 text-sm outline-none w-full h-[42px]"
-          >
-            <option value="all">All</option>
-            <option value="Active">Active</option>
-            <option value="Pending">Pending</option>
-            <option value="Delivered-unpaid">Delivered - Unpaid</option>
-            <option value="Completed">Completed</option>
-          </select>
+
+          <div className="flex flex-wrap gap-2 mt-1">
+            {[
+              {
+                key: "Completed",
+                label: tCommon("status.completed", "Completed"),
+              },
+              {
+                key: "Reserved",
+                label: tCommon("status.reserved", "Reserved"),
+              },
+              {
+                key: "InProgress",
+                label: tCommon("status.pending", "In progress"),
+              },
+              { key: "None", label: tCommon("status.none", "None") },
+            ].map((filterOption) => {
+              const isActive = filters.status === filterOption.key;
+              return (
+                <button
+                  key={filterOption.key}
+                  onClick={() =>
+                    setFilter(
+                      "status",
+                      isActive ? "all" : filterOption.key // "all" deselects
+                    )
+                  }
+                  className={`px-3 py-1 rounded-full text-sm lg:text-base transition-colors font-semibold ${
+                    isActive
+                      ? "bg-accent-content text-primary"
+                      : "bg-secondary text-primary/70 hover:bg-secondary/70"
+                  }`}
+                >
+                  {filterOption.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Tags Field */}
         <div className="flex flex-col relative md:col-span-3 mt-2 md:mt-0">
-          <label className="text-secondary/70 text-sm font-semibold mb-1">
+          <label className="text-secondary/70 indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
             {tUAC("filters.tags", { defaultValue: "Filter by Tags" })}
           </label>
 
@@ -125,12 +152,12 @@ export default function ClientFilters() {
               filters.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="bg-accent-content/20 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1"
+                  className="bg-accent-content/20 text-primary px-2 py-1 rounded-full text-xs lg:text-lg flex items-center gap-1"
                 >
                   {tag}
                   <button
                     onClick={() => handleRemoveTag(tag)}
-                    className="text-accent-content/70 hover:text-accent-content text-xs"
+                    className="text-primary hover:text-accent text-xs lg:text-lg"
                   >
                     <FaTimes />
                   </button>
@@ -148,14 +175,14 @@ export default function ClientFilters() {
                 placeholder={tUAC("filters.addTagPlaceholder", {
                   defaultValue: "Add tag and press Enter...",
                 })}
-                className="bg-transparent text-primary outline-none text-sm px-1 w-full placeholder:text-primary/50"
+                className="bg-transparent text-primary outline-none text-xs lg:text-lg px-1 w-full placeholder:text-primary/50"
               />
             </form>
 
             {filters.tags?.length > 0 && (
               <button
                 onClick={clearAllTags}
-                className="text-xs text-accent-content/60 hover:text-accent-content ml-auto"
+                className="text-xs lg:text-lg text-primary hover:text-accent font-semibold ml-auto"
               >
                 {tCommon("clear", { defaultValue: "Clear" })}
               </button>
@@ -169,7 +196,7 @@ export default function ClientFilters() {
                 <button
                   key={idx}
                   onClick={() => addTag(tag)}
-                  className="bg-accent-content/20 hover:bg-accent-content/30 text-primary px-3 py-1 rounded-full text-xs transition-colors"
+                  className="bg-secondary/40 hover:bg-accent-content/60 text-primary px-3 py-1 rounded-full text-xs lg:text-base transition-colors"
                 >
                   {tag}
                 </button>
@@ -179,7 +206,7 @@ export default function ClientFilters() {
 
           {(!filters.tags || filters.tags.length === 0) &&
             suggestions.length === 0 && (
-              <p className="text-secondary/60 text-sm italic mt-2">
+              <p className="text-secondary/60 indent-2 text-sm italic mt-2">
                 {tUAC("filters.noTags", {
                   defaultValue: "No tag filters active",
                 })}
