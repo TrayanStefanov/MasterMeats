@@ -33,7 +33,7 @@
         "title": "Информация за продукта",
         "nameLabel": "Име на продукта (вътрешен ключ)",
         "namePlaceholder": "primeren_produkt",
-        "priceLabel": "Цена за кг",
+        "priceLabel": "Цена за кг в евро",
         "pricePlaceholder": "0.00",
         "categoryLabel": "Категория на продукта",
         "categoryDropdown": {

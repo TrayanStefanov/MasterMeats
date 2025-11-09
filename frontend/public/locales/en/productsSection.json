@@ -25,5 +25,17 @@
     "description": "Rich, smoky aroma and deep flavor that brings out the essence of tradition. Gently seasoned with smoked red pepper for a perfectly balanced taste. Dried for at least 15 days.",
     "ingredients": "Pork loin with sweet and smoked red pepper",
     "badge": "Smoked"
+  },
+  "pastarma_luta": {
+    "title": "Pastarma - Spicy",
+    "description": "Traditional pastarma with a twist for spice lovers. Spicy red pepper has been added to the mix to set your mouth ablaze. Dried for a least 15 days.",
+    "ingredients": "Pork loin with sweet and spicy red pepper",
+    "badge": "Spicy"
+  },
+  "elena_fillet_mix_spicy": {
+    "title": "Elena Fillet Mix Spicy",
+    "description": "An aroma and taste that unfolds with every bite – a flavor for true connoisseurs. A pinch of black pepper to tease the senses and a pinch of spicy red pepper to light it ablaze. Dried for at least 15 days.",
+    "ingredients": "Pork loin, sweet red pepper, spicy red pepper black pepper, savory, and fenugreek",
+    "badge": "Spicy"
   }
 }

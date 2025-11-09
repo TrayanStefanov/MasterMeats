@@ -33,7 +33,7 @@
         "title": "Product Info",
         "nameLabel": "Product name (internal key)",
         "namePlaceholder": "example_example",
-        "priceLabel": "Price per kg",
+        "priceLabel": "Price per kg in Euro",
         "pricePlaceholder": "0.00",
         "categoryLabel": "Product Category",
         "categoryDropdown": {
