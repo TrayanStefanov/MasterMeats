@@ -8,10 +8,12 @@
         "quick": {
             "title": "Quick Filters",
             "filters": {
-                "completed": "Completed",
+                "showCurrent": "Show Current",
                 "reserved": "Reserved",
                 "deliveredNotPaid": "Delivered (Not Paid)",
-                "paidNotDelivered": "Paid (Not Delivered)"
+                "paidNotDelivered": "Paid (Not Delivered)",
+                "showCompleted": "Show Completed",
+                "showAll": "Show All"
             }
         },
         "productFilter": {

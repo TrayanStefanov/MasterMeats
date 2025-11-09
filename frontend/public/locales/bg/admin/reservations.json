@@ -8,10 +8,12 @@
         "quick": {
             "title": "Бързи филтри",
             "filters": {
-                "completed": "Завършени",
+                "showCurrent": "Текущи",
                 "reserved": "Резервирани",
                 "deliveredNotPaid": "Доставени (Неплатени)",
-                "paidNotDelivered": "Платени (Недоставени)"
+                "paidNotDelivered": "Платени (Недоставени)",
+                "showCompleted": "Завършени",
+                "showAll": "Всички"
             }
         },
         "productFilter": {
