@@ -12,7 +12,7 @@ export const useReservationStore = create((set, get) => ({
   filters: {
     search: "",
     products: [],
-    statusFilter: "", // new: "", "completed", "deliveredNotPaid", "paidNotDelivered", "reserved"
+    statusFilter: "showCurrent", // Default filter."showCurrent", "showAll", "showCompleted", "deliveredNotPaid", "paidNotDelivered", "reserved"
     sort: "deliveryDate",
     limit: 10,
   },
@@ -121,7 +121,7 @@ export const useReservationStore = create((set, get) => ({
       filters: {
         search: "",
         products: [],
-        statusFilter: "",
+        statusFilter: "showCurrent", // Default filter
         sort: "deliveryDate",
         limit: 10,
       },
