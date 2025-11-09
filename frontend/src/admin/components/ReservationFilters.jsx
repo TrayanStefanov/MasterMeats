@@ -69,7 +69,9 @@ export default function ReservationFilters() {
 
   const clearProducts = () => setFilter("products", []);
 
-  const quickFilters = tReservation("filters.quick.filters", { returnObjects: true });
+  const quickFilters = tReservation("filters.quick.filters", {
+    returnObjects: true,
+  });
   const quickFilterKeys = quickFilters ? Object.keys(quickFilters) : [];
 
   return (
@@ -100,7 +102,9 @@ export default function ReservationFilters() {
         {/* Quick Filters */}
         <div className="flex flex-col">
           <label className="text-accent-content indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
-            {tReservation("filters.quick.title", { defaultValue: "Quick Filters" })}
+            {tReservation("filters.quick.title", {
+              defaultValue: "Quick Filters",
+            })}
           </label>
 
           <div className="flex flex-wrap gap-2 mt-1">
@@ -109,7 +113,9 @@ export default function ReservationFilters() {
               return (
                 <button
                   key={key}
-                  onClick={() => setFilter("statusFilter", isActive ? "" : key)}
+                  onClick={() =>
+                    setFilter("statusFilter", isActive ? "showCurrent" : key)
+                  }
                   className={`px-3 py-1 rounded-lg text-sm lg:text-base transition-colors font-semibold ${
                     isActive
                       ? "bg-accent-content text-primary"
@@ -126,18 +132,22 @@ export default function ReservationFilters() {
         {/* Product Filters */}
         <div className="flex flex-col md:col-span-2 mt-2 md:mt-0">
           <label className="text-accent-content indent-2 text-sm lg:text-lg xl:text-xl font-semibold mb-1">
-            {tReservation("filters.productFilter.title", { defaultValue: "Filter by Products" })}
+            {tReservation("filters.productFilter.title", {
+              defaultValue: "Filter by Products",
+            })}
           </label>
 
           <div className="flex flex-wrap gap-2 bg-secondary border border-accent/30 rounded-md px-3 py-2 min-h-[42px]">
             {filters.products?.length > 0 &&
               filters.products.map((productId) => {
                 const p = allProducts.find((x) => x._id === productId);
-                const localizedName = p ? tProducts(`${p.name}.title`, p.name) : "Unknown";
+                const localizedName = p
+                  ? tProducts(`${p.name}.title`, p.name)
+                  : "Unknown";
                 return (
                   <span
                     key={productId}
-                    className="bg-accent-content/40 text-primary px-2 py-1 rounded-full text-xs lg:text-lg flex items-center gap-1"
+                    className="bg-accent text-secondary px-3 py-1 rounded-lg text-xs lg:text-lg flex items-center gap-1"
                   >
                     {localizedName}
                     <button
@@ -155,7 +165,9 @@ export default function ReservationFilters() {
                 type="text"
                 value={productSearch}
                 onChange={(e) => setProductSearch(e.target.value)}
-                placeholder={tReservation("filters.productFilter.placeholder", { defaultValue: "Search product..." })}
+                placeholder={tReservation("filters.productFilter.placeholder", {
+                  defaultValue: "Search product...",
+                })}
                 className="bg-transparent text-primary outline-none text-xs lg:text-lg px-1 w-full placeholder:text-primary/50"
               />
             </div>
@@ -178,7 +190,7 @@ export default function ReservationFilters() {
                   <button
                     key={p._id}
                     onClick={() => toggleProduct(p._id)}
-                    className="bg-secondary/40 hover:bg-accent-content/60 text-primary px-3 py-1 rounded-full text-xs lg:text-base transition-colors flex items-center gap-1"
+                    className="bg-secondary/50 border-accent-content hover:bg-accent-content/60 text-primary px-3 py-1 rounded-lg text-xs lg:text-base transition-colors flex items-center gap-1"
                   >
                     <FaPlus className="w-3 h-3" /> {localizedName}
                   </button>
@@ -186,11 +198,14 @@ export default function ReservationFilters() {
               })}
             </div>
           )}
-          {(!filters.products || filters.products.length === 0) && productSuggestions.length === 0 && (
-            <p className="text-secondary/60 indent-2 text-sm italic mt-2">
-              {tReservation("filters.productFilter.empty", { defaultValue: "No product filters active" })}
-            </p>
-          )}
+          {(!filters.products || filters.products.length === 0) &&
+            productSuggestions.length === 0 && (
+              <p className="text-secondary/60 indent-2 text-sm italic mt-2">
+                {tReservation("filters.productFilter.empty", {
+                  defaultValue: "No product filters active",
+                })}
+              </p>
+            )}
         </div>
       </div>
     </div>
