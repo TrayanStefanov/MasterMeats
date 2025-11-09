@@ -9,7 +9,10 @@
         "deleteClient": "Изтрий клиента",
         "updateReservation": "Обнови резервацията",
         "createReservation": "Създай резервация",
-        "deleteReservation": "Изтрий резервация"
+        "deleteReservation": "Изтрий резервация",
+        "showDetails": "Покажи детайли",
+        "hideDetails": "Скрий детайли",
+        "markAsCompleted":"Отбележи като завършена"
     },
     "units": {
         "grams": "гр.",

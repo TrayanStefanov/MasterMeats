@@ -7,6 +7,9 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import { MdDone, MdDoneOutline  } from "react-icons/md";
+
+
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useReservationStore } from "../stores/useReservationStore";
@@ -18,6 +21,7 @@ const IRLReservationsList = ({ onEdit }) => {
     reservations,
     fetchFilteredReservations,
     deleteReservation,
+    completeReservation,
     loading,
     currentPage,
     totalPages,
@@ -109,7 +113,7 @@ const IRLReservationsList = ({ onEdit }) => {
               <th className="px-6 py-3 text-left text-xs">
                 {tReservations("list.dateOfDelivery")}
               </th>
-              <th className="px-6 py-3 text-left text-xs">
+              <th className="px-6 py-3 text-center text-xs">
                 {tReservations("list.status")}
               </th>
               <th className="px-6 py-3 text-right text-xs">
@@ -194,7 +198,25 @@ const IRLReservationsList = ({ onEdit }) => {
                       <div className="flex justify-end items-center gap-3">
                         <button
                           type="button"
+                          onClick={() => completeReservation(res._id)}
+                          disabled={res.completed}
+                          title={res.completed ? tCommon("status.completed") : tCommon("buttons.markAsCompleted")}
+                          className={`transition-colors text-xl ${
+                            res.completed
+                              ? "text-primary cursor-default"
+                              : "text-accent-content/60 hover:text-accent-content"
+                          }`}
+                        >
+                          {res.completed ? (
+                            <MdDone className="h-8 w-8"/>
+                          ) : (
+                            <MdDoneOutline className="h-6 w-6"/>
+                          )}
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => onEdit && onEdit(res)}
+                          title={tCommon("buttons.updateReservation")}
                           className="text-accent-content/60 hover:text-accent-content transition-colors"
                         >
                           <FaEdit className="h-5 w-5" />
@@ -202,6 +224,7 @@ const IRLReservationsList = ({ onEdit }) => {
                         <button
                           type="button"
                           onClick={() => deleteReservation(res._id)}
+                          title={tCommon("buttons.deleteReservation")}
                           className="text-accent-content/60 hover:text-accent-content transition-colors"
                         >
                           <FaTrash className="h-5 w-5" />
@@ -209,6 +232,7 @@ const IRLReservationsList = ({ onEdit }) => {
                         <button
                           type="button"
                           onClick={() => toggleExpand(res._id)}
+                          title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                           className="text-accent-content/60 hover:text-accent-content transition-colors"
                         >
                           {isExpanded ? (

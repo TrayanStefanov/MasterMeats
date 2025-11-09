@@ -9,7 +9,10 @@
         "deleteClient": "Delete Client",
         "updateReservation": "Update Reservation",
         "createReservation": "Create Reservation",
-        "deleteReservation": "Delete Reservation"
+        "deleteReservation": "Delete Reservation",
+        "showDetails": "Show Details",
+        "hideDetails": "Hide Details",
+        "markAsCompleted": "Mark as Completed"
     },
     "units": {
         "grams": "g",
