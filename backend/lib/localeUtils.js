@@ -12,7 +12,7 @@ const ensureDir = (dirPath) => {
 
 export const readLocaleFile = (locale) => {
   try {
-    const filePath = path.join(LOCALE_PATH, locale, "translation.json");
+    const filePath = path.join(LOCALE_PATH, locale, "productsSection.json");
     ensureDir(path.dirname(filePath));
 
     if (!fs.existsSync(filePath)) {
@@ -24,14 +24,14 @@ export const readLocaleFile = (locale) => {
     const raw = fs.readFileSync(filePath, "utf8");
     return JSON.parse(raw);
   } catch (err) {
-    console.error(`❌ Failed to read locale file for ${locale}:`, err.message);
+    console.error(`Failed to read locale file for ${locale}:`, err.message);
     return {};
   }
 };
 
 export const writeLocaleFile = (locale, data) => {
   try {
-    const filePath = path.join(LOCALE_PATH, locale, "translation.json");
+    const filePath = path.join(LOCALE_PATH, locale, "productsSection.json");
     ensureDir(path.dirname(filePath));
 
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
@@ -45,14 +45,10 @@ export const updateLocaleKey = (name, newData) => {
   SUPPORTED_LOCALES.forEach((locale) => {
     try {
       const json = readLocaleFile(locale);
-      json.products = json.products || {};
-
-      // Merge product translation
-      json.products[name] = {
-        ...json.products[name],
-        ...newData[locale],
+      json[name] = {
+        ...json[name],
+        ...(newData[locale] || {}),
       };
-
       writeLocaleFile(locale, json);
       console.log(`Updated "${name}" in ${locale}`);
     } catch (err) {
@@ -65,8 +61,8 @@ export const deleteLocaleKey = (name) => {
   SUPPORTED_LOCALES.forEach((locale) => {
     try {
       const json = readLocaleFile(locale);
-      if (json.products?.[name]) {
-        delete json.products[name];
+      if (json[name]) {
+        delete json[name];
         writeLocaleFile(locale, json);
         console.log(`Deleted "${name}" from ${locale}`);
       }
