@@ -1,6 +1,7 @@
 // Compute reservation-level status
 export const getReservationStatus = (reservation) => {
   if (reservation.completed) return "completed";
+  if (reservation.delivered && reservation.amountDue === 0) return "completed";
   if (reservation.delivered && reservation.amountDue > 0) return "deliveredNotPaid";
   if (!reservation.completed && reservation.amountDue === 0) return "paidNotDelivered";
   if (!reservation.completed && reservation.amountDue > 0 && !reservation.delivered) return "reserved";
