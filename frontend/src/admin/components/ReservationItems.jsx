@@ -105,28 +105,28 @@ const ReservationItems = ({ products, setProducts, setDetails }) => {
             return (
               <div
                 key={i}
-                className="flex flex-col md:flex-row md:items-center md:justify-between bg-secondary/50 p-3 rounded-lg border border-accent/20"
+                className="flex flex-col md:flex-row md:items-center md:justify-between bg-secondary/70 p-3 rounded-lg border border-accent/20"
               >
                 <div>
-                  <p className="font-semibold text-secondary">
+                  <p className="font-semibold text-primary text-sm lg:text-lg xl:text-xl">
                     {tProducts(`${p.productKey}.title`, {
                       defaultValue: p.productKey,
                     })}
                   </p>
-                  <p className="text-sm text-secondary/70">
+                  <p className="text-sm lg:text-lg text-primary/70">
                     €{p.priceAtReservation.toFixed(2)} / {tCommon("units.kg")}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3 mt-3 md:mt-0">
                   {/* Quantity Controller */}
-                  <div className="flex items-center gap-1 lg:gap-2 border border-white/30 rounded-md overflow-hidden">
+                  <div className="flex items-center gap-1 lg:gap-2 bg-accent rounded-lg overflow-hidden">
                     <button
                       type="button"
                       onClick={() => decrement(i)}
                       className="px-1 lg:px-3 py-1"
                     >
-                      <FaMinus className="text-secondary w-3 h-3 lg:w-5 lg:h-5" />
+                      <FaMinus className="text-secondary hover:text-accent-content w-3 h-3 lg:w-5 lg:h-5" />
                     </button>
 
                     <motion.span
@@ -138,7 +138,7 @@ const ReservationItems = ({ products, setProducts, setDetails }) => {
                         stiffness: 300,
                         damping: 20,
                       }}
-                      className="p-1 text-base lg:text-lg 2xl:text-xl font-bold flex text-center"
+                      className="p-1 text-accent-content lg:text-lg 2xl:text-xl font-bold flex text-center"
                     >
                       {(p.quantityInGrams / 1000).toFixed(1)}{" "}
                       {tCommon("units.kg")}
@@ -149,7 +149,7 @@ const ReservationItems = ({ products, setProducts, setDetails }) => {
                       onClick={() => increment(i)}
                       className="px-1 lg:px-3"
                     >
-                      <FaPlus className="text-secondary w-3 h-3 lg:w-5 lg:h-5" />
+                      <FaPlus className="text-secondary hover:text-accent-content w-3 h-3 lg:w-5 lg:h-5" />
                     </button>
                   </div>
 
@@ -157,13 +157,13 @@ const ReservationItems = ({ products, setProducts, setDetails }) => {
                   <button
                     type="button"
                     onClick={() => handleRemove(i)}
-                    className="text-accent-content/70 hover:text-accent-content transition"
+                    className="text-accent/70 hover:text-accent transition"
                     title={
                       tCommon("buttons.deleteReservation") ||
                       "Delete Reservation"
                     }
                   >
-                    <FaTrash className="w-5 h-5" />
+                    <FaTrash className="w-6 h-6" />
                   </button>
                 </div>
               </div>

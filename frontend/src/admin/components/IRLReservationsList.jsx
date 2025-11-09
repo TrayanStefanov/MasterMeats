@@ -182,7 +182,7 @@ const IRLReservationsList = ({ onEdit }) => {
 
                     <td className="px-6 py-4 text-sm align-middle text-center text-nowrap">
                       <span
-                        className={`px-2 py-0.5 rounded-full font-medium ${getStatusBadgeColor(
+                        className={`px-3 py-1 rounded-lg font-medium ${getStatusBadgeColor(
                           res.status
                         )}`}
                       >

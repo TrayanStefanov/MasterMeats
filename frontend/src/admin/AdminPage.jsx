@@ -11,18 +11,24 @@ const ReservationsTab = lazy(() => import("./tabs/ReservationsTab"));
 const UsersAndClientsTab = lazy(() => import("./tabs/UsersAndClientsTab"));
 // const AnalyticsTab = lazy(() => import("./tabs/AnalyticsTab"));
 
-
 const AdminPage = () => {
   const { t: tCommon } = useTranslation("admin/common");
   const tabs = [
     { id: "products", label: tCommon("tabs.products"), icon: <FaBoxOpen /> },
-    { id: "reservations", label: tCommon("tabs.reservations"), icon: <FiBox /> },
+    {
+      id: "reservations",
+      label: tCommon("tabs.reservations"),
+      icon: <FiBox />,
+    },
     { id: "analytics", label: tCommon("tabs.analytics"), icon: <FaChartBar /> },
-    { id: "usersAndClients", label: tCommon("tabs.usersAndClients"), icon: <FaUsers /> },
+    {
+      id: "usersAndClients",
+      label: tCommon("tabs.usersAndClients"),
+      icon: <FaUsers />,
+    },
   ];
   const [activeTab, setActiveTab] = useState("products");
   const { fetchAllProducts } = useProductStore();
-  
 
   useEffect(() => {
     fetchAllProducts();
@@ -31,12 +37,12 @@ const AdminPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-secondary/80 via-secondary/40 to-secondary/80 p-8">
       <motion.h1
-        className="text-3xl lg:text-4xl 2xl:text-6xl font-bold text-accent mb-8 text-center"
+        className="text-3xl lg:text-4xl 2xl:text-6xl text-accent mb-8 text-center font-emphasis-heading"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        {tCommon("title")}
+        <p className="font-extrabold">{tCommon("title")}</p>
       </motion.h1>
 
       <div className="flex gap-4 mb-8 flex-wrap justify-center">

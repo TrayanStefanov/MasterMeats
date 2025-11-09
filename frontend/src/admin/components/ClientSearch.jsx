@@ -62,7 +62,7 @@ const ClientSearch = ({ onSelect, selectedClient }) => {
         className={`flex items-center flex-wrap border border-secondary rounded-lg p-1 focus-within:ring-2 focus-within:ring-accent transition`}
       >
         {selectedClient && selectedClient._id && selectedClient.name ? (
-          <span className="flex items-center text-secondary p-1 rounded-lg mr-1 mb-1 text-sm lg:text-base xl:text-lg">
+          <span className="flex items-center bg-accent text-secondary p-2 rounded-lg mr-1 mb-1 text-sm lg:text-base xl:text-lg">
             {selectedClient.name}
             <button
               type="button"

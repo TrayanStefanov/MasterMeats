@@ -139,7 +139,7 @@ const ClientsList = ({ onEdit }) => {
                   <td className="px-6 py-4 text-secondary/70">
                     {client.orderStatus ? (
                       <span
-                        className={`px-2 py-1 text-xs rounded-lg font-medium ${getStatusBadgeColor(
+                        className={`px-3 py-1 text-xs rounded-lg font-medium ${getStatusBadgeColor(
                           client.orderStatus
                         )}`}
                       >
