@@ -107,6 +107,31 @@ export const useReservationStore = create((set, get) => ({
     }
   },
 
+  completeReservation: async (reservationId) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axios.patch(`/api/reservations/${reservationId}`);
+
+      // Optimistic update: replace reservation in state
+      set((state) => ({
+        reservations: state.reservations.map((r) =>
+          r._id === reservationId
+            ? { ...r, completed: true, status: getReservationStatus({ ...r, completed: true, delivered: true, amountDue: 0 }) }
+            : r
+        ),
+        loading: false,
+      }));
+      res.status = "completed";
+      toast.success("Reservation marked as completed!");
+      return res.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Failed to complete reservation";
+      set({ loading: false, error: message });
+      toast.error(message);
+    }
+  },
+
   setFilter: (key, value) => {
     set((state) => {
       const newFilters = { ...state.filters, [key]: value };
@@ -130,3 +155,12 @@ export const useReservationStore = create((set, get) => ({
   setSelectedReservation: (reservation) =>
     set({ selectedReservation: reservation }),
 }));
+
+
+const getReservationStatus = (reservation) => {
+  if (reservation.completed) return "completed";
+  if (reservation.delivered && reservation.amountDue > 0) return "deliveredNotPaid";
+  if (!reservation.completed && reservation.amountDue === 0) return "paidNotDelivered";
+  if (!reservation.completed && reservation.amountDue > 0 && !reservation.delivered) return "reserved";
+  return "pending";
+};
