@@ -39,7 +39,7 @@ export const getAllReservations = async (req, res) => {
 
       case "showCompleted":
         matchStage.completed = true;
-        matchStage.dateOfDelivery = { $lt: today };
+        matchStage.dateOfDelivery = { $lte: today };
         break;
 
       case "all":
@@ -317,6 +317,39 @@ export const deleteReservation = async (req, res) => {
     res.json({ message: "Reservation deleted successfully" });
   } catch (error) {
     console.error("Error deleting reservation:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const completeReservation = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const reservation = await Reservation.findById(id);
+    if (!reservation) {
+      return res.status(404).json({ message: "Reservation not found" });
+    }
+
+    reservation.delivered = true;
+    reservation.amountDue = 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize time
+    reservation.dateOfDelivery = today;
+
+    // Recompute status
+    reservation.completed = getReservationStatus(reservation) === "completed";
+
+    await reservation.save();
+
+    await reservation.populate([
+      { path: "client", select: "name phone email" },
+      { path: "products.product", select: "name category pricePerKg" },
+    ]);
+
+    res.status(200).json(reservation);
+  } catch (error) {
+    console.error("Error completing reservation:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
