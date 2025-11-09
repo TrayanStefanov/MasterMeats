@@ -9,7 +9,7 @@ export const getAllReservations = async (req, res) => {
       search,
       category,
       products,
-      statusFilter,
+      statusFilter = "showCurrent", // default to Show Current
       sort = "deliveryDate",
       page = 1,
       limit = 10,
@@ -20,6 +20,33 @@ export const getAllReservations = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     const matchStage = {};
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Filter by Date and computed status
+    switch (statusFilter) {
+      case "reserved":
+      case "deliveredNotPaid":
+      case "paidNotDelivered":
+        matchStage.dateOfDelivery = { $gte: today };
+        break;
+
+      case "showCurrent":
+        matchStage.completed = false;
+        matchStage.dateOfDelivery = { $gte: today };
+        break;
+
+      case "showCompleted":
+        matchStage.completed = true;
+        matchStage.dateOfDelivery = { $lt: today };
+        break;
+
+      case "all":
+      default:
+        // no filtering
+        break;
+    }
 
     // Search by client name or phone
     if (search) {
@@ -126,8 +153,8 @@ export const getAllReservations = async (req, res) => {
       status: getReservationStatus(r),
     }));
 
-    // Apply JS-level statusFilter if provided
-    if (statusFilter) {
+    // Apply JS-level status filtering for reserved/deliveredNotPaid/paidNotDelivered
+    if (["reserved", "deliveredNotPaid", "paidNotDelivered"].includes(statusFilter)) {
       reservations = reservations.filter((r) => r.status === statusFilter);
     }
 
@@ -142,8 +169,7 @@ export const getAllReservations = async (req, res) => {
       status: getReservationStatus(r),
     }));
 
-    // Apply statusFilter to totalCount as well
-    if (statusFilter) {
+    if (["reserved", "deliveredNotPaid", "paidNotDelivered"].includes(statusFilter)) {
       totalCountResult = totalCountResult.filter((r) => r.status === statusFilter);
     }
 
