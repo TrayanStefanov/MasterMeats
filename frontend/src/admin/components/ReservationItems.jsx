@@ -38,7 +38,7 @@ const ReservationItems = ({ products, setProducts, setDetails }) => {
   const handleQuantityChange = (index, grams) => {
     setProducts((prev) =>
       prev.map((p, i) =>
-        i === index ? { ...p, quantityInGrams: Math.max(0, grams) } : p
+        i === index ? { ...p, quantityInGrams: Math.max(0.001, grams) } : p
       )
     );
   };
@@ -129,20 +129,18 @@ const ReservationItems = ({ products, setProducts, setDetails }) => {
                       <FaMinus className="text-secondary hover:text-accent-content w-3 h-3 lg:w-5 lg:h-5" />
                     </button>
 
-                    <motion.span
-                      key={p.quantityInGrams}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
+                    <input
+                      type="number"
+                      min={0.001} // 1 gram = 0.001 kg
+                      step={0.001} // smallest increment 1 gram
+                      value={(p.quantityInGrams / 1000).toFixed(3)}
+                      onChange={(e) => {
+                        let val = parseFloat(e.target.value);
+                        if (isNaN(val) || val < 0.001) val = 0.001; // minimum 1 gram
+                        handleQuantityChange(i, val * 1000); // convert kg to grams
                       }}
-                      className="p-1 text-accent-content lg:text-lg 2xl:text-xl font-bold flex text-center"
-                    >
-                      {(p.quantityInGrams / 1000).toFixed(1)}{" "}
-                      {tCommon("units.kg")}
-                    </motion.span>
+                      className="w-20 text-center bg-accent-content/10 border border-accent-content rounded p-1 lg:text-lg 2xl:text-xl font-bold no-spin"
+                    />
 
                     <button
                       type="button"

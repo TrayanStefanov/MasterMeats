@@ -45,12 +45,12 @@ const AboutSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="w-full lg:w-4/5 aspect-[3/4] overflow-hidden rounded-2xl shadow-lg shadow-accent mx-auto"
+            className="w-full lg:w-4/5 lg:aspect-[3/4] overflow-hidden rounded-2xl shadow-lg shadow-accent mx-auto"
           >
             <img
-              src="/about.jpg"
+              src="/Aboutus.jpg"
               alt={t("title")}
-              className="w-full h-full object-cover"
+              className="w-full h-auto lg:h-full object-contain lg:object-cover"
             />
           </motion.div>
 
