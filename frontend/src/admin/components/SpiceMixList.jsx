@@ -146,6 +146,79 @@ const SpiceMixList = ({ onEdit }) => {
                     </button>
                   </td>
                 </tr>
+
+                {/* Expanded row */}
+                <AnimatePresence>
+                  {expandedMix === mix._id && (
+                    <motion.tr
+                      ref={expandedRef}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="bg-gray-700"
+                    >
+                      <td colSpan={7} className="px-6 py-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-semibold text-lg">
+                            {mix.name} Ingredients
+                          </h4>
+                          <button
+                            onClick={() => setShowPercent(!showPercent)}
+                            className="px-2 py-1 bg-accent text-accent-content rounded"
+                          >
+                            {showPercent ? "Show grams" : "Show %"}
+                          </button>
+                        </div>
+
+                        {/* INGREDIENT TABLE */}
+                        <table className="w-full border border-accent/30 text-sm mb-4">
+                          <thead>
+                            <tr>
+                              <th className="border px-2 py-1">Ingredient</th>
+                              <th className="border px-2 py-1">
+                                {showPercent ? "%" : "Grams"}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {mix.ingredients.map((i) => (
+                              <tr key={i._id}>
+                                <td className="border px-2 py-1">{i.spice?.name}</td>
+                                <td className="border px-2 py-1">
+                                  {showPercent
+                                    ? ((i.grams / totalGrams) * 100).toFixed(1) + "%"
+                                    : i.grams + " g"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+
+                        {/* ADD STOCK INPUT */}
+                        <div className="flex gap-2 items-center mt-2">
+                          <input
+                            type="number"
+                            className="input input-sm w-24"
+                            placeholder="Grams"
+                            value={stockInputs[mix._id] || ""}
+                            onChange={(e) =>
+                              setStockInputs((p) => ({
+                                ...p,
+                                [mix._id]: e.target.value,
+                              }))
+                            }
+                          />
+                          <button
+                            className="btn btn-sm btn-primary"
+                            onClick={() => handleIncreaseStock(mix._id)}
+                          >
+                            Add Stock
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </Fragment>
             );
           })}
