@@ -10,6 +10,15 @@
         "updateReservation": "Обнови резервацията",
         "createReservation": "Създай резервация",
         "deleteReservation": "Изтрий резервация",
+        "createSpice": "Създай подправка",
+        "updateSpice": "Обнови подправката",
+        "deleteSpice": "Изтрий подправка",
+        "createSpiceMix": "Създай микс",
+        "updateSpiceMix": "Обнови микса",
+        "deleteSpiceMix": "Изтрий микс",
+        "createBatch": "Създай партида",
+        "updateBatch": "Обнови партидата",
+        "deleteBatch": "Изтрий партида",
         "showDetails": "Покажи детайли",
         "hideDetails": "Скрий детайли",
         "markAsCompleted":"Отбележи като завършена"
@@ -30,7 +39,8 @@
         "products": "Продукти",
         "reservations": "Резервации",
         "analytics": "Анализи",
-        "usersAndClients": "Потребители & Клиенти"
+        "usersAndClients": "Потребители & Клиенти",
+        "production": "Производство"
     },
     "status": {
         "status": "Статус",

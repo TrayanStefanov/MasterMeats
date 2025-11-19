@@ -10,6 +10,15 @@
         "updateReservation": "Update Reservation",
         "createReservation": "Create Reservation",
         "deleteReservation": "Delete Reservation",
+        "createSpice": "Create Spice",
+        "updateSpice": "Update Spice",
+        "deleteSpice": "Delete Spice",
+        "createSpiceMix": "Create Spice Mix",
+        "updateSpiceMix": "Update Spice Mix",
+        "deleteSpiceMix": "Delete Spice Mix",
+        "createBatch": "Create Batch",
+        "updateBatch": "Update Batch",
+        "deleteBatch": "Delete Batch",
         "showDetails": "Show Details",
         "hideDetails": "Hide Details",
         "markAsCompleted": "Mark as Completed"
@@ -30,7 +39,8 @@
         "products": "Products",
         "reservations": "Reservations",
         "analytics": "Analytics",
-        "usersAndClients": "Users & Clients"
+        "usersAndClients": "Users & Clients",
+        "production" : "Production"
     },
     "status": {
         "status": "Status",

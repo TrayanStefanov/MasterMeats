@@ -1,0 +1,23 @@
+{
+    "tabs": {
+        "batches": "Batches",
+        "spiceMixes": "Spice Mixes",
+        "spices" : "Spices"
+    },
+    "spices": {
+        "empty": "No spices found.",
+        "title": "Spices",
+        "list":{
+            "name": "Spice Name",
+            "supplier": "Supplier",
+            "costPerKg": "Cost Per Kg",
+            "stock": "Stock(Add)",
+            "notes": "Notes",
+            "isActive": "Activity",
+            "actions": "Actions"
+        },
+        "back": "Back to Spices",
+        "createTitle": "Create New Spice",
+        "editTitle": "Editing: {{name}}"
+    }
+}
