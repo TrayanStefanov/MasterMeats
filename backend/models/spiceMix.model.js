@@ -54,5 +54,54 @@ const SpiceMixSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+SpiceMixSchema.pre("save", async function (next) {
+  const mix = this;
+
+  let totalCost = 0;
+  let totalGrams = 0;
+
+  for (const ing of mix.ingredients) {
+    const spice = await mongoose.model("Spice").findById(ing.spice);
+    if (!spice) continue;
+
+    const costPerGram = spice.costPerKg / 1000;
+    totalCost += ing.grams * costPerGram;
+    totalGrams += ing.grams;
+  }
+
+  mix.costPer100g = totalGrams
+    ? Number(((totalCost / totalGrams) * 100).toFixed(2))
+    : 0;
+
+  next();
+});
+
+
+
+SpiceMixSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+  if (!update.ingredients) return next();
+
+  const Spice = mongoose.model("Spice");
+  let totalCost = 0;
+  let totalGrams = 0;
+
+  for (const ing of update.ingredients) {
+    const spice = await Spice.findById(ing.spice);
+    if (!spice) continue;
+
+    const costPerGram = spice.costPerKg / 1000;
+    totalCost += ing.grams * costPerGram;
+    totalGrams += ing.grams;
+  }
+
+  update.costPer100g = totalGrams
+    ? Number(((totalCost / totalGrams) * 100).toFixed(2))
+    : 0;
+
+  next();
+});
+
+
 const SpiceMix = mongoose.model("SpiceMix", SpiceMixSchema);
 export default SpiceMix;
