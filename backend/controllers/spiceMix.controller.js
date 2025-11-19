@@ -1,4 +1,5 @@
 import SpiceMix from "../models/spiceMix.model.js";
+import Spice from "../models/spice.model.js";
 
 function normalizeTags(tags) {
   if (!Array.isArray(tags)) return [];
@@ -31,6 +32,15 @@ export const getSpiceMixes = async (req, res) => {
   }
 };
 
+export const getAllTags = async (req, res) => {
+  try {
+    const tags = await SpiceMix.distinct("tags");
+    res.status(200).json({ tags });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 export const getSpiceMix = async (req, res) => {
   try {
     const mix = await SpiceMix.findById(req.params.id).populate(
@@ -60,6 +70,48 @@ export const updateSpiceMix = async (req, res) => {
     res.status(200).json(updated);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+};
+
+export const addStockToMix = async (req, res) => {
+  const { id } = req.params;
+  const { increaseBy } = req.body;
+
+  if (!increaseBy || increaseBy <= 0) {
+    return res.status(400).json({ message: "Invalid increase amount." });
+  }
+
+  try {
+    const mix = await SpiceMix.findById(id).populate("ingredients.spice");
+
+    if (!mix) return res.status(404).json({ message: "Mix not found" });
+
+    const totalRecipeGrams = mix.ingredients.reduce(
+      (sum, ing) => sum + ing.grams,
+      0
+    );
+
+    const multiplier = increaseBy / totalRecipeGrams;
+
+    // Start subtracting ingredient stocks
+    for (const ing of mix.ingredients) {
+      const subtractAmount = ing.grams * multiplier;
+
+      const spice = await Spice.findById(ing.spice._id);
+      if (!spice) continue;
+
+      spice.stockInGrams = Math.max(0, spice.stockInGrams - subtractAmount);
+      await spice.save();
+    }
+
+    // Add final mix stock
+    mix.stockInGrams += increaseBy;
+    await mix.save();
+
+    res.json(mix);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update mix stock." });
   }
 };
 
