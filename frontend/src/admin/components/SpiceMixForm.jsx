@@ -42,6 +42,46 @@ const SpiceMixForm = ({ mix, onChange }) => {
     setLocalMix((prev) => ({ ...prev, costPer100g }));
   }, [localMix.ingredients, spices]);
 
+  const addIngredient = () => {
+    handleFieldChange("ingredients", [
+      ...(localMix.ingredients || []),
+      { spice: "", grams: 0 },
+    ]);
+  };
+
+  const removeIngredient = (index) => {
+    handleFieldChange(
+      "ingredients",
+      (localMix.ingredients || []).filter((_, i) => i !== index)
+    );
+  };
+
+  const updateIngredient = (index, key, value) => {
+    const updated = (localMix.ingredients || []).map((ing, i) =>
+      i === index
+        ? { ...ing, [key]: key === "grams" ? parseFloat(value) || 0 : value }
+        : ing
+    );
+    handleFieldChange("ingredients", updated);
+  };
+
+  const adjustValue = (index, amount) => {
+    const updated = (localMix.ingredients || []).map((ing, i) =>
+      i === index
+        ? { ...ing, grams: amount === 0 ? 0 : Math.max(0, ing.grams + amount) }
+        : ing
+    );
+    handleFieldChange("ingredients", updated);
+  };
+
+  const validate = () =>
+    (localMix.ingredients || []).every((i) => i.spice && i.grams > 0);
+
+  const totalGrams =
+    (localMix.ingredients || []).reduce(
+      (sum, ing) => sum + (ing.grams || 0),
+      0
+    ) || 0;
 
   const allTags = useMemo(
     () => spiceMixAvailableTags || [],
@@ -157,6 +197,105 @@ const SpiceMixForm = ({ mix, onChange }) => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Ingredients builder */}
+      <div className="border border-accent/30 rounded-md p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold text-lg text-secondary">Ingredients</h3>
+          <button
+            type="button"
+            onClick={addIngredient}
+            className="flex items-center gap-2 bg-accent text-accent-content px-3 py-1 rounded hover:bg-accent/80"
+          >
+            <FaPlus /> Add Ingredient
+          </button>
+        </div>
+
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-accent text-accent-content">
+              <th className="border-secondary border-2 px-2 py-1">Spice</th>
+              <th className="border-secondary border-2 px-2 py-1">Grams</th>
+              <th className="border-secondary border-2 px-2 py-1">Adjust</th>
+              <th className="border-secondary border-2 px-2 py-1">Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(localMix.ingredients || []).map((ing, idx) => (
+              <tr key={idx}>
+                <td>
+                  <select
+                    value={ing.spice}
+                    onChange={(e) =>
+                      updateIngredient(idx, "spice", e.target.value)
+                    }
+                    className="w-full bg-secondary text-primary border border-accent/30 rounded px-2 py-1"
+                  >
+                    <option value="">Select spice...</option>
+                    {spices.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+
+                <td>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value={ing.grams}
+                    onChange={(e) =>
+                      updateIngredient(idx, "grams", e.target.value)
+                    }
+                    className="w-full bg-secondary text-primary border border-accent/30 rounded px-2 py-1 no-spinner"
+                  />
+                </td>
+
+                <td className="p-1">
+                  <div className="flex flex-wrap gap-1 justify-between">
+                    {ADJUST_STEPS.map((step) => (
+                      <button
+                        type="button"
+                        key={step}
+                        onClick={() => adjustValue(idx, step)}
+                        className="px-2 py-1 text-base rounded bg-accent/80 hover:bg-accent transition text-accent-content"
+                      >
+                        {step > 0 ? `+${step}` : step}
+                      </button>
+                    ))}
+                  </div>
+                </td>
+
+                <td className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => removeIngredient(idx)}
+                    className="text-accent-content/60 hover:text-accent-content transition"
+                  >
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <p className="text-sm text-secondary">
+          Total: <strong>{totalGrams} g</strong>
+        </p>
+
+        <p className="text-sm text-secondary">
+          Cost per 100g: <strong>€{localMix.costPer100g?.toFixed(2)}</strong>
+        </p>
+
+        {!validate() && (
+          <p className="text-red-500 text-sm">
+            ⚠ Please fill all spices and amounts before saving.
+          </p>
+        )}
       </div>
 
       <style>
