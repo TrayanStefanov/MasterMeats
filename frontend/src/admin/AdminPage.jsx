@@ -2,6 +2,8 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { FaBoxOpen, FaChartBar, FaUsers } from "react-icons/fa";
 import { FiBox } from "react-icons/fi";
+import { MdFactory } from "react-icons/md";
+
 import { useTranslation } from "react-i18next";
 
 import { useProductStore } from "../stores/useProductStore";
@@ -9,6 +11,7 @@ import { useProductStore } from "../stores/useProductStore";
 const ProductTab = lazy(() => import("./tabs/ProductTab"));
 const ReservationsTab = lazy(() => import("./tabs/ReservationsTab"));
 const UsersAndClientsTab = lazy(() => import("./tabs/UsersAndClientsTab"));
+const ProductionTab = lazy(() => import("./tabs/ProductionTab"));
 // const AnalyticsTab = lazy(() => import("./tabs/AnalyticsTab"));
 
 const AdminPage = () => {
@@ -20,12 +23,13 @@ const AdminPage = () => {
       label: tCommon("tabs.reservations"),
       icon: <FiBox />,
     },
-    { id: "analytics", label: tCommon("tabs.analytics"), icon: <FaChartBar /> },
     {
       id: "usersAndClients",
       label: tCommon("tabs.usersAndClients"),
       icon: <FaUsers />,
     },
+    { id: "production", label: tCommon("tabs.production"), icon: <MdFactory /> },
+    { id: "analytics", label: tCommon("tabs.analytics"), icon: <FaChartBar /> },
   ];
   const [activeTab, setActiveTab] = useState("products");
   const { fetchAllProducts } = useProductStore();
@@ -73,12 +77,13 @@ const AdminPage = () => {
         >
           {activeTab === "products" && <ProductTab />}
           {activeTab === "reservations" && <ReservationsTab />}
+          {activeTab === "usersAndClients" && <UsersAndClientsTab />}
+          {activeTab === "production" && <ProductionTab />}
           {activeTab === "analytics" && (
             <div className="text-center text-secondary/70 py-12">
               Analytics tab coming soon!
             </div>
           )}
-          {activeTab === "usersAndClients" && <UsersAndClientsTab />}
         </Suspense>
       </div>
     </div>
