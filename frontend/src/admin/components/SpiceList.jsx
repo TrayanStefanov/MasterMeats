@@ -152,7 +152,7 @@ const SpiceList = ({ onEdit }) => {
             ))}
           </tbody>
         </table>
-
+        {totalPages > 1 && spices.length > 0 && (
         <Pagination
           totalPages={totalPages}
           currentPage={currentPage}
@@ -160,6 +160,7 @@ const SpiceList = ({ onEdit }) => {
           showingCount={spices.length}
           onPageChange={(page) => fetchSpices(page)}
         />
+      )}
       </motion.div>
     </>
   );
