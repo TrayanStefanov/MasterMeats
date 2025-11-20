@@ -113,4 +113,128 @@ export const useProductionStore = create((set, get) => ({
 
     setSelectedSpice: (spice) => set({ selectedSpice: spice }),
 
+    /* Spice Mixes */
+
+    spiceMixes: [],
+    spiceMixAvailableTags: [],
+
+    fetchSpiceMixes: async () => {
+        set({ loading: true, error: null });
+        try {
+            const res = await axios.get("/api/spicemixes");
+            const mixes = res.data;
+
+            const tags = [...new Set(mixes.flatMap((m) => m.tags || []))];
+
+            set({ spiceMixes: mixes, spiceMixAvailableTags: tags, loading: false });
+        } catch (err) {
+            const msg = err.response?.data?.message || "Failed to fetch spice mixes";
+            set({ loading: false, error: msg });
+            toast.error(msg);
+        }
+    },
+
+    createSpiceMix: async (data) => {
+        set({ loading: true, error: null });
+        try {
+            const totalGrams = (data.ingredients || []).reduce(
+                (sum, ing) => sum + (ing.grams || 0),
+                0
+            );
+
+            for (const ing of data.ingredients || []) {
+                if (!ing.spice || !ing.grams) continue;
+                await axios.put(`/api/spices/${ing.spice}`, {
+                    $inc: { stockInGrams: -ing.grams },
+                });
+            }
+
+            const res = await axios.post("/api/spicemixes", {
+                ...data,
+                stockInGrams: totalGrams,
+            });
+
+            set((state) => ({
+                spiceMixes: [res.data, ...state.spiceMixes],
+                spiceMixAvailableTags: [
+                    ...new Set([...state.spiceMixAvailableTags, ...(res.data.tags || [])]),
+                ],
+                loading: false,
+            }));
+
+            toast.success("Spice mix created successfully!");
+        } catch (err) {
+            const msg = err.response?.data?.message || "Failed to create spice mix";
+            set({ loading: false, error: msg });
+            toast.error(msg);
+        }
+    },
+
+    updateSpiceMix: async (id, updates) => {
+        set({ loading: true, error: null });
+        try {
+            const res = await axios.put(`/api/spicemixes/${id}`, updates);
+
+            set((state) => ({
+                spiceMixes: state.spiceMixes.map((m) =>
+                    m._id === id ? res.data : m
+                ),
+                spiceMixAvailableTags: [
+                    ...new Set([...state.spiceMixAvailableTags, ...(res.data.tags || [])]),
+                ],
+                loading: false,
+            }));
+
+            toast.success("Spice mix updated successfully!");
+        } catch (err) {
+            const msg = err.response?.data?.message || "Failed to update spice mix";
+            set({ loading: false, error: msg });
+            toast.error(msg);
+        }
+    },
+
+    deleteSpiceMix: async (id) => {
+        set({ loading: true, error: null });
+        try {
+            await axios.delete(`/api/spicemixes/${id}`);
+            set((state) => ({
+                spiceMixes: state.spiceMixes.filter((m) => m._id !== id),
+                loading: false,
+            }));
+            toast.success("Spice mix deleted successfully!");
+        } catch (err) {
+            const msg = err.response?.data?.message || "Failed to delete spice mix";
+            set({ loading: false, error: msg });
+            toast.error(msg);
+        }
+    },
+
+    addStockToMix: async (mixId, gramsToAdd) => {
+        if (!gramsToAdd || gramsToAdd <= 0) return;
+
+        set({ loading: true, error: null });
+        try {
+            const res = await axios.put(`/api/spicemixes/${mixId}/addStock`, {
+                increaseBy: gramsToAdd,
+            });
+
+            const updatedMix = res.data;
+
+            set((state) => ({
+                spiceMixes: state.spiceMixes.map((m) =>
+                    m._id === mixId ? updatedMix : m
+                ),
+            }));
+
+            const spicesRes = await axios.get("/api/spices");
+            set({ spices: spicesRes.data, loading: false });
+
+            toast.success(`Added ${gramsToAdd} g to ${updatedMix.name}`);
+        } catch (err) {
+            const msg =
+                err.response?.data?.message || "Failed to add stock to spice mix";
+            set({ loading: false, error: msg });
+            toast.error(msg);
+        }
+    },
 }));
