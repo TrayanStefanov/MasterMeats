@@ -22,15 +22,38 @@ export const createSpiceMix = async (req, res) => {
 
 export const getSpiceMixes = async (req, res) => {
   try {
-    const mixes = await SpiceMix.find()
+    const { search, isActive, tags } = req.query;
+
+    const query = {};
+
+    // Name search
+    if (search) {
+      query.name = { $regex: search, $options: "i" }; // case-insensitive
+    }
+
+    // Status filter
+    if (isActive !== undefined) {
+      if (isActive === "true") query.isActive = true;
+      else if (isActive === "false") query.isActive = false;
+    }
+
+    // Tags filter (comma-separated)
+    if (tags) {
+      const tagArray = tags.split(",").map((t) => t.trim()).filter(Boolean);
+      if (tagArray.length) query.tags = { $all: tagArray }; // match all tags
+    }
+
+    const mixes = await SpiceMix.find(query)
       .populate("ingredients.spice", "name costPerKg")
       .sort({ name: 1 });
 
     res.status(200).json(mixes);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 export const getAllTags = async (req, res) => {
   try {
