@@ -2,37 +2,60 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlusCircle, FaArrowLeft, FaSpinner, FaSave } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { useProductionStore } from "../stores/useProductionStore";
-import SpiceList from "../components/SpicesList";
+import { useSpiceStore } from "../stores/useSpiceStore";
+import SpiceList from "../components/SpiceList";
 import SpiceForm from "../components/SpiceForm";
 
 const SpiceTab = () => {
-  const { fetchSpices, createSpice, updateSpice, loading } = useProductionStore();
+  const { fetchSpices, createSpice, updateSpice, loading } = useSpiceStore();
   const [mode, setMode] = useState("list"); // "list" | "create" | "edit"
-  const [spice, setSpice] = useState({ name: "", costPerKg: "", supplier: "", notes: "", isActive: true });
+  const [spice, setSpice] = useState({
+    _id: null,
+    name: "",
+    costPerKg: "",
+    supplier: "",
+    notes: "",
+    stockInGrams: 0,
+    isActive: true,
+  });
 
   const { t: tProduction } = useTranslation("admin/production");
   const { t: tCommon } = useTranslation("admin/common");
 
+  // Fetch spices on mount
   useEffect(() => {
     fetchSpices();
   }, [fetchSpices]);
 
   const handleEdit = (spiceData) => {
-    setSpice(spiceData);
+    setSpice({ ...spiceData }); // preserves _id
     setMode("edit");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCreate = () => {
-    setSpice({ name: "", costPerKg: "", supplier: "", notes: "", isActive: true });
+    setSpice({
+      name: "",
+      costPerKg: "",
+      supplier: "",
+      notes: "",
+      stockInGrams: 0,
+      isActive: true,
+    });
     setMode("create");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleBack = async () => {
     setMode("list");
-    setSpice({ name: "", costPerKg: "", supplier: "", notes: "", isActive: true });
+    setSpice({
+      name: "",
+      costPerKg: "",
+      supplier: "",
+      notes: "",
+      stockInGrams: 0,
+      isActive: true,
+    });
     await fetchSpices();
   };
 
@@ -102,13 +125,11 @@ const SpiceTab = () => {
 
             <form
               onSubmit={handleSubmit}
-              className={`space-y-6 ${loading ? "opacity-75 pointer-events-none" : ""}`}
+              className={`space-y-6 ${
+                loading ? "opacity-75 pointer-events-none" : ""
+              }`}
             >
-              <SpiceForm
-                spice={spice}
-                mode={mode}
-                onChange={(updated) => setSpice(updated)}
-              />
+              <SpiceForm spice={spice} mode={mode} onChange={setSpice} />
 
               <button
                 type="submit"
