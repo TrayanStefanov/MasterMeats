@@ -1,23 +1,23 @@
 import { useState, useEffect } from "react";
-import { useProductionStore } from "../stores/useProductionStore";
+import { useSpiceStore } from "../stores/useSpiceStore";
 
 export default function SpiceFilters() {
-  const { filters, setFilter } = useProductionStore();
-  const [searchInput, setSearchInput] = useState(filters.search || "");
+  const { filters, setFilter } = useSpiceStore();
+  const [searchInput, setSearchInput] = useState(filters?.search || "");
 
   useEffect(() => {
-    setSearchInput(filters.search || "");
-  }, [filters.search]);
+    setSearchInput(filters?.search || "");
+  }, [filters?.search]);
 
   // Debounced search effect
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (searchInput.trim() !== filters.search) {
+      if (searchInput.trim() !== filters?.search) {
         setFilter("search", searchInput.trim());
       }
     }, 400);
     return () => clearTimeout(handler);
-  }, [searchInput, filters.search, setFilter]);
+  }, [searchInput, filters?.search, setFilter]);
 
   return (
     <div className="min-w-[90%] mx-auto rounded-md border-4 border-accent-content/60 p-4 mb-4">
@@ -45,8 +45,9 @@ export default function SpiceFilters() {
           </label>
           <div className="flex items-center gap-2">
             {["all", "true", "false"].map((val) => {
-              const label = val === "all" ? "All" : val === "true" ? "Active" : "Inactive";
-              const isSelected = filters.isActive === val; 
+              const label =
+                val === "all" ? "All" : val === "true" ? "Active" : "Inactive";
+              const isSelected = filters?.isActive === val;
               return (
                 <button
                   key={val}
