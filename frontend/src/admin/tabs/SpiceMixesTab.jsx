@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlusCircle, FaArrowLeft, FaSpinner, FaSave } from "react-icons/fa";
-import { useProductionStore } from "../stores/useProductionStore";
+import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 import SpiceMixList from "../components/SpiceMixList";
 import SpiceMixForm from "../components/SpiceMixForm";
 
 const SpiceMixesTab = () => {
-  const {
-    fetchSpices,
-    fetchSpiceMixes,
-    createSpiceMix,
-    updateSpiceMix,
-    loading,
-  } = useProductionStore();
+  const { fetchSpiceMixes, createSpiceMix, updateSpiceMix, loading, filters } =
+    useSpiceMixStore();
+
+  useEffect(() => {
+    fetchSpiceMixes();
+  }, [fetchSpiceMixes, filters]); // <- refetch whenever filters change
+
   const [mode, setMode] = useState("list"); // list | create | edit
   const [mix, setMix] = useState({
     name: "",
@@ -22,11 +22,6 @@ const SpiceMixesTab = () => {
     ingredients: [],
     isActive: true,
   });
-
-  useEffect(() => {
-    fetchSpices(); // make sure spice list is loaded
-    fetchSpiceMixes();
-  }, []);
 
   const handleEdit = (mixData) => {
     setMix(mixData);
@@ -104,7 +99,6 @@ const SpiceMixesTab = () => {
                 <FaPlusCircle /> Create Mix
               </button>
             </div>
-
             <SpiceMixList onEdit={handleEdit} />
           </motion.div>
         )}
