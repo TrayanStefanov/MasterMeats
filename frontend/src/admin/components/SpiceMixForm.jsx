@@ -1,16 +1,28 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { useProductionStore } from "../stores/useProductionStore";
+
+import { useSpiceStore } from "../stores/useSpiceStore";
+import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 
 const ADJUST_STEPS = [-50, -25, -10, -5, -2, -1, 0, 1, 2, 5, 10, 25, 50];
 
 const SpiceMixForm = ({ mix, onChange }) => {
-  const { spices = [], spiceMixAvailableTags } = useProductionStore();
+  const { availableTags } = useSpiceMixStore();
+  const { spices, fetchSpices } = useSpiceStore();
+
+  useEffect(() => {
+    fetchSpices(); // Load all active spices
+  }, []);
   const [localMix, setLocalMix] = useState(mix);
   const [tagInput, setTagInput] = useState("");
   const wrapperRef = useRef(null);
 
   useEffect(() => setLocalMix(mix), [mix]);
+
+  const getAvailableForSpice = (spiceId) => {
+    const spice = spices.find((s) => s._id === spiceId);
+    return spice?.stockInGrams ?? Infinity;
+  };
 
   const handleFieldChange = (key, value) => {
     setLocalMix((prev) => {
@@ -20,27 +32,24 @@ const SpiceMixForm = ({ mix, onChange }) => {
     });
   };
 
-  useEffect(() => {
-    let totalCost = 0;
-    let totalGrams = 0;
+  const totalGrams = useMemo(
+    () =>
+      (localMix.ingredients || []).reduce(
+        (sum, ing) => sum + (ing.grams || 0),
+        0
+      ),
+    [localMix.ingredients]
+  );
 
+  const costPer100g = useMemo(() => {
+    let totalCost = 0;
     (localMix.ingredients || []).forEach((ing) => {
       const spice = spices.find((s) => s._id === ing.spice);
       if (!spice) return;
-
-      const costPerGram = spice.costPerKg / 1000;
-      const grams = ing.grams || 0;
-
-      totalCost += grams * costPerGram;
-      totalGrams += grams;
+      totalCost += (ing.grams || 0) * (spice.costPerKg / 1000);
     });
-
-    const costPer100g = totalGrams
-      ? Number(((totalCost / totalGrams) * 100).toFixed(2))
-      : 0;
-
-    setLocalMix((prev) => ({ ...prev, costPer100g }));
-  }, [localMix.ingredients, spices]);
+    return totalGrams ? Number(((totalCost / totalGrams) * 100).toFixed(2)) : 0;
+  }, [localMix.ingredients, spices, totalGrams]);
 
   const addIngredient = () => {
     handleFieldChange("ingredients", [
@@ -57,47 +66,41 @@ const SpiceMixForm = ({ mix, onChange }) => {
   };
 
   const updateIngredient = (index, key, value) => {
-    const updated = (localMix.ingredients || []).map((ing, i) =>
-      i === index
-        ? { ...ing, [key]: key === "grams" ? parseFloat(value) || 0 : value }
-        : ing
-    );
+    const updated = (localMix.ingredients || []).map((ing, i) => {
+      if (i !== index) return ing;
+      if (key === "grams") {
+        const numeric = parseFloat(value) || 0;
+        const available = getAvailableForSpice(ing.spice);
+        return { ...ing, grams: Math.min(numeric, available) };
+      }
+      return { ...ing, [key]: value };
+    });
     handleFieldChange("ingredients", updated);
   };
 
   const adjustValue = (index, amount) => {
-    const updated = (localMix.ingredients || []).map((ing, i) =>
-      i === index
-        ? { ...ing, grams: amount === 0 ? 0 : Math.max(0, ing.grams + amount) }
-        : ing
-    );
+    const updated = (localMix.ingredients || []).map((ing, i) => {
+      if (i !== index) return ing;
+      const available = getAvailableForSpice(ing.spice);
+      const newVal = amount === 0 ? 0 : ing.grams + amount;
+      return { ...ing, grams: Math.max(0, Math.min(newVal, available)) };
+    });
     handleFieldChange("ingredients", updated);
   };
 
   const validate = () =>
     (localMix.ingredients || []).every((i) => i.spice && i.grams > 0);
 
-  const totalGrams =
-    (localMix.ingredients || []).reduce(
-      (sum, ing) => sum + (ing.grams || 0),
-      0
-    ) || 0;
-
-  const allTags = useMemo(
-    () => spiceMixAvailableTags || [],
-    [spiceMixAvailableTags]
-  );
-
   const filteredSuggestions = useMemo(() => {
     if (!tagInput) return [];
-    return allTags
+    return (availableTags || [])
       .filter(
         (t) =>
           t.toLowerCase().startsWith(tagInput.toLowerCase()) &&
           !(localMix.tags || []).includes(t)
       )
       .slice(0, 6);
-  }, [tagInput, allTags, localMix.tags]);
+  }, [tagInput, availableTags, localMix.tags]);
 
   const handleAddTag = (e, tagOverride = null) => {
     e?.preventDefault?.();
@@ -128,6 +131,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
 
   return (
     <div className="space-y-6" ref={wrapperRef}>
+      {/* Name, Notes, Tags */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col">
           <label className="mb-1 text-sm lg:text-lg text-secondary">Name</label>
@@ -154,26 +158,21 @@ const SpiceMixForm = ({ mix, onChange }) => {
         <div className="flex flex-col md:col-span-2">
           <label className="mb-1 text-sm lg:text-lg text-secondary">Tags</label>
           <div className="flex flex-wrap items-center gap-2 p-3 rounded-md bg-secondary border border-accent/20">
-            {(localMix.tags || []).length > 0 ? (
-              localMix.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="bg-accent-content/20 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1"
+            {(localMix.tags || []).map((tag, idx) => (
+              <span
+                key={idx}
+                className="bg-accent-content/20 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1"
+              >
+                {tag}
+                <button
+                  onClick={() => handleRemoveTag(tag)}
+                  className="text-accent-content/70 hover:text-accent-content text-xs"
                 >
-                  {tag}
-                  <button
-                    onClick={() => handleRemoveTag(tag)}
-                    className="text-accent-content/70 hover:text-accent-content text-xs"
-                  >
-                    ✕
-                  </button>
-                </span>
-              ))
-            ) : (
-              <span className="text-primary/40 text-sm italic">
-                No tags yet
+                  ✕
+                </button>
               </span>
-            )}
+            ))}
+
             <input
               type="text"
               value={tagInput}
@@ -183,6 +182,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
               className="flex-1 w-full p-3 bg-transparent text-primary outline-none text-sm"
             />
           </div>
+
           {filteredSuggestions.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {filteredSuggestions.map((tag) => (
@@ -199,7 +199,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
         </div>
       </div>
 
-      {/* Ingredients builder */}
+      {/* Ingredients Builder */}
       <div className="border border-accent/30 rounded-md p-4 space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="font-semibold text-lg text-secondary">Ingredients</h3>
@@ -233,11 +233,13 @@ const SpiceMixForm = ({ mix, onChange }) => {
                     className="w-full bg-secondary text-primary border border-accent/30 rounded px-2 py-1"
                   >
                     <option value="">Select spice...</option>
-                    {spices.map((s) => (
-                      <option key={s._id} value={s._id}>
-                        {s.name}
-                      </option>
-                    ))}
+                    {spices
+                      .filter((s) => s.isActive)
+                      .map((s) => (
+                        <option key={s._id} value={s._id}>
+                          {s.name} (Stock: {s.stockInGrams}g)
+                        </option>
+                      ))}
                   </select>
                 </td>
 
@@ -252,6 +254,11 @@ const SpiceMixForm = ({ mix, onChange }) => {
                     }
                     className="w-full bg-secondary text-primary border border-accent/30 rounded px-2 py-1 no-spinner"
                   />
+                  {ing.spice && (
+                    <p className="text-xs text-red-400 mt-1">
+                      Max available: {getAvailableForSpice(ing.spice)} g
+                    </p>
+                  )}
                 </td>
 
                 <td className="p-1">
@@ -288,7 +295,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
         </p>
 
         <p className="text-sm text-secondary">
-          Cost per 100g: <strong>€{localMix.costPer100g?.toFixed(2)}</strong>
+          Cost per 100g: <strong>€{costPer100g}</strong>
         </p>
 
         {!validate() && (
