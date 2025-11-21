@@ -8,15 +8,16 @@ import {
   deleteSpiceMix,
   getAllTags
 } from "../controllers/spiceMix.controller.js";
+import { protectRoute, adminRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/", createSpiceMix);
-router.get("/", getSpiceMixes);
-router.get("/tags", getAllTags);
-router.get("/:id", getSpiceMix);
-router.put("/:id", updateSpiceMix);
-router.put("/:id/addStock", addStockToMix);
-router.delete("/:id", deleteSpiceMix);
+router.post("/", protectRoute, adminRoute, createSpiceMix);
+router.get("/", protectRoute, adminRoute, getSpiceMixes);
+router.get("/tags", protectRoute, adminRoute, getAllTags);
+router.get("/:id", protectRoute, adminRoute, getSpiceMix);
+router.put("/:id", protectRoute, adminRoute, updateSpiceMix);
+router.put("/:id/addStock", protectRoute, adminRoute, addStockToMix);
+router.delete("/:id", protectRoute, adminRoute, deleteSpiceMix);
 
 export default router;
