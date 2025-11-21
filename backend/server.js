@@ -14,6 +14,7 @@ import reservationRoutes from "./routes/reservations.routes.js";
 import clientRoutes from "./routes/client.routes.js";
 import spiceRoutes from "./routes/spice.routes.js";
 import spiceMixRoutes from "./routes/spiceMix.routes.js";
+import batchRoutes from "./routes/batch.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 
 import { connectDB } from "./lib/db.js";
@@ -41,6 +42,7 @@ app.use("/api/reservations", reservationRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/spices", spiceRoutes);
 app.use("/api/spicemixes", spiceMixRoutes);
+app.use("/api/batches", batchRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
 app.listen(PORT, () => {
