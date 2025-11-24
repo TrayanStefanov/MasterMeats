@@ -30,10 +30,10 @@ const PreppingPhaseSchema = new Schema({
 const CuringPhaseSchema = new Schema({
   saltName: { type: String },
   saltAmountKg: { type: Number, default: 0 },
-  saltTimeHours: { type: Number, default: 0 },
+  timeInSaltHours: { type: Number, default: 0 },
 
   liquidType: { type: String, default: null },       // wine, water, marinade
-  liquidTimeHours: { type: Number, default: 0 },
+  timeInLiquidHours: { type: Number, default: 0 },
 
   rinseTime: { type: Number, default: 0 },
   timeTaken: { type: Number, default: 0 }
