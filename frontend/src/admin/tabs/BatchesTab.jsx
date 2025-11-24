@@ -1,33 +1,23 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaPlusCircle, FaArrowLeft, FaSpinner, FaSave } from "react-icons/fa";
+import { FaPlusCircle, FaArrowLeft } from "react-icons/fa";
 import { useBatchStore } from "../stores/useBatchStore";
 import { useTranslation } from "react-i18next";
 
+import BatchCreate from "../components/BatchesCreate";
 
-// Placeholder components (to be created later)
 const BatchList = ({ onEdit }) => (
-  <div className="text-lg opacity-70">Batch list goes here...</div>
-);
-
-const BatchForm = ({ batch, mode, onChange }) => (
-  <div className="text-lg opacity-70">
-    Batch creation/phase stepper will be implemented here...
-  </div>
+  <div className="text-lg opacity-70">Batch list goes here…</div>
 );
 
 const BatchesTab = () => {
   const {
     fetchBatches,
-    createBatch,
-    updatePhase,
-    loading,
-    currentBatch,
     clearCurrentBatch,
   } = useBatchStore();
 
-  const [mode, setMode] = useState("list");
-  const [batch, setBatch] = useState({}); 
+  const [mode, setMode] = useState("list"); // list | create | edit
+  const [selectedBatch, setSelectedBatch] = useState(null);
 
   const { t: tProduction } = useTranslation("admin/production");
   const { t: tCommon } = useTranslation("admin/common");
@@ -36,39 +26,27 @@ const BatchesTab = () => {
     fetchBatches();
   }, []);
 
+  /** Start creating a batch */
   const handleCreate = () => {
-    setBatch({});
-    setMode("create");
     clearCurrentBatch();
+    setSelectedBatch(null);
+    setMode("create");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleEdit = (batchData) => {
-    setBatch(batchData);
+  /** Edit an existing batch */
+  const handleEdit = (batch) => {
+    setSelectedBatch(batch);
     setMode("edit");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  /** Back to list */
   const handleBack = async () => {
     setMode("list");
     clearCurrentBatch();
     await fetchBatches();
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (mode === "create") {
-        await createBatch(batch);
-      } else {
-        // Edit mode — update only allowed phases
-        // Will be replaced with phase-specific update calls
-      }
-      handleBack();
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   return (
@@ -121,36 +99,7 @@ const BatchesTab = () => {
               <FaArrowLeft /> {tCommon("buttons.back") || "Back"}
             </button>
 
-            <form
-              onSubmit={handleSubmit}
-              className={`space-y-6 ${
-                loading ? "opacity-75 pointer-events-none" : ""
-              }`}
-            >
-              <BatchForm batch={batch} mode={mode} onChange={setBatch} />
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    <FaSpinner className="animate-spin" />
-                    {mode === "edit"
-                      ? tCommon("buttons.updating")
-                      : tCommon("buttons.creating")}
-                  </>
-                ) : (
-                  <>
-                    {mode === "edit" ? <FaSave /> : <FaPlusCircle />}
-                    {mode === "edit"
-                      ? tCommon("buttons.update")
-                      : tCommon("buttons.create")}
-                  </>
-                )}
-              </button>
-            </form>
+            <BatchCreate editBatch={selectedBatch} />
           </motion.div>
         )}
       </AnimatePresence>
