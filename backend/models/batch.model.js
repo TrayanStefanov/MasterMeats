@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
+const CounterSchema = new Schema({
+  name: String,
+  value: Number
+});
+const Counter = mongoose.models.Counter || mongoose.model("Counter", CounterSchema);
+
 /* SUB-SCHEMAS */
 
 /** Sourcing Phase */
@@ -103,20 +109,13 @@ const BatchSchema = new Schema({
 
 BatchSchema.pre("save", async function (next) {
   if (!this.batchNumber) {
-    const Counter = mongoose.model("Counter", new Schema({
-      name: String,
-      value: Number
-    }));
-
     const counter = await Counter.findOneAndUpdate(
       { name: "batchNumber" },
       { $inc: { value: 1 } },
       { upsert: true, new: true }
     );
-
     this.batchNumber = counter.value;
   }
-
   next();
 });
 
