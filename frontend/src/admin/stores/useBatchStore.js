@@ -8,141 +8,99 @@ export const useBatchStore = create((set, get) => ({
   loading: false,
   error: null,
 
-  fetchBatches: async () => {
+  apiCall: async (fn, successMsg = null, errorMsg = "Something went wrong") => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.get("/batches");
-      set({ batches: res.data || [], loading: false });
+      const res = await fn();
+      if (successMsg) toast.success(successMsg);
+      return res.data;
     } catch (err) {
-      const msg = err.response?.data?.message || "Failed to fetch batches";
-      set({ loading: false, error: msg });
+      const msg = err.response?.data?.message || errorMsg;
+      console.error("API Error:", err);
+      set({ error: msg });
       toast.error(msg);
+      throw err;
+    } finally {
+      set({ loading: false });
     }
+  },
+
+  fetchBatches: async () => {
+    const data = await get().apiCall(
+      () => axios.get("/batches"),
+      null,
+      "Failed to fetch batches"
+    );
+    set({ batches: data || [] });
   },
 
   fetchBatchById: async (id) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await axios.get(`/batches/${id}`);
-      set({ currentBatch: res.data, loading: false });
-      return res.data;
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to fetch batch";
-      set({ loading: false, error: msg });
-      toast.error(msg);
-    }
+    const data = await get().apiCall(
+      () => axios.get(`/batches/${id}`),
+      null,
+      "Failed to fetch batch"
+    );
+    set({ currentBatch: data });
+    return data;
   },
-
   createBatch: async (data) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await axios.post("/batches", data);
+    const newBatch = await get().apiCall(
+      () => axios.post("/batches", data),
+      "Batch created successfully",
+      "Failed to create batch"
+    );
 
-      set((state) => ({
-        batches: [res.data, ...state.batches],
-        currentBatch: res.data,
-        loading: false,
-      }));
+    set((state) => ({
+      batches: [newBatch, ...state.batches],
+      currentBatch: newBatch,
+    }));
 
-      toast.success("Batch created successfully");
-      return res.data;
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to create batch";
-      set({ loading: false, error: msg });
-      toast.error(msg);
-      throw err;
-    }
+    return newBatch;
   },
 
   updatePhase: async (batchId, phase, data) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await axios.put(`/batches/${batchId}/${phase}`, data);
+    const updatedBatch = await get().apiCall(
+      () => axios.put(`/batches/${batchId}/${phase}`, data),
+      `${phase} phase updated`,
+      "Failed to update phase"
+    );
 
-      set((state) => ({
-        currentBatch:
-          state.currentBatch?._id === batchId ? res.data : state.currentBatch,
-        batches: state.batches.map((b) => (b._id === batchId ? res.data : b)),
-        loading: false,
-      }));
+    set((state) => ({
+      currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
+      batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
+    }));
 
-      toast.success(`${phase} phase updated`);
-      return res.data;
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to update phase";
-      set({ loading: false, error: msg });
-      toast.error(msg);
-      throw err;
-    }
+    return updatedBatch;
   },
 
-  addSeasoningEntry: async (batchId, entry) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await axios.post(`/batches/${batchId}/seasoning`, entry);
+  addEntry: async (batchId, phase, entry) => {
+    const updatedBatch = await get().apiCall(
+      () => axios.post(`/batches/${batchId}/${phase}`, entry),
+      `${phase === "seasoning" ? "Seasoning" : "Vacuum"} entry added`,
+      `Failed to add ${phase} entry`
+    );
 
-      set((state) => ({
-        currentBatch:
-          state.currentBatch?._id === batchId ? res.data : state.currentBatch,
-        batches: state.batches.map((b) => (b._id === batchId ? res.data : b)),
-        loading: false,
-      }));
+    set((state) => ({
+      currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
+      batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
+    }));
 
-      toast.success("Seasoning entry added");
-      return res.data;
-    } catch (err) {
-      const msg =
-        err.response?.data?.message || "Failed to add seasoning entry";
-      set({ loading: false, error: msg });
-      toast.error(msg);
-      throw err;
-    }
+    return updatedBatch;
   },
-
-  addVacuumEntry: async (batchId, entry) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await axios.post(`/batches/${batchId}/vacuum`, entry);
-
-      set((state) => ({
-        currentBatch:
-          state.currentBatch?._id === batchId ? res.data : state.currentBatch,
-        batches: state.batches.map((b) => (b._id === batchId ? res.data : b)),
-        loading: false,
-      }));
-
-      toast.success("Vacuum sealing entry added");
-      return res.data;
-    } catch (err) {
-      const msg =
-        err.response?.data?.message || "Failed to add vacuum entry";
-      set({ loading: false, error: msg });
-      toast.error(msg);
-      throw err;
-    }
-  },
-
   finishBatch: async (batchId) => {
-    set({ loading: true, error: null });
-    try {
-      const res = await axios.put(`/batches/${batchId}/finish`);
+    const updatedBatch = await get().apiCall(
+      () => axios.put(`/batches/${batchId}/finish`),
+      "Batch marked as finished",
+      "Failed to finish batch"
+    );
 
-      set((state) => ({
-        currentBatch:
-          state.currentBatch?._id === batchId ? res.data : state.currentBatch,
-        batches: state.batches.map((b) => (b._id === batchId ? res.data : b)),
-        loading: false,
-      }));
+    set((state) => ({
+      currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
+      batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
+    }));
 
-      toast.success("Batch marked as finished");
-      return res.data;
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to finish batch";
-      set({ loading: false, error: msg });
-      toast.error(msg);
-      throw err;
-    }
+    return updatedBatch;
   },
 
-  clearCurrentBatch: () => set({ currentBatch: null }),
+  clearCurrentBatch: () => set({ currentBatch: null, error: null }),
 }));
