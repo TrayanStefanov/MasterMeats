@@ -1,142 +1,119 @@
 import Batch from "../models/batch.model.js";
 
+/* --------------------------- HELPER --------------------------- */
+const handleError = (res, context, err) => {
+  console.error(`[${context}]`, err);
+  res.status(500).json({ error: err.message || "Server Error" });
+};
+
+/* --------------------------- CREATE --------------------------- */
 export const createBatch = async (req, res) => {
   try {
     const batch = new Batch({
       ...req.body,
-      startTime: new Date(), // auto set on first creation
+      startTime: new Date(),
     });
 
     await batch.save();
-
     res.status(201).json(batch);
   } catch (err) {
-    console.error("[createBatch] Error creating batch:", err);
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, "createBatch", err);
   }
 };
 
+/* --------------------------- READ --------------------------- */
 export const getBatches = async (req, res) => {
   try {
     const batches = await Batch.find().sort({ createdAt: -1 });
     res.json(batches);
   } catch (err) {
-    console.error("[getBatches] Error fetching batches:", err);
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, "getBatches", err);
   }
 };
 
 export const getBatch = async (req, res) => {
   try {
     const batch = await Batch.findById(req.params.id);
-    if (!batch) {
-      console.warn(`[getBatch] Batch not found: ${req.params.id}`);
-      return res.status(404).json({ error: "Batch not found" });
-    }
-
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
     res.json(batch);
   } catch (err) {
-    console.error(`[getBatch] Error fetching batch ${req.params.id}:`, err);
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, `getBatch ${req.params.id}`, err);
   }
 };
 
+/* --------------------------- UPDATE --------------------------- */
 export const updateBatch = async (req, res) => {
   try {
-    const batch = await Batch.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true, runValidators: true }
-    );
+    const batch = await Batch.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true, runValidators: true });
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
 
-    if (!batch) {
-      console.warn(`[updateBatch] Batch not found: ${req.params.id}`);
-      return res.status(404).json({ error: "Batch not found" });
-    }
-
-    await batch.save(); // re-triggers pre-save totals recalculation
-
+    await batch.save();
     res.json(batch);
   } catch (err) {
-    console.error(`[updateBatch] Error updating batch ${req.params.id}:`, err);
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, `updateBatch ${req.params.id}`, err);
   }
 };
 
-export const addSeasoningEntry = async (req, res) => {
+/* --------------------- PHASE-SPECIFIC UPDATES --------------------- */
+export const updateSourcingPhase = async (req, res) => updatePhaseField(req, res, "sourcingPhase");
+export const updatePreppingPhase = async (req, res) => updatePhaseField(req, res, "preppingPhase");
+export const updateCuringPhase = async (req, res) => updatePhaseField(req, res, "curingPhase");
+
+const updatePhaseField = async (req, res, field) => {
   try {
     const batch = await Batch.findById(req.params.id);
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
 
-    if (!batch) {
-      console.warn(`[addSeasoningEntry] Batch not found: ${req.params.id}`);
-      return res.status(404).json({ error: "Batch not found" });
-    }
-
-    batch.seasoningPhase.push(req.body);
-    await batch.save(); // auto recalculates totals
+    batch[field] = { ...batch[field], ...req.body };
+    await batch.save();
 
     res.json(batch);
   } catch (err) {
-    console.error(
-      `[addSeasoningEntry] Error adding seasoning entry to batch ${req.params.id}:`,
-      err
-    );
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, `updatePhaseField ${field} ${req.params.id}`, err);
   }
 };
-export const addVacuumEntry = async (req, res) => {
+
+/* --------------------- ADD ENTRIES --------------------- */
+export const addSeasoningEntry = async (req, res) => addPhaseEntry(req, res, "seasoningPhase");
+export const addVacuumEntry = async (req, res) => addPhaseEntry(req, res, "vacuumPhase");
+
+const addPhaseEntry = async (req, res, field) => {
   try {
     const batch = await Batch.findById(req.params.id);
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
 
-    if (!batch) {
-      console.warn(`[addVacuumEntry] Batch not found: ${req.params.id}`);
-      return res.status(404).json({ error: "Batch not found" });
-    }
-
-    batch.vacuumPhase.push(req.body);
-    await batch.save(); // auto recalculates totals
+    batch[field].push(req.body);
+    await batch.save();
 
     res.json(batch);
   } catch (err) {
-    console.error(
-      `[addVacuumEntry] Error adding vacuum entry to batch ${req.params.id}:`,
-      err
-    );
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, `addPhaseEntry ${field} ${req.params.id}`, err);
   }
 };
 
+/* --------------------------- FINISH --------------------------- */
 export const finishBatch = async (req, res) => {
   try {
     const batch = await Batch.findById(req.params.id);
-
-    if (!batch) {
-      console.warn(`[finishBatch] Batch not found: ${req.params.id}`);
-      return res.status(404).json({ error: "Batch not found" });
-    }
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
 
     batch.finishTime = new Date();
-    await batch.save(); // triggers elapsedTime + totals update
+    await batch.save();
 
     res.json(batch);
   } catch (err) {
-    console.error(`[finishBatch] Error finishing batch ${req.params.id}:`, err);
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, `finishBatch ${req.params.id}`, err);
   }
 };
 
+/* --------------------------- DELETE --------------------------- */
 export const deleteBatch = async (req, res) => {
   try {
     const batch = await Batch.findByIdAndDelete(req.params.id);
-
-    if (!batch) {
-      console.warn(`[deleteBatch] Batch not found: ${req.params.id}`);
-      return res.status(404).json({ error: "Batch not found" });
-    }
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
 
     res.json({ message: "Batch deleted", batch });
   } catch (err) {
-    console.error(`[deleteBatch] Error deleting batch ${req.params.id}:`, err);
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, `deleteBatch ${req.params.id}`, err);
   }
 };
