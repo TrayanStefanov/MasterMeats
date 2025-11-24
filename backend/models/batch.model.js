@@ -21,8 +21,6 @@ const SourcingPhaseSchema = new Schema({
 
 /** Prepping Phase */
 const PreppingPhaseSchema = new Schema({
-  meatType: { type: String, required: true },
-  rawKg: { type: Number, required: true },
   wasteKg: { type: Number, default: 0 },
   cookingCutsKg: { type: Number, default: 0 },
   timeTaken: { type: Number, default: 0 }
