@@ -6,24 +6,7 @@ const PhasePrepping = ({ data, onChange }) => {
     <div className="flex flex-col gap-4">
       <h2 className="text-xl font-bold">Prepping</h2>
 
-      {/* Type of meat cut */}
-      <input
-        className="input input-bordered"
-        placeholder="Type of meat cut"
-        value={data.meatType}
-        onChange={(e) => update("meatType", e.target.value)}
-      />
-
-      {/* Raw KG */}
-      <input
-        type="number"
-        className="input input-bordered"
-        placeholder="Raw KG"
-        value={data.rawKg}
-        onChange={(e) => update("rawKg", e.target.value)}
-      />
-
-      {/* Waste cuts (trash) in KG */}
+      {/* Waste KG */}
       <input
         type="number"
         className="input input-bordered"
@@ -32,16 +15,16 @@ const PhasePrepping = ({ data, onChange }) => {
         onChange={(e) => update("wasteKg", e.target.value)}
       />
 
-      {/* Cooking cuts (imperfect fillets) KG */}
+      {/* Cooking Cuts KG */}
       <input
         type="number"
         className="input input-bordered"
-        placeholder="Cooking cuts (imperfect fillets) KG"
+        placeholder="Cooking cuts (imperfect fillets) in KG"
         value={data.cookingCutsKg}
         onChange={(e) => update("cookingCutsKg", e.target.value)}
       />
 
-      {/* Time taken (minutes) */}
+      {/* Time Taken */}
       <input
         type="number"
         className="input input-bordered"
