@@ -2,12 +2,23 @@ import { create } from "zustand";
 import axios from "../../lib/axios.js";
 import { toast } from "react-hot-toast";
 
+const PHASE_NAMES = {
+  sourcing: "Sourcing",
+  prepping: "Prepping",
+  curing: "Curing",
+  seasoning: "Seasoning",
+  vacuum: "Vacuum Sealing",
+};
+
 export const useBatchStore = create((set, get) => ({
   batches: [],
   currentBatch: null,
   loading: false,
   error: null,
 
+  /* -----------------------------
+   * Generic API call helper
+   * ----------------------------- */
   apiCall: async (fn, successMsg = null, errorMsg = "Something went wrong") => {
     set({ loading: true, error: null });
     try {
@@ -16,7 +27,6 @@ export const useBatchStore = create((set, get) => ({
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.message || errorMsg;
-      console.error("API Error:", err);
       set({ error: msg });
       toast.error(msg);
       throw err;
@@ -25,6 +35,9 @@ export const useBatchStore = create((set, get) => ({
     }
   },
 
+  /* -----------------------------
+   * Fetch all batches
+   * ----------------------------- */
   fetchBatches: async () => {
     const data = await get().apiCall(
       () => axios.get("/batches"),
@@ -34,6 +47,9 @@ export const useBatchStore = create((set, get) => ({
     set({ batches: data || [] });
   },
 
+  /* -----------------------------
+   * Fetch single batch
+   * ----------------------------- */
   fetchBatchById: async (id) => {
     const data = await get().apiCall(
       () => axios.get(`/batches/${id}`),
@@ -43,9 +59,13 @@ export const useBatchStore = create((set, get) => ({
     set({ currentBatch: data });
     return data;
   },
-  createBatch: async (data) => {
+
+  /* -----------------------------
+   * Create a new batch
+   * ----------------------------- */
+  createBatch: async (batchData) => {
     const newBatch = await get().apiCall(
-      () => axios.post("/batches", data),
+      () => axios.post("/batches", batchData),
       "Batch created successfully",
       "Failed to create batch"
     );
@@ -58,11 +78,14 @@ export const useBatchStore = create((set, get) => ({
     return newBatch;
   },
 
+  /* -----------------------------
+   * Update a phase
+   * ----------------------------- */
   updatePhase: async (batchId, phase, data) => {
     const updatedBatch = await get().apiCall(
       () => axios.put(`/batches/${batchId}/${phase}`, data),
-      `${phase} phase updated`,
-      "Failed to update phase"
+      `${PHASE_NAMES[phase] || phase} phase updated`,
+      `Failed to update ${phase} phase`
     );
 
     set((state) => ({
@@ -73,10 +96,17 @@ export const useBatchStore = create((set, get) => ({
     return updatedBatch;
   },
 
-  addEntry: async (batchId, phase, entry) => {
+  /* -----------------------------
+   * Add an entry to a phase (seasoning or vacuum)
+   * ----------------------------- */
+  addPhaseEntry: async (batchId, phase, entry) => {
+    if (!["seasoning", "vacuum"].includes(phase)) {
+      throw new Error(`Invalid phase for entries: ${phase}`);
+    }
+
     const updatedBatch = await get().apiCall(
       () => axios.post(`/batches/${batchId}/${phase}`, entry),
-      `${phase === "seasoning" ? "Seasoning" : "Vacuum"} entry added`,
+      `${PHASE_NAMES[phase]} entry added`,
       `Failed to add ${phase} entry`
     );
 
@@ -87,6 +117,10 @@ export const useBatchStore = create((set, get) => ({
 
     return updatedBatch;
   },
+
+  /* -----------------------------
+   * Finish a batch
+   * ----------------------------- */
   finishBatch: async (batchId) => {
     const updatedBatch = await get().apiCall(
       () => axios.put(`/batches/${batchId}/finish`),
@@ -102,5 +136,8 @@ export const useBatchStore = create((set, get) => ({
     return updatedBatch;
   },
 
+  /* -----------------------------
+   * Reset state
+   * ----------------------------- */
   clearCurrentBatch: () => set({ currentBatch: null, error: null }),
 }));
