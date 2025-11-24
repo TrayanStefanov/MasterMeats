@@ -10,10 +10,30 @@ import PhaseSeasoning from "./PhaseSeasoning";
 import PhaseVacuum from "./PhaseVacuumSealing";
 import Stepper from "./PhasesStepper";
 
-const BatchCreate = () => {
-  const { createBatch, updatePhase, currentBatch, loading } = useBatchStore();
+const PHASE_KEYS = ["sourcing", "prepping", "curing", "seasoning", "vacuum"];
+const PHASE_LABELS = [
+  "Sourcing",
+  "Prepping",
+  "Curing",
+  "Seasoning",
+  "Vacuum Sealing",
+];
+const ADDITIVE_PHASES = ["seasoning", "vacuum"];
 
+// Define required fields for each phase
+const REQUIRED_FIELDS = {
+  sourcing: ["meatType", "meatCutType", "supplier", "amountKg", "pricePerKg"],
+  prepping: [], // no required fields now
+  curing: [],
+  seasoning: [],
+  vacuum: [],
+};
+
+const BatchCreate = () => {
+  const { createBatch, updatePhase, addPhaseEntry, currentBatch, loading } =
+    useBatchStore();
   const [step, setStep] = useState(0);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [phases, setPhases] = useState({
     sourcing: {
@@ -24,13 +44,7 @@ const BatchCreate = () => {
       pricePerKg: "",
       timeTaken: "",
     },
-    prepping: {
-      meatType: "",
-      rawKg: "",
-      wasteKg: "",
-      cookingCutsKg: "",
-      timeTaken: "",
-    },
+    prepping: { wasteKg: "", cookingCutsKg: "", timeTaken: "" },
     curing: {
       saltName: "",
       saltAmountKg: "",
@@ -40,33 +54,9 @@ const BatchCreate = () => {
       rinseTime: "",
       timeTaken: "",
     },
-
-    seasoning: {
-      entries: [],
-      timeTaken: "",
-    },
-
-    vacuum: {
-      entries: [],
-      timeTaken: "",
-    },
+    seasoning: { entries: [], timeTaken: "" },
+    vacuum: { entries: [], timeTaken: "" },
   });
-
-  const phaseKeys = [
-    "sourcing",
-    "prepping",
-    "curing",
-    "seasoning",
-    "vacuum",
-  ];
-
-  const phaseLabels = [
-    "Sourcing",
-    "Prepping",
-    "Curing",
-    "Seasoning",
-    "Vacuum Sealing",
-  ];
 
   const phaseComponents = [
     <PhaseSourcing
@@ -91,41 +81,79 @@ const BatchCreate = () => {
     />,
   ];
 
-  const sanitizePhaseData = (phaseData) => {
-    const sanitized = { ...phaseData };
-    Object.keys(sanitized).forEach((key) => {
-      if (sanitized[key] === "")
-        sanitized[key] = 0; // default numeric fields to 0
-      else if (!isNaN(sanitized[key])) sanitized[key] = Number(sanitized[key]);
+  // Sanitize numeric fields
+  const sanitize = (data) =>
+    Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [
+        k,
+        v === "" ? 0 : !isNaN(v) ? Number(v) : v,
+      ])
+    );
+
+  // Validate required fields
+  const validatePhase = (phaseKey, data) => {
+    const required = REQUIRED_FIELDS[phaseKey];
+    const missing = required.filter(
+      (f) => data[f] === "" || data[f] === null || data[f] === undefined
+    );
+    return missing.length > 0 ? missing : null;
+  };
+
+  // Validate additive entries
+  const validateAdditiveEntries = (phaseKey, entries) => {
+    const errors = [];
+    entries.forEach((entry, i) => {
+      if (!entry.spiceId && !entry.spiceMixId) {
+        errors.push(`Entry ${i + 1} must have a spiceId or spiceMixId`);
+      }
+      if (!entry.cuts || entry.cuts <= 0) {
+        errors.push(`Entry ${i + 1} must have valid cuts`);
+      }
     });
-    return sanitized;
+    return errors.length > 0 ? errors : null;
   };
 
   const handleSubmitPhase = async () => {
-    const phaseKey = phaseKeys[step];
-    let dataToSend = sanitizePhaseData(phases[phaseKey]);
+    const phaseKey = PHASE_KEYS[step];
+    const phaseData = sanitize(phases[phaseKey]);
+    setErrorMsg("");
 
     try {
+      // Check required fields
+      const missingFields = ADDITIVE_PHASES.includes(phaseKey)
+        ? validateAdditiveEntries(phaseKey, phaseData.entries)
+        : validatePhase(phaseKey, phaseData);
+
+      if (missingFields) {
+        setErrorMsg(`Missing or invalid fields: ${missingFields.join(", ")}`);
+        return;
+      }
+
       if (!currentBatch && step === 0) {
-        // Create new batch
+        // Initial batch creation
         const batchData = {
-          sourcingPhase: sanitizePhaseData(phases.sourcing),
-          preppingPhase: sanitizePhaseData(phases.prepping),
-          curingPhase: sanitizePhaseData(phases.curing),
+          sourcingPhase: sanitize(phases.sourcing),
+          preppingPhase: sanitize(phases.prepping),
+          curingPhase: sanitize(phases.curing),
           seasoningPhase: phases.seasoning.entries,
           vacuumPhase: phases.vacuum.entries,
         };
-
-        console.log("Creating initial batch:", batchData);
+        console.log("Submitting batchData:", batchData);
         await createBatch(batchData);
+      } else if (ADDITIVE_PHASES.includes(phaseKey)) {
+        // Add all entries in one batch
+        if (phaseData.entries.length > 0) {
+          await addPhaseEntry(currentBatch._id, phaseKey, phaseData.entries);
+        }
       } else {
-        console.log(`Updating phase "${phaseKey}" for batch`, currentBatch._id);
-        await updatePhase(currentBatch._id, phaseKey, dataToSend);
+        // Update standard phase
+        await updatePhase(currentBatch._id, phaseKey, phaseData);
       }
 
-      if (step < phaseKeys.length - 1) setStep(step + 1);
+      if (step < PHASE_KEYS.length - 1) setStep(step + 1);
     } catch (err) {
-      console.error("Error submitting phase:", err);
+      console.error(`Error submitting phase "${phaseKey}":`, err);
+      setErrorMsg(err.message || "An error occurred while saving the phase.");
     }
   };
 
@@ -134,12 +162,15 @@ const BatchCreate = () => {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full mx-auto flex flex-col gap-10"
+      className="w-full mx-auto flex flex-col gap-6"
     >
-      <Stepper steps={phaseLabels} current={step} />
+      <Stepper steps={PHASE_LABELS} current={step} />
+
       <div className="bg-base-200 rounded-xl p-6 shadow-md">
         {phaseComponents[step]}
       </div>
+
+      {errorMsg && <p className="text-red-500 mt-2">{errorMsg}</p>}
 
       <div className="flex justify-between mt-4">
         <button
@@ -155,7 +186,7 @@ const BatchCreate = () => {
           disabled={loading}
           onClick={handleSubmitPhase}
         >
-          {step === phaseKeys.length - 1 ? (
+          {step === PHASE_KEYS.length - 1 ? (
             <>
               <FaSave /> Finish Batch
             </>
