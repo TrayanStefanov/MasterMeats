@@ -23,7 +23,7 @@ const ADDITIVE_PHASES = ["seasoning", "vacuum"];
 // Define required fields for each phase
 const REQUIRED_FIELDS = {
   sourcing: ["meatType", "meatCutType", "supplier", "amountKg", "pricePerKg"],
-  prepping: [], // no required fields now
+  prepping: [], 
   curing: [],
   seasoning: [],
   vacuum: [],
@@ -48,9 +48,9 @@ const BatchCreate = () => {
     curing: {
       saltName: "",
       saltAmountKg: "",
-      saltTimeHours: "",
+      timeInSaltHours: "",
       liquidType: "",
-      liquidTimeHours: "",
+      timeInLiquidHours: "",
       rinseTime: "",
       timeTaken: "",
     },
