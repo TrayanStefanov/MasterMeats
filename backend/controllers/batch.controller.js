@@ -44,7 +44,12 @@ export const getBatch = async (req, res) => {
 /* --------------------------- UPDATE --------------------------- */
 export const updateBatch = async (req, res) => {
   try {
-    const batch = await Batch.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true, runValidators: true });
+    const batch = await Batch.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+
     if (!batch) return res.status(404).json({ error: "Batch not found" });
 
     await batch.save();
@@ -54,40 +59,122 @@ export const updateBatch = async (req, res) => {
   }
 };
 
-/* --------------------- PHASE-SPECIFIC UPDATES --------------------- */
-export const updateSourcingPhase = async (req, res) => updatePhaseField(req, res, "sourcingPhase");
-export const updatePreppingPhase = async (req, res) => updatePhaseField(req, res, "preppingPhase");
-export const updateCuringPhase = async (req, res) => updatePhaseField(req, res, "curingPhase");
+/* --------------------- PHASE FULL-OBJECT UPDATE --------------------- */
+export const updateSourcingPhase = async (req, res) =>
+  updatePhaseObject(req, res, "sourcingPhase");
 
-const updatePhaseField = async (req, res, field) => {
+export const updatePreppingPhase = async (req, res) =>
+  updatePhaseObject(req, res, "preppingPhase");
+
+export const updateCuringPhase = async (req, res) =>
+  updatePhaseObject(req, res, "curingPhase");
+
+export const updateSeasoningPhase = async (req, res) =>
+  updatePhaseObject(req, res, "seasoningPhase");
+
+export const updateVacuumPhase = async (req, res) =>
+  updatePhaseObject(req, res, "vacuumPhase");
+
+/** Replace/patch full phase object */
+const updatePhaseObject = async (req, res, field) => {
   try {
+    console.log("DEBUG: updatePhaseObject", req.params.id, field, req.body);
     const batch = await Batch.findById(req.params.id);
     if (!batch) return res.status(404).json({ error: "Batch not found" });
 
-    batch[field] = { ...batch[field], ...req.body };
-    await batch.save();
+    batch[field] = {
+      // keep existing doc (ensures mongoose getters stay intact)
+      ...(batch[field]?._doc || {}),
 
+      /**
+       * Ensure entries array always exists
+       * If req.body omits entries, we KEEP the old array
+       * If req.body includes entries, that overwrites intentionally
+       */
+      entries: req.body.entries ?? batch[field]?.entries ?? [],
+
+      /**
+       * Preserve phase-level fields unless overwritten
+       * Works for both seasoningPhase + vacuumPhase
+       */
+      timeTaken: req.body.timeTaken ?? batch[field]?.timeTaken ?? 0,
+      paperTowelCost:
+        req.body.paperTowelCost ?? batch[field]?.paperTowelCost ?? 0,
+      vacuumRollCost:
+        req.body.vacuumRollCost ?? batch[field]?.vacuumRollCost ?? 0,
+
+      // finally apply request body to override anything intentionally changed
+      ...req.body,
+    };
+
+    await batch.save();
     res.json(batch);
   } catch (err) {
-    handleError(res, `updatePhaseField ${field} ${req.params.id}`, err);
+    handleError(res, `updatePhaseObject ${field}`, err);
   }
 };
 
 /* --------------------- ADD ENTRIES --------------------- */
-export const addSeasoningEntry = async (req, res) => addPhaseEntry(req, res, "seasoningPhase");
-export const addVacuumEntry = async (req, res) => addPhaseEntry(req, res, "vacuumPhase");
-
-const addPhaseEntry = async (req, res, field) => {
+export const addSeasoningEntry = async (req, res) => {
   try {
     const batch = await Batch.findById(req.params.id);
     if (!batch) return res.status(404).json({ error: "Batch not found" });
 
-    batch[field].push(req.body);
-    await batch.save();
+    if (!batch.seasoningPhase)
+      batch.seasoningPhase = { entries: [], timeTaken: 0, paperTowelCost: 0 };
 
+    // unwrap entries
+    const entries = Array.isArray(req.body)
+      ? req.body
+      : Array.isArray(req.body.entries)
+      ? req.body.entries
+      : [req.body];
+
+    // Add new entries
+    batch.seasoningPhase.entries.push(...entries);
+
+    // Merge top-level fields from req.body
+    batch.seasoningPhase.timeTaken =
+      req.body.timeTaken ?? batch.seasoningPhase.timeTaken ?? 0;
+    batch.seasoningPhase.paperTowelCost =
+      req.body.paperTowelCost ?? batch.seasoningPhase.paperTowelCost ?? 0;
+
+    await batch.save();
+    console.log("DEBUG: addSeasoningEntry", batch);
     res.json(batch);
   } catch (err) {
-    handleError(res, `addPhaseEntry ${field} ${req.params.id}`, err);
+    handleError(res, `addSeasoningEntry ${req.params.id}`, err);
+  }
+};
+
+/* ----------------------- ADD VACUUM ENTRIES ----------------------- */
+export const addVacuumEntry = async (req, res) => {
+  try {
+    const batch = await Batch.findById(req.params.id);
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
+
+    if (!batch.vacuumPhase)
+      batch.vacuumPhase = { entries: [], timeTaken: 0, vacuumRollCost: 0 };
+
+    // unwrap entries
+    const entries = Array.isArray(req.body.entries)
+      ? req.body.entries
+      : Array.isArray(req.body)
+      ? req.body
+      : [req.body];
+
+    batch.vacuumPhase.entries.push(...entries);
+
+    // Update phase-level fields
+    batch.vacuumPhase.timeTaken =
+      req.body.timeTaken ?? batch.vacuumPhase.timeTaken;
+    batch.vacuumPhase.vacuumRollCost =
+      req.body.vacuumRollCost ?? batch.vacuumPhase.vacuumRollCost;
+
+    await batch.save();
+    res.json(batch);
+  } catch (err) {
+    handleError(res, `addVacuumEntry ${req.params.id}`, err);
   }
 };
 
