@@ -65,7 +65,6 @@ SeasoningEntrySchema.pre("validate", function (next) {
   next();
 });
 
-
 const SeasoningPhaseSchema = new Schema({
   entries: { type: [SeasoningEntrySchema], default: [] },
   timeTaken: { type: Number, default: 0 }, 
@@ -126,7 +125,6 @@ const BatchSchema = new Schema(
   { timestamps: true }
 );
 
-}, { timestamps: true });
 
 /* AUTO-INCREMENT BATCH #  */
 
