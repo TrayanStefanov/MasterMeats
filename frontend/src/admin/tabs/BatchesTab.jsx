@@ -11,10 +11,7 @@ const BatchList = ({ onEdit }) => (
 );
 
 const BatchesTab = () => {
-  const {
-    fetchBatches,
-    clearCurrentBatch,
-  } = useBatchStore();
+  const { fetchBatches, clearCurrentBatch } = useBatchStore();
 
   const [mode, setMode] = useState("list"); // list | create | edit
   const [selectedBatch, setSelectedBatch] = useState(null);
@@ -99,7 +96,10 @@ const BatchesTab = () => {
               <FaArrowLeft /> {tCommon("buttons.back") || "Back"}
             </button>
 
-            <BatchCreate editBatch={selectedBatch} />
+            <BatchCreate
+              editBatch={selectedBatch}
+              onFinish={handleBack} 
+            />
           </motion.div>
         )}
       </AnimatePresence>
