@@ -1,29 +1,50 @@
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { useSpiceStore } from "../stores/useSpiceStore";
+import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 
-const PhaseVacuumSealing = ({ data, onChange }) => {
-  const update = (field, value) =>
-    onChange({ ...data, [field]: value });
+const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
+  const { spices, fetchSpices, loading: spicesLoading } = useSpiceStore();
+  const { spiceMixes, fetchSpiceMixes, loading: mixesLoading } = useSpiceMixStore();
 
+  const [initialized, setInitialized] = useState(false);
+
+  // Fetch spices and mixes on mount
+  useEffect(() => {
+    fetchSpices();
+    fetchSpiceMixes();
+  }, []);
+
+  // Initialize vacuum entries from seasoning phase
+  useEffect(() => {
+    if (!initialized && previousPhaseEntries?.length && !data.entries.length) {
+      const mappedEntries = previousPhaseEntries.map((e) => {
+        const spice = spices.find((s) => s._id === e.spiceId);
+        const mix = spiceMixes.find((m) => m._id === e.spiceMixId);
+
+        return {
+          spiceName: spice ? spice.name : mix ? mix.name : "Unknown Spice",
+          originalSlices: Number(e.cuts) || 0,
+          rackPositions: Array.isArray(e.rackPositions) ? e.rackPositions : [],
+          vacuumedSlices: "",
+          driedKg: "",
+        };
+      });
+
+      onChange({ ...data, entries: mappedEntries });
+      setInitialized(true);
+    }
+  }, [previousPhaseEntries, spices, spiceMixes, data.entries, initialized]);
+
+  // Helper to update individual entries
   const updateEntry = (idx, field, value) => {
     const newEntries = [...data.entries];
     newEntries[idx] = { ...newEntries[idx], [field]: value };
     onChange({ ...data, entries: newEntries });
   };
 
-  const addEntry = () => {
-    onChange({
-      ...data,
-      entries: [
-        ...data.entries,
-        { cutsCount: "", spiceId: "", driedKg: "" },
-      ],
-    });
-  };
+  const updateField = (field, value) => onChange({ ...data, [field]: value });
 
-  const removeEntry = (idx) => {
-    const newEntries = data.entries.filter((_, i) => i !== idx);
-    onChange({ ...data, entries: newEntries });
-  };
+  if (spicesLoading || mixesLoading) return <p>Loading spices...</p>;
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,61 +52,46 @@ const PhaseVacuumSealing = ({ data, onChange }) => {
 
       {data.entries.map((entry, idx) => (
         <div key={idx} className="bg-base-300 p-4 rounded-xl">
-          <div className="flex justify-between items-center">
-            <h3 className="font-semibold">Entry #{idx + 1}</h3>
-            <button
-              className="btn btn-error btn-sm"
-              onClick={() => removeEntry(idx)}
-            >
-              <FaTrash />
-            </button>
-          </div>
+          <h3 className="font-semibold mb-2">Entry #{idx + 1}</h3>
 
-          <div className="flex flex-col gap-3 mt-3">
+          <div className="flex flex-col gap-2">
+            <div><strong>Spice name:</strong> {entry.spiceName}</div>
+            <div><strong># of slices (seasoning):</strong> {entry.originalSlices}</div>
+            <div><strong>Rack positions:</strong> {entry.rackPositions.join(", ") || "N/A"}</div>
+
             <input
               type="number"
               className="input input-bordered"
-              placeholder="Number of cuts"
-              value={entry.cutsCount}
-              onChange={(e) => updateEntry(idx, "cutsCount", e.target.value)}
-            />
-
-            <input
-              className="input input-bordered"
-              placeholder="Spice ID"
-              value={entry.spiceId}
-              onChange={(e) => updateEntry(idx, "spiceId", e.target.value)}
+              placeholder="# of vacuumed slices"
+              value={entry.vacuumedSlices}
+              onChange={(e) => updateEntry(idx, "vacuumedSlices", Number(e.target.value))}
             />
 
             <input
               type="number"
               className="input input-bordered"
-              placeholder="Dried KG"
+              placeholder="Total dried KG"
               value={entry.driedKg}
-              onChange={(e) => updateEntry(idx, "driedKg", e.target.value)}
+              onChange={(e) => updateEntry(idx, "driedKg", Number(e.target.value))}
             />
           </div>
         </div>
       ))}
 
-      <button className="btn btn-accent" onClick={addEntry}>
-        <FaPlus /> Add Entry
-      </button>
-
       <input
         type="number"
-        className="input input-bordered"
-        placeholder="Time taken (minutes)"
+        className="input input-bordered mt-4"
+        placeholder="Total time taken (minutes)"
         value={data.timeTaken}
-        onChange={(e) => update("timeTaken", e.target.value)}
+        onChange={(e) => updateField("timeTaken", Number(e.target.value))}
       />
 
       <input
         type="number"
         className="input input-bordered"
         placeholder="Vacuum roll cost"
-        value={data.rollCost}
-        onChange={(e) => update("rollCost", e.target.value)}
+        value={data.vacuumRollCost}
+        onChange={(e) => updateField("vacuumRollCost", Number(e.target.value))}
       />
     </div>
   );
