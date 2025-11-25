@@ -20,7 +20,6 @@ const PHASE_LABELS = [
 ];
 const ADDITIVE_PHASES = ["seasoning", "vacuum"];
 
-// Define required fields for each phase
 const REQUIRED_FIELDS = {
   sourcing: ["meatType", "meatCutType", "supplier", "amountKg", "pricePerKg"],
   prepping: [],
@@ -29,12 +28,12 @@ const REQUIRED_FIELDS = {
   vacuum: [],
 };
 
-const BatchCreate = () => {
+const BatchCreate = ({ editBatch, onFinish }) => {
   const { createBatch, updatePhase, addPhaseEntry, currentBatch, loading } =
     useBatchStore();
+
   const [step, setStep] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
-
   const [phases, setPhases] = useState({
     sourcing: {
       meatType: "",
@@ -82,7 +81,7 @@ const BatchCreate = () => {
     />,
   ];
 
-  // Helpers
+  // ---------------- Helpers ----------------
   const sanitize = (data) =>
     Object.fromEntries(
       Object.entries(data).map(([k, v]) => [
@@ -123,16 +122,19 @@ const BatchCreate = () => {
     return errors.length > 0 ? errors : null;
   };
 
-  const handleSubmitPhase = async () => {
+  const submitPhase = async ({
+    advanceStep = true,
+    returnToList = false,
+  } = {}) => {
     const phaseKey = PHASE_KEYS[step];
     setErrorMsg("");
 
     try {
-      let phaseData =
-        phaseKey === "seasoning" || phaseKey === "vacuum"
-          ? { ...phases[phaseKey] }
-          : sanitize(phases[phaseKey]);
+      let phaseData = ADDITIVE_PHASES.includes(phaseKey)
+        ? { ...phases[phaseKey] }
+        : sanitize(phases[phaseKey]);
 
+      // Seasoning
       if (phaseKey === "seasoning") {
         if (!currentBatch) {
           setErrorMsg("You must complete Sourcing first");
@@ -141,50 +143,50 @@ const BatchCreate = () => {
 
         const entries = sanitizeSeasoningEntries(phaseData.entries || []);
         const errors = validateSeasoningEntries(entries);
-        console.log("DEBUG: Seasoning entries payload before submit", entries); 
         if (errors) {
           setErrorMsg(errors.join(", "));
-          console.log("DEBUG: Validation errors", errors); 
           return;
         }
         phaseData.entries = entries;
 
         if (entries.length > 0) {
-          console.log("DEBUG: Payload to send to backend", entries);
           await addPhaseEntry(currentBatch._id, "seasoning", {
             entries,
             timeTaken: Number(phaseData.timeTaken),
             paperTowelCost: Number(phaseData.paperTowelCost),
           });
         }
-      } else {
+      }
+
+      else if (ADDITIVE_PHASES.includes(phaseKey)) {
+        await addPhaseEntry(currentBatch._id, phaseKey, {
+          entries: phaseData.entries || [],
+          timeTaken: Number(phaseData.timeTaken || 0),
+          ...(phaseKey === "vacuum"
+            ? { vacuumRollCost: Number(phaseData.vacuumRollCost || 0) }
+            : { paperTowelCost: Number(phaseData.paperTowelCost || 0) }),
+        });
+      }
+      
+      else {
         const missingFields = validatePhase(phaseKey, phaseData);
         if (missingFields) {
           setErrorMsg(`Missing or invalid fields: ${missingFields.join(", ")}`);
           return;
         }
 
-        if (ADDITIVE_PHASES.includes(phaseKey)) {
-          // For seasoning and vacuum
-          await addPhaseEntry(currentBatch._id, phaseKey, {
-            ...phaseData,
-            entries: phaseData.entries || [],
-            timeTaken: Number(phaseData.timeTaken || 0),
-            ...(phaseKey === "seasoning"
-              ? { paperTowelCost: Number(phaseData.paperTowelCost || 0) }
-              : { vacuumRollCost: Number(phaseData.vacuumRollCost || 0) }),
-          });
+        if (!currentBatch && step === 0) {
+          await createBatch({ sourcingPhase: sanitize(phases.sourcing) });
         } else {
-          // Non-additive phases
-          if (!currentBatch && step === 0) {
-            await createBatch({ sourcingPhase: sanitize(phases.sourcing) });
-          } else {
-            await updatePhase(currentBatch._id, phaseKey, phaseData);
-          }
+          await updatePhase(currentBatch._id, phaseKey, phaseData);
         }
       }
 
-      if (step < PHASE_KEYS.length - 1) setStep(step + 1);
+      // Advance step if requested
+      if (advanceStep && step < PHASE_KEYS.length - 1) setStep(step + 1);
+
+      // If requested, return to batch list
+      if (returnToList && typeof onFinish === "function") onFinish();
     } catch (err) {
       console.error(`Error submitting phase "${phaseKey}":`, err);
       setErrorMsg(err.message || "An error occurred while saving the phase.");
@@ -206,7 +208,7 @@ const BatchCreate = () => {
 
       {errorMsg && <p className="text-red-500 mt-2">{errorMsg}</p>}
 
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-4 gap-2">
         <button
           className="btn btn-accent"
           disabled={step === 0}
@@ -215,21 +217,31 @@ const BatchCreate = () => {
           <FaArrowLeft /> Back
         </button>
 
-        <button
-          className="btn btn-primary"
-          disabled={loading}
-          onClick={handleSubmitPhase}
-        >
-          {step === PHASE_KEYS.length - 1 ? (
-            <>
-              <FaSave /> Finish Batch
-            </>
-          ) : (
-            <>
-              Next <FaArrowRight />
-            </>
-          )}
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="btn btn-secondary"
+            disabled={loading}
+            onClick={() => submitPhase({ returnToList: true })}
+          >
+            <FaSave /> Save Phase
+          </button>
+
+          <button
+            className="btn btn-primary"
+            disabled={loading}
+            onClick={() => submitPhase()}
+          >
+            {step === PHASE_KEYS.length - 1 ? (
+              <>
+                <FaSave /> Finish Batch
+              </>
+            ) : (
+              <>
+                Next <FaArrowRight />
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </motion.div>
   );
