@@ -48,7 +48,7 @@ export const useBatchStore = create((set, get) => ({
   },
 
   /* -----------------------------
-   * Fetch single batch
+   * Fetch a single batch by ID
    * ----------------------------- */
   fetchBatchById: async (id) => {
     const data = await get().apiCall(
@@ -82,6 +82,12 @@ export const useBatchStore = create((set, get) => ({
    * Update a phase
    * ----------------------------- */
   updatePhase: async (batchId, phase, data) => {
+    if (["seasoning", "vacuum"].includes(phase)) {
+      throw new Error(
+        `${PHASE_NAMES[phase]} is additive; use addPhaseEntry instead`
+      );
+    }
+
     const updatedBatch = await get().apiCall(
       () => axios.put(`/batches/${batchId}/${phase}`, data),
       `${PHASE_NAMES[phase] || phase} phase updated`,
@@ -99,24 +105,27 @@ export const useBatchStore = create((set, get) => ({
   /* -----------------------------
    * Add an entry to a phase (seasoning or vacuum)
    * ----------------------------- */
-  addPhaseEntry: async (batchId, phase, entry) => {
-    if (!["seasoning", "vacuum"].includes(phase)) {
-      throw new Error(`Invalid phase for entries: ${phase}`);
-    }
+  addPhaseEntry: async (batchId, phase, data) => {
+  if (!["seasoning", "vacuum"].includes(phase)) {
+    throw new Error(`Invalid phase for entries: ${phase}`);
+  }
 
-    const updatedBatch = await get().apiCall(
-      () => axios.post(`/batches/${batchId}/${phase}`, entry),
-      `${PHASE_NAMES[phase]} entry added`,
-      `Failed to add ${phase} entry`
-    );
+  const payload = Array.isArray(data) ? { entries: data } : data;
 
-    set((state) => ({
-      currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
-      batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
-    }));
+  const updatedBatch = await get().apiCall(
+    () => axios.post(`/batches/${batchId}/${phase}`, payload),
+    `${PHASE_NAMES[phase]} entry added`,
+    `Failed to add ${phase} entry`
+  );
 
-    return updatedBatch;
-  },
+  set((state) => ({
+    currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
+    batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
+  }));
+
+  return updatedBatch;
+},
+
 
   /* -----------------------------
    * Finish a batch
