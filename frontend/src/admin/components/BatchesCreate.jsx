@@ -23,7 +23,7 @@ const ADDITIVE_PHASES = ["seasoning", "vacuum"];
 // Define required fields for each phase
 const REQUIRED_FIELDS = {
   sourcing: ["meatType", "meatCutType", "supplier", "amountKg", "pricePerKg"],
-  prepping: [], 
+  prepping: [],
   curing: [],
   seasoning: [],
   vacuum: [],
@@ -54,8 +54,8 @@ const BatchCreate = () => {
       rinseTime: "",
       timeTaken: "",
     },
-    seasoning: { entries: [], timeTaken: "" },
-    vacuum: { entries: [], timeTaken: "" },
+    seasoning: { entries: [], timeTaken: "", paperTowelCost: "" },
+    vacuum: { entries: [], timeTaken: "", vacuumRollCost: "" },
   });
 
   const phaseComponents = [
@@ -78,10 +78,11 @@ const BatchCreate = () => {
     <PhaseVacuum
       data={phases.vacuum}
       onChange={(v) => setPhases((p) => ({ ...p, vacuum: v }))}
+      previousPhaseEntries={phases.seasoning.entries}
     />,
   ];
 
-  // Sanitize numeric fields
+  // Helpers
   const sanitize = (data) =>
     Object.fromEntries(
       Object.entries(data).map(([k, v]) => [
@@ -90,7 +91,6 @@ const BatchCreate = () => {
       ])
     );
 
-  // Validate required fields
   const validatePhase = (phaseKey, data) => {
     const required = REQUIRED_FIELDS[phaseKey];
     const missing = required.filter(
@@ -99,55 +99,89 @@ const BatchCreate = () => {
     return missing.length > 0 ? missing : null;
   };
 
-  // Validate additive entries
-  const validateAdditiveEntries = (phaseKey, entries) => {
+  const sanitizeSeasoningEntries = (entries) =>
+    entries.map((entry) => ({
+      cuts: Number(entry.cuts) || 0,
+      spiceAmountUsed: Number(entry.spiceAmountUsed) || 0,
+      spiceId: entry.spiceId ? entry.spiceId.toString().trim() : null,
+      spiceMixId: entry.spiceMixId ? entry.spiceMixId.toString().trim() : null,
+      rackPositions: Array.isArray(entry.rackPositions)
+        ? entry.rackPositions
+        : [],
+    }));
+
+  const validateSeasoningEntries = (entries) => {
     const errors = [];
     entries.forEach((entry, i) => {
-      if (!entry.spiceId && !entry.spiceMixId) {
-        errors.push(`Entry ${i + 1} must have a spiceId or spiceMixId`);
-      }
-      if (!entry.cuts || entry.cuts <= 0) {
-        errors.push(`Entry ${i + 1} must have valid cuts`);
-      }
+      if (!entry.spiceId && !entry.spiceMixId)
+        errors.push(`Entry ${i + 1}: Must select a spice or mix`);
+      if (!entry.cuts || entry.cuts <= 0)
+        errors.push(`Entry ${i + 1}: Must have valid cuts`);
+      if (!entry.spiceAmountUsed || entry.spiceAmountUsed <= 0)
+        errors.push(`Entry ${i + 1}: Must enter spice amount used`);
     });
     return errors.length > 0 ? errors : null;
   };
 
   const handleSubmitPhase = async () => {
     const phaseKey = PHASE_KEYS[step];
-    const phaseData = sanitize(phases[phaseKey]);
     setErrorMsg("");
 
     try {
-      // Check required fields
-      const missingFields = ADDITIVE_PHASES.includes(phaseKey)
-        ? validateAdditiveEntries(phaseKey, phaseData.entries)
-        : validatePhase(phaseKey, phaseData);
+      let phaseData =
+        phaseKey === "seasoning" || phaseKey === "vacuum"
+          ? { ...phases[phaseKey] }
+          : sanitize(phases[phaseKey]);
 
-      if (missingFields) {
-        setErrorMsg(`Missing or invalid fields: ${missingFields.join(", ")}`);
-        return;
-      }
+      if (phaseKey === "seasoning") {
+        if (!currentBatch) {
+          setErrorMsg("You must complete Sourcing first");
+          return;
+        }
 
-      if (!currentBatch && step === 0) {
-        // Initial batch creation
-        const batchData = {
-          sourcingPhase: sanitize(phases.sourcing),
-          preppingPhase: sanitize(phases.prepping),
-          curingPhase: sanitize(phases.curing),
-          seasoningPhase: phases.seasoning.entries,
-          vacuumPhase: phases.vacuum.entries,
-        };
-        console.log("Submitting batchData:", batchData);
-        await createBatch(batchData);
-      } else if (ADDITIVE_PHASES.includes(phaseKey)) {
-        // Add all entries in one batch
-        if (phaseData.entries.length > 0) {
-          await addPhaseEntry(currentBatch._id, phaseKey, phaseData.entries);
+        const entries = sanitizeSeasoningEntries(phaseData.entries || []);
+        const errors = validateSeasoningEntries(entries);
+        console.log("DEBUG: Seasoning entries payload before submit", entries); 
+        if (errors) {
+          setErrorMsg(errors.join(", "));
+          console.log("DEBUG: Validation errors", errors); 
+          return;
+        }
+        phaseData.entries = entries;
+
+        if (entries.length > 0) {
+          console.log("DEBUG: Payload to send to backend", entries);
+          await addPhaseEntry(currentBatch._id, "seasoning", {
+            entries,
+            timeTaken: Number(phaseData.timeTaken),
+            paperTowelCost: Number(phaseData.paperTowelCost),
+          });
         }
       } else {
-        // Update standard phase
-        await updatePhase(currentBatch._id, phaseKey, phaseData);
+        const missingFields = validatePhase(phaseKey, phaseData);
+        if (missingFields) {
+          setErrorMsg(`Missing or invalid fields: ${missingFields.join(", ")}`);
+          return;
+        }
+
+        if (ADDITIVE_PHASES.includes(phaseKey)) {
+          // For seasoning and vacuum
+          await addPhaseEntry(currentBatch._id, phaseKey, {
+            ...phaseData,
+            entries: phaseData.entries || [],
+            timeTaken: Number(phaseData.timeTaken || 0),
+            ...(phaseKey === "seasoning"
+              ? { paperTowelCost: Number(phaseData.paperTowelCost || 0) }
+              : { vacuumRollCost: Number(phaseData.vacuumRollCost || 0) }),
+          });
+        } else {
+          // Non-additive phases
+          if (!currentBatch && step === 0) {
+            await createBatch({ sourcingPhase: sanitize(phases.sourcing) });
+          } else {
+            await updatePhase(currentBatch._id, phaseKey, phaseData);
+          }
+        }
       }
 
       if (step < PHASE_KEYS.length - 1) setStep(step + 1);
