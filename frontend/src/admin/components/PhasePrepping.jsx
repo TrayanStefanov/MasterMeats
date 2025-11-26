@@ -4,7 +4,7 @@ const PhasePrepping = ({ data, onChange }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-xl font-bold">Prepping</h2>
+      <h2 className="text-2xl font-bold indent-2 text-secondary">Prepping</h2>
 
       {/* Waste KG */}
       <input
