@@ -66,7 +66,6 @@ const BatchCreate = ({ editBatch, onFinish }) => {
   // ------------------ Prefill and set step ------------------
   useEffect(() => {
     if (!editBatch) return;
-
     const newPhases = { ...phases };
     PHASE_KEYS.forEach((key) => {
       const batchPhaseKey = `${key}Phase`;
@@ -254,14 +253,14 @@ const BatchCreate = ({ editBatch, onFinish }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="w-full mx-auto flex flex-col gap-6"
+      transition={{ duration: 0.5 }}
+      className="bg-secondary/50 text-secondary-content shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-6 p-6 flex flex-col gap-6"
     >
       <Stepper steps={PHASE_LABELS} current={step} />
 
-      <div className="bg-base-200 rounded-xl p-6 shadow-md">
+      <div className="bg-accent/70 rounded-lg p-6 shadow-inner">
         {phaseComponents[step]}
       </div>
 
@@ -277,7 +276,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
         </button>
 
         <button
-          className="btn btn-secondary"
+          className="btn btn-accent"
           disabled={loading}
           onClick={() =>
             handleSubmitPhase(step === PHASE_KEYS.length - 1 ? false : true)
@@ -296,7 +295,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
 
         {step < PHASE_KEYS.length - 1 && (
           <button
-            className="btn btn-primary"
+            className="btn btn-accent"
             disabled={loading}
             onClick={() => handleSubmitPhase(true)}
           >
