@@ -67,8 +67,8 @@ SeasoningEntrySchema.pre("validate", function (next) {
 
 const SeasoningPhaseSchema = new Schema({
   entries: { type: [SeasoningEntrySchema], default: [] },
-  timeTaken: { type: Number, default: 0 }, 
-  paperTowelCost: { type: Number, default: 0 }, 
+  timeTaken: { type: Number, default: 0 },
+  paperTowelCost: { type: Number, default: 0 },
 });
 
 /** Vacuum Phase **/
@@ -82,8 +82,8 @@ const VacuumEntrySchema = new Schema({
 
 const VacuumPhaseSchema = new Schema({
   entries: { type: [VacuumEntrySchema], default: [] },
-  timeTaken: { type: Number, default: 0 }, 
-  vacuumRollCost: { type: Number, default: 0 }, 
+  timeTaken: { type: Number, default: 0 },
+  vacuumRollCost: { type: Number, default: 0 },
 });
 
 /*  MAIN BATCH SCHEMA */
@@ -120,6 +120,7 @@ const BatchSchema = new Schema(
     totalElapsedTimeHours: { type: Number, default: 0 },
 
     totalCost: { type: Number, default: 0 },
+    driedTotal: { type: Number, default: 0 },
     costPerKgDried: { type: Number, default: 0 },
   },
   { timestamps: true }
@@ -167,11 +168,12 @@ BatchSchema.pre("save", function (next) {
     this.totalElapsedTimeHours =
       (this.finishTime - this.startTime) / (1000 * 60 * 60);
 
-  const driedTotal = (this.vacuumPhase?.entries || []).reduce(
+  // Dried total
+  this.driedTotal = (this.vacuumPhase?.entries || []).reduce(
     (sum, v) => sum + (v.driedKg || 0),
     0
   );
-  this.costPerKgDried = driedTotal > 0 ? totalCost / driedTotal : 0;
+  this.costPerKgDried = this.driedTotal > 0 ? totalCost / this.driedTotal : 0;
 
   next();
 });
