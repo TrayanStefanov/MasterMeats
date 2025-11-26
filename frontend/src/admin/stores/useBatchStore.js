@@ -106,25 +106,25 @@ export const useBatchStore = create((set, get) => ({
    * Add an entry to a phase (seasoning or vacuum)
    * ----------------------------- */
   addPhaseEntry: async (batchId, phase, data) => {
-  if (!["seasoning", "vacuum"].includes(phase)) {
-    throw new Error(`Invalid phase for entries: ${phase}`);
-  }
+    if (!["seasoning", "vacuum"].includes(phase)) {
+      throw new Error(`Invalid phase for entries: ${phase}`);
+    }
 
-  const payload = Array.isArray(data) ? { entries: data } : data;
+    const payload = Array.isArray(data) ? { entries: data } : data;
 
-  const updatedBatch = await get().apiCall(
-    () => axios.post(`/batches/${batchId}/${phase}`, payload),
-    `${PHASE_NAMES[phase]} entry added`,
-    `Failed to add ${phase} entry`
-  );
+    const updatedBatch = await get().apiCall(
+      () => axios.post(`/batches/${batchId}/${phase}`, payload),
+      `${PHASE_NAMES[phase]} entry added`,
+      `Failed to add ${phase} entry`
+    );
 
-  set((state) => ({
-    currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
-    batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
-  }));
+    set((state) => ({
+      currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
+      batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
+    }));
 
-  return updatedBatch;
-},
+    return updatedBatch;
+  },
 
 
   /* -----------------------------
@@ -148,5 +148,7 @@ export const useBatchStore = create((set, get) => ({
   /* -----------------------------
    * Reset state
    * ----------------------------- */
+  setCurrentBatch: (batch) => set({ currentBatch: batch }),
+
   clearCurrentBatch: () => set({ currentBatch: null, error: null }),
 }));
