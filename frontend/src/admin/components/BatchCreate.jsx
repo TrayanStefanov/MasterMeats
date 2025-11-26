@@ -18,7 +18,6 @@ const PHASE_LABELS = [
   "Seasoning",
   "Vacuum Sealing",
 ];
-const ADDITIVE_PHASES = ["seasoning", "vacuum"];
 
 const REQUIRED_FIELDS = {
   sourcing: ["meatType", "meatCutType", "supplier", "amountKg", "pricePerKg"],
@@ -32,11 +31,12 @@ const BatchCreate = ({ editBatch, onFinish }) => {
   const {
     createBatch,
     updatePhase,
-    addPhaseEntry,
+    finishBatch,
     currentBatch,
     setCurrentBatch,
     loading,
   } = useBatchStore();
+
   const [step, setStep] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -68,7 +68,6 @@ const BatchCreate = ({ editBatch, onFinish }) => {
     if (!editBatch) return;
 
     const newPhases = { ...phases };
-
     PHASE_KEYS.forEach((key) => {
       const batchPhaseKey = `${key}Phase`;
       if (editBatch[batchPhaseKey]) {
@@ -78,7 +77,6 @@ const BatchCreate = ({ editBatch, onFinish }) => {
         };
       }
     });
-
     setPhases(newPhases);
     setCurrentBatch(editBatch);
 
@@ -93,15 +91,14 @@ const BatchCreate = ({ editBatch, onFinish }) => {
       );
       if (
         incomplete ||
-        (ADDITIVE_PHASES.includes(key) &&
+        (["seasoning", "vacuum"].includes(key) &&
           (!data.entries || data.entries.length === 0))
       ) {
         nextStep = i;
         break;
       }
-      nextStep = i + 1;
     }
-    setStep(Math.min(nextStep, PHASE_KEYS.length - 1));
+    setStep(nextStep);
   }, [editBatch]);
 
   // ------------------ Helpers ------------------
@@ -121,26 +118,60 @@ const BatchCreate = ({ editBatch, onFinish }) => {
     return missing.length > 0 ? missing : null;
   };
 
-  const sanitizeSeasoningEntries = (entries) =>
-    entries.map((entry) => ({
-      cuts: Number(entry.cuts) || 0,
-      spiceAmountUsed: Number(entry.spiceAmountUsed) || 0,
-      spiceId: entry.spiceId ? entry.spiceId.toString().trim() : null,
-      spiceMixId: entry.spiceMixId ? entry.spiceMixId.toString().trim() : null,
-      rackPositions: Array.isArray(entry.rackPositions)
-        ? entry.rackPositions
-        : [],
-    }));
+  const sanitizeEntries = (phaseKey, entries) => {
+    if (!entries || !entries.length) return [];
+    return entries
+      .map((entry) => {
+        if (phaseKey === "seasoning") {
+          return {
+            cuts: Number(entry.cuts) || 0,
+            spiceAmountUsed: Number(entry.spiceAmountUsed) || 0,
+            spiceId: entry.spiceId ? entry.spiceId.toString().trim() : null,
+            spiceMixId: entry.spiceMixId
+              ? entry.spiceMixId.toString().trim()
+              : null,
+            rackPositions: Array.isArray(entry.rackPositions)
+              ? entry.rackPositions
+              : [],
+          };
+        }
+        if (phaseKey === "vacuum") {
+          return {
+            ...entry,
+            vacuumedSlices: Number(entry.vacuumedSlices) || 0,
+            driedKg: Number(entry.driedKg) || 0,
+            rackPositions: Array.isArray(entry.rackPositions)
+              ? entry.rackPositions
+              : [],
+          };
+        }
+        return entry;
+      })
+      .filter((entry) => {
+        if (phaseKey === "seasoning")
+          return (
+            (entry.spiceId || entry.spiceMixId) &&
+            entry.cuts > 0 &&
+            entry.spiceAmountUsed > 0
+          );
+        if (phaseKey === "vacuum")
+          return entry.vacuumedSlices > 0 || entry.driedKg > 0;
+        return true;
+      });
+  };
 
-  const validateSeasoningEntries = (entries) => {
+  const validateEntries = (phaseKey, entries) => {
+    if (!entries || !entries.length) return null;
     const errors = [];
     entries.forEach((entry, i) => {
-      if (!entry.spiceId && !entry.spiceMixId)
-        errors.push(`Entry ${i + 1}: Must select a spice or mix`);
-      if (!entry.cuts || entry.cuts <= 0)
-        errors.push(`Entry ${i + 1}: Must have valid cuts`);
-      if (!entry.spiceAmountUsed || entry.spiceAmountUsed <= 0)
-        errors.push(`Entry ${i + 1}: Must enter spice amount used`);
+      if (phaseKey === "seasoning") {
+        if (!entry.spiceId && !entry.spiceMixId)
+          errors.push(`Entry ${i + 1}: Must select a spice or mix`);
+        if (!entry.cuts || entry.cuts <= 0)
+          errors.push(`Entry ${i + 1}: Must have valid cuts`);
+        if (!entry.spiceAmountUsed || entry.spiceAmountUsed <= 0)
+          errors.push(`Entry ${i + 1}: Must enter spice amount used`);
+      }
     });
     return errors.length > 0 ? errors : null;
   };
@@ -150,58 +181,46 @@ const BatchCreate = ({ editBatch, onFinish }) => {
     setErrorMsg("");
     const phaseKey = PHASE_KEYS[step];
     try {
-      let phaseData = ADDITIVE_PHASES.includes(phaseKey)
-        ? { ...phases[phaseKey] }
-        : sanitize(phases[phaseKey]);
+      let phaseData = { ...phases[phaseKey] };
 
-      // ----------------- Seasoning -----------------
-      if (phaseKey === "seasoning") {
-        if (!currentBatch) {
-          setErrorMsg("You must complete Sourcing first");
-          return;
-        }
+      // Sanitize numeric fields
+      if (phaseKey !== "seasoning" && phaseKey !== "vacuum")
+        phaseData = sanitize(phaseData);
 
-        const entries = sanitizeSeasoningEntries(phaseData.entries || []);
-        const errors = validateSeasoningEntries(entries);
+      // Sanitize entries
+      if (phaseKey === "seasoning" || phaseKey === "vacuum") {
+        phaseData.entries = sanitizeEntries(phaseKey, phaseData.entries);
+        const errors = validateEntries(phaseKey, phaseData.entries);
         if (errors) {
           setErrorMsg(errors.join(", "));
           return;
         }
-        phaseData.entries = entries;
+      }
 
-        if (entries.length > 0) {
-          await addPhaseEntry(currentBatch._id, "seasoning", {
-            entries,
-            timeTaken: Number(phaseData.timeTaken || 0),
-            paperTowelCost: Number(phaseData.paperTowelCost || 0),
-          });
-        }
-      }
-      // ----------------- Vacuum -----------------
-      else if (phaseKey === "vacuum" && currentBatch) {
-        await addPhaseEntry(currentBatch._id, "vacuum", {
-          entries: phaseData.entries || [],
-          timeTaken: Number(phaseData.timeTaken || 0),
-          vacuumRollCost: Number(phaseData.vacuumRollCost || 0),
-        });
-      }
-      // ----------------- Other phases -----------------
-      else {
+      // Validate required fields
+      if (phaseKey !== "seasoning" && phaseKey !== "vacuum") {
         const missing = validatePhase(phaseKey, phaseData);
         if (missing) {
           setErrorMsg(`Missing or invalid fields: ${missing.join(", ")}`);
           return;
         }
-
-        if (!currentBatch && step === 0) {
-          await createBatch({ sourcingPhase: sanitize(phases.sourcing) });
-        } else {
-          await updatePhase(currentBatch._id, phaseKey, phaseData);
-        }
       }
 
-      // Move to next step if not just saving
+      // Submit
+      if (!currentBatch && step === 0) {
+        await createBatch({ sourcingPhase: sanitize(phases.sourcing) });
+      } else {
+        await updatePhase(currentBatch._id, phaseKey, phaseData);
+      }
+
+      // Move to next step
       if (goNext && step < PHASE_KEYS.length - 1) setStep(step + 1);
+
+      // Auto-finish on last step if called via "Finish Batch"
+      if (!goNext && step === PHASE_KEYS.length - 1) {
+        await finishBatch(currentBatch._id);
+        if (onFinish) onFinish();
+      }
     } catch (err) {
       console.error(`Error submitting phase "${phaseKey}":`, err);
       setErrorMsg(err.message || "An error occurred while saving the phase.");
@@ -260,7 +279,9 @@ const BatchCreate = ({ editBatch, onFinish }) => {
         <button
           className="btn btn-secondary"
           disabled={loading}
-          onClick={handleSubmitPhase}
+          onClick={() =>
+            handleSubmitPhase(step === PHASE_KEYS.length - 1 ? false : true)
+          }
         >
           {step === PHASE_KEYS.length - 1 ? (
             <>
@@ -277,7 +298,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
           <button
             className="btn btn-primary"
             disabled={loading}
-            onClick={handleSubmitPhase}
+            onClick={() => handleSubmitPhase(true)}
           >
             Next <FaArrowRight />
           </button>
