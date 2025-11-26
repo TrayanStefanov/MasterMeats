@@ -4,13 +4,10 @@ import { FaPlusCircle, FaArrowLeft } from "react-icons/fa";
 import { useBatchStore } from "../stores/useBatchStore";
 import { useTranslation } from "react-i18next";
 
-import BatchCreate from "../components/BatchesCreate";
+import BatchList from "../components/BatchList";
+import BatchesCreate from "../components/BatchesCreate";
 
-const BatchList = ({ onEdit }) => (
-  <div className="text-lg opacity-70">Batch list goes here…</div>
-);
-
-const BatchesTab = () => {
+const BatchTab = () => {
   const { fetchBatches, clearCurrentBatch } = useBatchStore();
 
   const [mode, setMode] = useState("list"); // list | create | edit
@@ -23,7 +20,7 @@ const BatchesTab = () => {
     fetchBatches();
   }, []);
 
-  /** Start creating a batch */
+  /** Start creating a new batch */
   const handleCreate = () => {
     clearCurrentBatch();
     setSelectedBatch(null);
@@ -38,7 +35,7 @@ const BatchesTab = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  /** Back to list */
+  /** Return to list */
   const handleBack = async () => {
     setMode("list");
     clearCurrentBatch();
@@ -73,7 +70,8 @@ const BatchesTab = () => {
                 onClick={handleCreate}
                 className="flex items-center text-base lg:text-xl xl:text-2xl gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
               >
-                <FaPlusCircle /> {tCommon("buttons.create") || "Create Batch"}
+                <FaPlusCircle />
+                {tCommon("buttons.create") || "Create Batch"}
               </button>
             </div>
 
@@ -81,6 +79,7 @@ const BatchesTab = () => {
           </motion.div>
         )}
 
+        {/* ---------------- CREATE / EDIT VIEW ---------------- */}
         {(mode === "create" || mode === "edit") && (
           <motion.div
             key={mode}
@@ -91,14 +90,14 @@ const BatchesTab = () => {
           >
             <button
               onClick={handleBack}
-              className="mb-4 flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
+              className="mb-4 flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition"
             >
               <FaArrowLeft /> {tCommon("buttons.back") || "Back"}
             </button>
 
-            <BatchCreate
+            <BatchesCreate 
               editBatch={selectedBatch}
-              onFinish={handleBack} 
+              onFinish={handleBack}
             />
           </motion.div>
         )}
@@ -107,4 +106,4 @@ const BatchesTab = () => {
   );
 };
 
-export default BatchesTab;
+export default BatchTab;
