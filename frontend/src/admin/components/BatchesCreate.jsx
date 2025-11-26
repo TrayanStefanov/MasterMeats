@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaArrowLeft, FaArrowRight, FaSave } from "react-icons/fa";
 import { useBatchStore } from "../stores/useBatchStore";
@@ -29,11 +29,17 @@ const REQUIRED_FIELDS = {
 };
 
 const BatchCreate = ({ editBatch, onFinish }) => {
-  const { createBatch, updatePhase, addPhaseEntry, currentBatch, loading } =
-    useBatchStore();
-
+  const {
+    createBatch,
+    updatePhase,
+    addPhaseEntry,
+    currentBatch,
+    setCurrentBatch,
+    loading,
+  } = useBatchStore();
   const [step, setStep] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+
   const [phases, setPhases] = useState({
     sourcing: {
       meatType: "",
@@ -57,31 +63,48 @@ const BatchCreate = ({ editBatch, onFinish }) => {
     vacuum: { entries: [], timeTaken: "", vacuumRollCost: "" },
   });
 
-  const phaseComponents = [
-    <PhaseSourcing
-      data={phases.sourcing}
-      onChange={(v) => setPhases((p) => ({ ...p, sourcing: v }))}
-    />,
-    <PhasePrepping
-      data={phases.prepping}
-      onChange={(v) => setPhases((p) => ({ ...p, prepping: v }))}
-    />,
-    <PhaseCuring
-      data={phases.curing}
-      onChange={(v) => setPhases((p) => ({ ...p, curing: v }))}
-    />,
-    <PhaseSeasoning
-      data={phases.seasoning}
-      onChange={(v) => setPhases((p) => ({ ...p, seasoning: v }))}
-    />,
-    <PhaseVacuum
-      data={phases.vacuum}
-      onChange={(v) => setPhases((p) => ({ ...p, vacuum: v }))}
-      previousPhaseEntries={phases.seasoning.entries}
-    />,
-  ];
+  // ------------------ Prefill and set step ------------------
+  useEffect(() => {
+    if (!editBatch) return;
 
-  // ---------------- Helpers ----------------
+    const newPhases = { ...phases };
+
+    PHASE_KEYS.forEach((key) => {
+      const batchPhaseKey = `${key}Phase`;
+      if (editBatch[batchPhaseKey]) {
+        newPhases[key] = {
+          ...editBatch[batchPhaseKey],
+          entries: editBatch[batchPhaseKey]?.entries || [],
+        };
+      }
+    });
+
+    setPhases(newPhases);
+    setCurrentBatch(editBatch);
+
+    // Determine first incomplete phase
+    let nextStep = 0;
+    for (let i = 0; i < PHASE_KEYS.length; i++) {
+      const key = PHASE_KEYS[i];
+      const data = newPhases[key];
+      const required = REQUIRED_FIELDS[key] || [];
+      const incomplete = required.some(
+        (f) => data[f] === "" || data[f] === null || data[f] === undefined
+      );
+      if (
+        incomplete ||
+        (ADDITIVE_PHASES.includes(key) &&
+          (!data.entries || data.entries.length === 0))
+      ) {
+        nextStep = i;
+        break;
+      }
+      nextStep = i + 1;
+    }
+    setStep(Math.min(nextStep, PHASE_KEYS.length - 1));
+  }, [editBatch]);
+
+  // ------------------ Helpers ------------------
   const sanitize = (data) =>
     Object.fromEntries(
       Object.entries(data).map(([k, v]) => [
@@ -122,19 +145,16 @@ const BatchCreate = ({ editBatch, onFinish }) => {
     return errors.length > 0 ? errors : null;
   };
 
-  const submitPhase = async ({
-    advanceStep = true,
-    returnToList = false,
-  } = {}) => {
-    const phaseKey = PHASE_KEYS[step];
+  // ------------------ Submit Phase ------------------
+  const handleSubmitPhase = async (goNext = true) => {
     setErrorMsg("");
-
+    const phaseKey = PHASE_KEYS[step];
     try {
       let phaseData = ADDITIVE_PHASES.includes(phaseKey)
         ? { ...phases[phaseKey] }
         : sanitize(phases[phaseKey]);
 
-      // Seasoning
+      // ----------------- Seasoning -----------------
       if (phaseKey === "seasoning") {
         if (!currentBatch) {
           setErrorMsg("You must complete Sourcing first");
@@ -152,26 +172,24 @@ const BatchCreate = ({ editBatch, onFinish }) => {
         if (entries.length > 0) {
           await addPhaseEntry(currentBatch._id, "seasoning", {
             entries,
-            timeTaken: Number(phaseData.timeTaken),
-            paperTowelCost: Number(phaseData.paperTowelCost),
+            timeTaken: Number(phaseData.timeTaken || 0),
+            paperTowelCost: Number(phaseData.paperTowelCost || 0),
           });
         }
       }
-
-      else if (ADDITIVE_PHASES.includes(phaseKey)) {
-        await addPhaseEntry(currentBatch._id, phaseKey, {
+      // ----------------- Vacuum -----------------
+      else if (phaseKey === "vacuum" && currentBatch) {
+        await addPhaseEntry(currentBatch._id, "vacuum", {
           entries: phaseData.entries || [],
           timeTaken: Number(phaseData.timeTaken || 0),
-          ...(phaseKey === "vacuum"
-            ? { vacuumRollCost: Number(phaseData.vacuumRollCost || 0) }
-            : { paperTowelCost: Number(phaseData.paperTowelCost || 0) }),
+          vacuumRollCost: Number(phaseData.vacuumRollCost || 0),
         });
       }
-      
+      // ----------------- Other phases -----------------
       else {
-        const missingFields = validatePhase(phaseKey, phaseData);
-        if (missingFields) {
-          setErrorMsg(`Missing or invalid fields: ${missingFields.join(", ")}`);
+        const missing = validatePhase(phaseKey, phaseData);
+        if (missing) {
+          setErrorMsg(`Missing or invalid fields: ${missing.join(", ")}`);
           return;
         }
 
@@ -182,16 +200,38 @@ const BatchCreate = ({ editBatch, onFinish }) => {
         }
       }
 
-      // Advance step if requested
-      if (advanceStep && step < PHASE_KEYS.length - 1) setStep(step + 1);
-
-      // If requested, return to batch list
-      if (returnToList && typeof onFinish === "function") onFinish();
+      // Move to next step if not just saving
+      if (goNext && step < PHASE_KEYS.length - 1) setStep(step + 1);
     } catch (err) {
       console.error(`Error submitting phase "${phaseKey}":`, err);
       setErrorMsg(err.message || "An error occurred while saving the phase.");
     }
   };
+
+  // ------------------ Phase Components ------------------
+  const phaseComponents = [
+    <PhaseSourcing
+      data={phases.sourcing}
+      onChange={(v) => setPhases((p) => ({ ...p, sourcing: v }))}
+    />,
+    <PhasePrepping
+      data={phases.prepping}
+      onChange={(v) => setPhases((p) => ({ ...p, prepping: v }))}
+    />,
+    <PhaseCuring
+      data={phases.curing}
+      onChange={(v) => setPhases((p) => ({ ...p, curing: v }))}
+    />,
+    <PhaseSeasoning
+      data={phases.seasoning}
+      onChange={(v) => setPhases((p) => ({ ...p, seasoning: v }))}
+    />,
+    <PhaseVacuum
+      data={phases.vacuum}
+      onChange={(v) => setPhases((p) => ({ ...p, vacuum: v }))}
+      previousPhaseEntries={phases.seasoning.entries}
+    />,
+  ];
 
   return (
     <motion.div
@@ -217,31 +257,31 @@ const BatchCreate = ({ editBatch, onFinish }) => {
           <FaArrowLeft /> Back
         </button>
 
-        <div className="flex gap-2">
-          <button
-            className="btn btn-secondary"
-            disabled={loading}
-            onClick={() => submitPhase({ returnToList: true })}
-          >
-            <FaSave /> Save Phase
-          </button>
+        <button
+          className="btn btn-secondary"
+          disabled={loading}
+          onClick={handleSubmitPhase}
+        >
+          {step === PHASE_KEYS.length - 1 ? (
+            <>
+              <FaSave /> Finish Batch
+            </>
+          ) : (
+            <>
+              <FaSave /> Save Phase
+            </>
+          )}
+        </button>
 
+        {step < PHASE_KEYS.length - 1 && (
           <button
             className="btn btn-primary"
             disabled={loading}
-            onClick={() => submitPhase()}
+            onClick={handleSubmitPhase}
           >
-            {step === PHASE_KEYS.length - 1 ? (
-              <>
-                <FaSave /> Finish Batch
-              </>
-            ) : (
-              <>
-                Next <FaArrowRight />
-              </>
-            )}
+            Next <FaArrowRight />
           </button>
-        </div>
+        )}
       </div>
     </motion.div>
   );
