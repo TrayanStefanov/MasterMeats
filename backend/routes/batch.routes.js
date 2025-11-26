@@ -3,14 +3,13 @@ import {
   createBatch,
   getBatches,
   getBatch,
-  updateBatch,
-  addSeasoningEntry,
-  addVacuumEntry,
   finishBatch,
   deleteBatch,
   updateSourcingPhase,
   updatePreppingPhase,
-  updateCuringPhase
+  updateCuringPhase,
+  updateSeasoningPhase,
+  updateVacuumPhase
 } from "../controllers/batch.controller.js";
 import { protectRoute, adminRoute } from "../middleware/auth.middleware.js";
 
@@ -26,8 +25,8 @@ router.delete("/:id", protectRoute, adminRoute, deleteBatch);
 router.put("/:id/sourcing", protectRoute, adminRoute, updateSourcingPhase);
 router.put("/:id/prepping", protectRoute, adminRoute, updatePreppingPhase);
 router.put("/:id/curing", protectRoute, adminRoute, updateCuringPhase);
-router.post("/:id/seasoning", protectRoute, adminRoute, addSeasoningEntry);
-router.post("/:id/vacuum", protectRoute, adminRoute, addVacuumEntry);
-router.post("/:id/finish", protectRoute, adminRoute, finishBatch);
+router.put("/:id/seasoning", protectRoute, adminRoute, updateSeasoningPhase);
+router.put("/:id/vacuum", protectRoute, adminRoute, updateVacuumPhase);
+router.put("/:id/finish", protectRoute, adminRoute, finishBatch);
 
 export default router;
