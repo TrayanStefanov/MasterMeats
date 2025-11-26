@@ -54,7 +54,7 @@ const CombinedSpiceSelector = ({
     <div className="relative w-full" ref={containerRef}>
       {/* Select Box */}
       <div
-        className="select select-bordered w-full flex justify-between items-center cursor-pointer"
+        className="select select-bordered bg-secondary w-full flex justify-between items-center cursor-pointer"
         onClick={() => setOpen(!open)}
       >
         {selectedLabel}
@@ -62,7 +62,7 @@ const CombinedSpiceSelector = ({
       </div>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full bg-base-200 border rounded-xl shadow-lg max-h-64 overflow-y-auto p-2">
+        <div className="absolute z-50 mt-1 w-full bg-secondary border border-accent rounded-xl shadow-lg max-h-64 overflow-y-auto p-2">
           
           {/* Search Box */}
           <input
@@ -85,7 +85,7 @@ const CombinedSpiceSelector = ({
             ) : (
               <div
                 key={item._id}
-                className="p-2 rounded-lg hover:bg-base-300 cursor-pointer"
+                className="p-2 rounded-lg text-primary  hover:bg-accent-content cursor-pointer"
                 onClick={() => {
                   onChange({ id: item._id, type: item.type });
                   setOpen(false);
