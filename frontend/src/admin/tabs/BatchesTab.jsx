@@ -5,7 +5,7 @@ import { useBatchStore } from "../stores/useBatchStore";
 import { useTranslation } from "react-i18next";
 
 import BatchList from "../components/BatchList";
-import BatchesCreate from "../components/BatchesCreate";
+import BatchCreate from "../components/BatchCreate";
 
 const BatchTab = () => {
   const { fetchBatches, clearCurrentBatch } = useBatchStore();
@@ -95,7 +95,7 @@ const BatchTab = () => {
               <FaArrowLeft /> {tCommon("buttons.back") || "Back"}
             </button>
 
-            <BatchesCreate 
+            <BatchCreate 
               editBatch={selectedBatch}
               onFinish={handleBack}
             />
