@@ -63,12 +63,12 @@ const PhaseSeasoning = ({ data, onChange }) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-xl font-bold">Seasoning</h2>
+      <h2 className="text-2xl font-bold indent-2 text-secondary">Seasoning</h2>
 
       {data.entries.map((entry, idx) => (
-        <div key={idx} className="bg-base-300 p-4 rounded-xl">
+        <div key={idx} className="border-4 border-secondary p-4 rounded-xl">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold">Entry #{idx + 1}</h3>
+            <h3 className="text-lg font-semibold text-secondary/80">Entry #{idx + 1}</h3>
             <button
               className="btn btn-error btn-sm"
               onClick={() => removeEntry(idx)}
