@@ -95,6 +95,7 @@ export const getAllClients = async (req, res) => {
 
 
       const orderStatus = getClientStatus(reservationsWithStatus);
+      console.log(client.name, orderStatus, reservationsWithStatus.map(r => r.status));
 
       return {
         ...client,
