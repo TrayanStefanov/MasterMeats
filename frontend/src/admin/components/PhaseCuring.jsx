@@ -4,7 +4,7 @@ const PhaseCuring = ({ data, onChange }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-xl font-bold">Curing</h2>
+      <h2 className="text-2xl font-bold indent-2 text-secondary">Curing</h2>
 
       <input
         className="input input-bordered"
