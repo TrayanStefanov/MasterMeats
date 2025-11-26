@@ -9,11 +9,11 @@ const PhaseSourcing = ({ data, onChange }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-xl font-bold">Sourcing</h2>
+      <h2 className="text-2xl font-bold indent-2 text-secondary">Sourcing</h2>
 
       {/* Meat Type Dropdown */}
       <select
-        className="select select-bordered w-full"
+        className="select select-bordered w-full bg-secondary"
         value={data.meatType || ""}
         onChange={(e) => update("meatType", e.target.value)}
       >
@@ -29,7 +29,7 @@ const PhaseSourcing = ({ data, onChange }) => {
 
       {/* Cut Type Dropdown */}
       <select
-        className="select select-bordered w-full"
+        className="select select-bordered w-full bg-secondary"
         value={data.meatCutType || ""}
         onChange={(e) => update("meatCutType", e.target.value)}
       >
