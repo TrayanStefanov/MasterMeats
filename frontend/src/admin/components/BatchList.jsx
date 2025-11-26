@@ -11,7 +11,9 @@ const BatchList = ({ onEdit }) => {
     expanded === id ? "bg-accent/90" : "hover:bg-accent/80 cursor-pointer";
 
   if (loading && batches.length === 0)
-    return <p className="text-center py-8 text-secondary/60">Loading batches…</p>;
+    return (
+      <p className="text-center py-8 text-secondary/60">Loading batches…</p>
+    );
 
   if (!batches || batches.length === 0)
     return (
@@ -56,37 +58,37 @@ const BatchList = ({ onEdit }) => {
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
-                  {batch.metrics?.totalDriedKg ?? "—"}
+                  {batch.driedTotal ?? "—"}
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
-                  {batch.metrics?.totalRawKg ?? "—"}
+                  {batch.sourcingPhase?.amountKg ?? "—"}
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
-                  {batch.metrics?.costPerKgDried
-                    ? "€" + batch.metrics.costPerKgDried.toFixed(2)
+                  {batch.costPerKgDried
+                    ? "€" + batch.costPerKgDried.toFixed(2)
                     : "—"}
                 </td>
 
                 <td className="px-6 py-4">
                   <span
                     className={`px-2 py-1 rounded text-xs ${
-                      batch.status === "complete"
+                      batch.finishTime
                         ? "bg-green-600 text-white"
                         : "bg-yellow-600 text-white"
                     }`}
                   >
-                    {batch.status || "In Progress"}
+                    {batch.finishTime ? "Complete" : "In Progress"}
                   </span>
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
-                  {batch.dateStarted ? batch.dateStarted.split("T")[0] : "—"}
+                  {batch.startTime ? batch.startTime.split("T")[0] : "—"}
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
-                  {batch.dateFinished ? batch.dateFinished.split("T")[0] : "—"}
+                  {batch.finishTime ? batch.finishTime.split("T")[0] : "—"}
                 </td>
 
                 <td className="px-6 py-4 text-right flex justify-end gap-3">
@@ -103,13 +105,15 @@ const BatchList = ({ onEdit }) => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setExpanded(
-                        expanded === batch._id ? null : batch._id
-                      );
+                      setExpanded(expanded === batch._id ? null : batch._id);
                     }}
                     className="text-accent-content/60 hover:text-accent-content transition-colors"
                   >
-                    {expanded === batch._id ? <FaChevronUp /> : <FaChevronDown />}
+                    {expanded === batch._id ? (
+                      <FaChevronUp />
+                    ) : (
+                      <FaChevronDown />
+                    )}
                   </button>
                 </td>
               </tr>
@@ -121,33 +125,30 @@ const BatchList = ({ onEdit }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <h4 className="font-bold text-primary">Total Time</h4>
-                        <p>{batch.metrics?.totalTime ?? "—"}</p>
+                        <p>{batch.totalWorkTime ?? "—"} min</p>
                       </div>
 
                       <div>
                         <h4 className="font-bold text-primary">Cost</h4>
                         <p>
-                          {batch.metrics?.totalCost
-                            ? "€" + batch.metrics.totalCost.toFixed(2)
+                          {batch.totalCost
+                            ? "€" + batch.totalCost.toFixed(2)
                             : "—"}
                         </p>
                       </div>
 
                       <div>
-                        <h4 className="font-bold text-primary">Raw / Waste</h4>
+                        <h4 className="font-bold text-primary">
+                          Raw / Waste / Cooking
+                        </h4>
                         <p>
-                          Raw: {batch.metrics?.totalRawKg ?? "—"} kg<br />
-                          Waste: {batch.metrics?.wasteKg ?? "—"} kg
+                          Raw: {batch.sourcingPhase?.amountKg ?? "—"} kg
+                          <br />
+                          Waste: {batch.preppingPhase?.wasteKg ?? "—"} kg
+                          <br />
+                          Cooked: {batch.preppingPhase?.cookingCutsKg ?? "—"} kg
                         </p>
                       </div>
-                    </div>
-
-                    {/* Cooking Info */}
-                    <div className="mt-4">
-                      <h4 className="font-bold text-primary">Cooking</h4>
-                      <pre className="whitespace-pre-wrap opacity-80">
-                        {batch?.cookingNotes || "No cooking notes."}
-                      </pre>
                     </div>
                   </td>
                 </tr>
