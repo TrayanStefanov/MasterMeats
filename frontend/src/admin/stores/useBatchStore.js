@@ -10,15 +10,36 @@ const PHASE_NAMES = {
   vacuum: "Vacuum Sealing",
 };
 
+// Helper: sanitize numeric fields
+const sanitizePhaseData = (data) =>
+  Object.fromEntries(
+    Object.entries(data).map(([k, v]) => [
+      k,
+      v === "" ? 0 : !isNaN(v) ? Number(v) : v,
+    ])
+  );
+
+// Helper: filter out empty/incomplete entries for array-based phases
+const filterValidEntries = (phase, entries) => {
+  if (!entries || !entries.length) return [];
+  return entries.filter((e) => {
+    if (phase === "seasoning") {
+      return (e.spiceId || e.spiceMixId) && Number(e.cuts) > 0 && Number(e.spiceAmountUsed) > 0;
+    }
+    if (phase === "vacuum") {
+      return Number(e.vacuumedSlices) > 0 || Number(e.driedKg) > 0;
+    }
+    return true; // for single-object phases, keep everything
+  });
+};
+
 export const useBatchStore = create((set, get) => ({
   batches: [],
   currentBatch: null,
   loading: false,
   error: null,
 
-  /* -----------------------------
-   * Generic API call helper
-   * ----------------------------- */
+  // Generic API helper
   apiCall: async (fn, successMsg = null, errorMsg = "Something went wrong") => {
     set({ loading: true, error: null });
     try {
@@ -35,34 +56,17 @@ export const useBatchStore = create((set, get) => ({
     }
   },
 
-  /* -----------------------------
-   * Fetch all batches
-   * ----------------------------- */
   fetchBatches: async () => {
-    const data = await get().apiCall(
-      () => axios.get("/batches"),
-      null,
-      "Failed to fetch batches"
-    );
+    const data = await get().apiCall(() => axios.get("/batches"), null, "Failed to fetch batches");
     set({ batches: data || [] });
   },
 
-  /* -----------------------------
-   * Fetch a single batch by ID
-   * ----------------------------- */
   fetchBatchById: async (id) => {
-    const data = await get().apiCall(
-      () => axios.get(`/batches/${id}`),
-      null,
-      "Failed to fetch batch"
-    );
+    const data = await get().apiCall(() => axios.get(`/batches/${id}`), null, "Failed to fetch batch");
     set({ currentBatch: data });
     return data;
   },
 
-  /* -----------------------------
-   * Create a new batch
-   * ----------------------------- */
   createBatch: async (batchData) => {
     const newBatch = await get().apiCall(
       () => axios.post("/batches", batchData),
@@ -78,14 +82,14 @@ export const useBatchStore = create((set, get) => ({
     return newBatch;
   },
 
-  /* -----------------------------
-   * Update a phase
-   * ----------------------------- */
+  // ---------------- Phase Update ----------------
   updatePhase: async (batchId, phase, data) => {
-    if (["seasoning", "vacuum"].includes(phase)) {
-      throw new Error(
-        `${PHASE_NAMES[phase]} is additive; use addPhaseEntry instead`
-      );
+    // Sanitize numeric fields
+    data = sanitizePhaseData(data);
+
+    // If phase has entries array, filter out incomplete entries
+    if (phase === "seasoning" || phase === "vacuum") {
+      data.entries = filterValidEntries(phase, data.entries);
     }
 
     const updatedBatch = await get().apiCall(
@@ -102,34 +106,6 @@ export const useBatchStore = create((set, get) => ({
     return updatedBatch;
   },
 
-  /* -----------------------------
-   * Add an entry to a phase (seasoning or vacuum)
-   * ----------------------------- */
-  addPhaseEntry: async (batchId, phase, data) => {
-    if (!["seasoning", "vacuum"].includes(phase)) {
-      throw new Error(`Invalid phase for entries: ${phase}`);
-    }
-
-    const payload = Array.isArray(data) ? { entries: data } : data;
-
-    const updatedBatch = await get().apiCall(
-      () => axios.post(`/batches/${batchId}/${phase}`, payload),
-      `${PHASE_NAMES[phase]} entry added`,
-      `Failed to add ${phase} entry`
-    );
-
-    set((state) => ({
-      currentBatch: state.currentBatch?._id === batchId ? updatedBatch : state.currentBatch,
-      batches: state.batches.map((b) => (b._id === batchId ? updatedBatch : b)),
-    }));
-
-    return updatedBatch;
-  },
-
-
-  /* -----------------------------
-   * Finish a batch
-   * ----------------------------- */
   finishBatch: async (batchId) => {
     const updatedBatch = await get().apiCall(
       () => axios.put(`/batches/${batchId}/finish`),
@@ -145,10 +121,6 @@ export const useBatchStore = create((set, get) => ({
     return updatedBatch;
   },
 
-  /* -----------------------------
-   * Reset state
-   * ----------------------------- */
   setCurrentBatch: (batch) => set({ currentBatch: batch }),
-
   clearCurrentBatch: () => set({ currentBatch: null, error: null }),
 }));
