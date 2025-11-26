@@ -6,17 +6,17 @@ const Stepper = ({ steps, current }) => {
       {steps.map((label, idx) => (
         <div key={idx} className="flex flex-col items-center w-full">
           <motion.div
-            className={`w-10 h-10 flex items-center justify-center rounded-full 
-            ${idx === current ? "bg-primary text-white" :
-              idx < current ? "bg-success text-white" :
-              "bg-base-300 text-base-content"}`}
+            className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-accent
+            ${idx === current ? "bg-accent-content text-white" :
+              idx < current ? "bg-accent border-secondary text-white" :
+              "bg-secondary text-base-content"}`}
             layout
           >
             {idx + 1}
           </motion.div>
-          <p className="text-sm mt-2">{label}</p>
-          {idx < steps.length - 1 && (
-            <div className="h-1 bg-base-300 w-full mt-4"></div>
+          <p className="text-lg font-bold mt-2 text-accent">{label}</p>
+          {idx < steps.length && (
+            <div className="h-1 bg-accent w-full mt-4"></div>
           )}
         </div>
       ))}
