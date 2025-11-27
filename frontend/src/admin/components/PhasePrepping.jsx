@@ -1,3 +1,5 @@
+import TimeInput from "./TimeInput";
+
 const PhasePrepping = ({ data, onChange }) => {
   const update = (field, value) =>
     onChange({ ...data, [field]: value });
@@ -25,12 +27,10 @@ const PhasePrepping = ({ data, onChange }) => {
       />
 
       {/* Time Taken */}
-      <input
-        type="number"
-        className="input input-bordered"
-        placeholder="Time taken (minutes)"
-        value={data.timeTaken}
-        onChange={(e) => update("timeTaken", e.target.value)}
+      <label>Time taken</label>
+      <TimeInput
+        valueMinutes={data.workTimeMinutes || 0}
+        onChange={(val) => update("workTimeMinutes", val)}
       />
     </div>
   );
