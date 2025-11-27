@@ -1,11 +1,44 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { FaEdit, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useBatchStore } from "../stores/useBatchStore";
+import { useSpiceStore } from "../stores/useSpiceStore";
+import { useSpiceMixStore } from "../stores/useSpiceMixStore";
+
+const currency = (v) => (typeof v === "number" ? `€${v.toFixed(2)}` : v ?? "—");
+
+const prettyNumber = (v, digits = 1) =>
+  typeof v === "number" ? v.toFixed(digits) : v ?? "—";
 
 const BatchList = ({ onEdit }) => {
   const { batches = [], loading } = useBatchStore();
+
+  // spice stores
+  const { spices, fetchSpices } = useSpiceStore();
+  const { spiceMixes, fetchSpiceMixes } = useSpiceMixStore();
+
+  // local expanded state
   const [expanded, setExpanded] = useState(null);
+
+  // ensure spices / mixes are loaded (non-blocking)
+  useEffect(() => {
+    if (!spices || spices.length === 0) fetchSpices();
+    if (!spiceMixes || spiceMixes.length === 0) fetchSpiceMixes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // quick lookup maps
+  const spicesById = useMemo(() => {
+    const map = new Map();
+    (spices || []).forEach((s) => map.set(s._id?.toString(), s));
+    return map;
+  }, [spices]);
+
+  const mixesById = useMemo(() => {
+    const map = new Map();
+    (spiceMixes || []).forEach((m) => map.set(m._id?.toString(), m));
+    return map;
+  }, [spiceMixes]);
 
   const rowClass = (id) =>
     expanded === id ? "bg-accent/90" : "hover:bg-accent/80 cursor-pointer";
@@ -21,6 +54,28 @@ const BatchList = ({ onEdit }) => {
         No batches created yet.
       </p>
     );
+
+  // helper to compute spice cost for a seasoning entry
+  const computeEntrySpiceCost = (entry) => {
+    const grams = Number(entry.spiceAmountUsed || 0); // grams
+    if (entry.spiceId) {
+      const spice = spicesById.get(entry.spiceId?.toString());
+      if (!spice || typeof spice.costPerKg !== "number")
+        return { cost: 0, name: "Unknown spice" };
+      // costPerKg -> cost per gram = /1000
+      const cost = (spice.costPerKg / 1000) * grams;
+      return { cost, name: spice.name || "Unknown spice" };
+    }
+    if (entry.spiceMixId) {
+      const mix = mixesById.get(entry.spiceMixId?.toString());
+      if (!mix || typeof mix.costPer100g !== "number")
+        return { cost: 0, name: "Unknown mix" };
+      // costPer100g -> cost per gram = /100
+      const cost = (mix.costPer100g / 100) * grams;
+      return { cost, name: mix.name || "Unknown mix" };
+    }
+    return { cost: 0, name: "Unknown" };
+  };
 
   return (
     <motion.div
@@ -43,175 +98,261 @@ const BatchList = ({ onEdit }) => {
         </thead>
 
         <tbody className="bg-accent/70 divide-y divide-accent-content">
-          {batches.map((batch) => (
-            <Fragment key={batch._id}>
-              {/* MAIN ROW */}
-              <tr
-                className={`transition-colors ${rowClass(batch._id)}`}
-                onClick={() =>
-                  setExpanded(expanded === batch._id ? null : batch._id)
-                }
-              >
-                <td className="px-6 py-4 text-secondary font-medium">
-                  {batch.batchNumber || batch._id.slice(-6)}
-                </td>
+          {batches.map((batch) => {
+            // compute breakdown for this row (non-expensive)
+            const rawKg = batch.sourcingPhase?.amountKg || 0;
+            const rawCost =
+              rawKg && batch.sourcingPhase?.pricePerKg
+                ? rawKg * batch.sourcingPhase.pricePerKg
+                : 0;
 
-                <td className="px-6 py-4 text-secondary/70">
-                  {batch.driedTotal ?? "—"}
-                </td>
+            const paperTowelCost = batch.seasoningPhase?.paperTowelCost || 0;
+            const vacuumRollCost = batch.vacuumPhase?.vacuumRollCost || 0;
 
-                <td className="px-6 py-4 text-secondary/70">
-                  {batch.totalCost ?? "—"}
-                </td>
+            // compute spice costs and per-item list
+            const seasoningEntries = batch.seasoningPhase?.entries || [];
+            const spiceLines = seasoningEntries.map((e) =>
+              computeEntrySpiceCost(e)
+            );
+            const spiceCost = spiceLines.reduce((s, l) => s + (l.cost || 0), 0);
 
-                <td className="px-6 py-4 text-secondary/70">
-                  {batch.costPerKgDried
-                    ? "€" + batch.costPerKgDried.toFixed(2)
-                    : "—"}
-                </td>
+            const computedTotal =
+              rawCost + paperTowelCost + vacuumRollCost + spiceCost;
 
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded text-xs ${
-                      batch.finishTime
-                        ? "bg-green-600 text-white"
-                        : "bg-yellow-600 text-white"
-                    }`}
-                  >
-                    {batch.finishTime ? "Complete" : "In Progress"}
-                  </span>
-                </td>
+            return (
+              <Fragment key={batch._id}>
+                {/* MAIN ROW */}
+                <tr
+                  className={`transition-colors ${rowClass(batch._id)}`}
+                  onClick={() =>
+                    setExpanded(expanded === batch._id ? null : batch._id)
+                  }
+                >
+                  <td className="px-6 py-4 text-secondary font-medium">
+                    {batch.batchNumber ?? batch._id.slice(-6)}
+                  </td>
 
-                <td className="px-6 py-4 text-secondary/70">
-                  {batch.finishTime ? batch.finishTime.split("T")[0] : "—"}
-                </td>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {typeof batch.driedTotal === "number"
+                      ? batch.driedTotal
+                      : "—"}
+                  </td>
 
-                <td className="px-6 py-4 text-right flex justify-end gap-3">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(batch);
-                    }}
-                    className="text-accent-content/60 hover:text-accent-content transition-colors"
-                  >
-                    <FaEdit />
-                  </button>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {batch.totalCost
+                      ? currency(batch.totalCost)
+                      : currency(computedTotal)}
+                  </td>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setExpanded(expanded === batch._id ? null : batch._id);
-                    }}
-                    className="text-accent-content/60 hover:text-accent-content transition-colors"
-                  >
-                    {expanded === batch._id ? (
-                      <FaChevronUp />
-                    ) : (
-                      <FaChevronDown />
-                    )}
-                  </button>
-                </td>
-              </tr>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {batch.costPerKgDried
+                      ? currency(batch.costPerKgDried)
+                      : "—"}
+                  </td>
 
-              {/* EXPANDED INFO */}
-              {expanded === batch._id && (
-                <tr className="bg-accent/50">
-                  <td colSpan="8" className="px-16 py-10 text-secondary">
-                    <h3 className="font-bold text-accent-content text-3xl mb-8 text-center">
-                      Batch #{batch.batchNumber || batch._id.slice(-6)} Info
-                    </h3>
-                    <div className="flex justify-between">
-                      {/* COLUMN 1 — TIME */}
-                      <div>
-                        <h4 className="font-bold text-accent-content text-xl mb-2 text-center">Time</h4>
-                        <p>
-                          Start:{" "}
-                          {batch.startTime
-                            ? new Date(batch.startTime).toLocaleString()
-                            : "—"}
-                          <br />
-                          Finish:{" "}
-                          {batch.finishTime
-                            ? new Date(batch.finishTime).toLocaleString()
-                            : "—"}
-                          <br />
-                          <br />
-                          Curing in Salt:{" "}
-                          {batch.curingPhase?.timeInSaltHours ?? "—"} hrs
-                          <br />
-                          Curing in Liquid:{" "}
-                          {batch.curingPhase?.timeInLiquidHours ?? "—"} hrs
-                          <br />
-                          <br />
-                          Total Work Time: {batch.totalWorkTime ?? "—"} min
-                          <br />
-                          Total Production Time:
-                          {batch.totalElapsedTimeHours
-                            ? batch.totalElapsedTimeHours.toFixed(1) + " hrs"
-                            : "—"}
-                        </p>
-                      </div>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-2 py-1 rounded text-xs ${
+                        batch.finishTime
+                          ? "bg-green-600 text-white"
+                          : "bg-yellow-600 text-white"
+                      }`}
+                    >
+                      {batch.finishTime ? "Complete" : "In Progress"}
+                    </span>
+                  </td>
 
-                      {/* COLUMN 2 — COST */}
-                      <div>
-                        <h4 className="font-bold text-accent-content text-xl mb-2 text-center">Cost</h4>
-                        <p>
-                          Raw Meat: €
-                          {batch.sourcingPhase
-                            ? (
-                                batch.sourcingPhase.amountKg *
-                                batch.sourcingPhase.pricePerKg
-                              ).toFixed(2)
-                            : "—"}
-                          <br />
-                          Salt Used: {batch.curingPhase?.saltAmountKg ?? "—"} kg
-                          <br />
-                          Spices:
-                          <br />
-                          {(batch.seasoningPhase?.entries ?? []).map((e, i) => (
-                            <span key={i} className="ml-3 block">
-                              {e.spiceId?.name ||
-                                e.spiceMixId?.name ||
-                                "Unknown"}{" "}
-                              — {e.spiceAmountUsed} g
-                            </span>
-                          ))}
-                          <br />
-                          Vacuum Rolls: €
-                          {batch.vacuumPhase?.vacuumRollCost ?? "—"}
-                        </p>
-                      </div>
+                  <td className="px-6 py-4 text-secondary/70">
+                    {batch.finishTime ? batch.finishTime.split("T")[0] : "—"}
+                  </td>
 
-                      {/* COLUMN 3 — DETAILS */}
-                      <div>
-                        <h4 className="font-bold text-accent-content text-xl mb-2 text-center">Details</h4>
-                        <p>
-                          Raw Meat: {batch.sourcingPhase?.amountKg ?? "—"} kg
-                          <br />
-                          Waste: {batch.preppingPhase?.wasteKg ?? "—"} kg
-                          <br />
-                          Cooking Cuts:{" "}
-                          {batch.preppingPhase?.cookingCutsKg ?? "—"} kg
-                          <br />
-                          {batch.curingPhase?.saltAmountKg &&
-                            batch.sourcingPhase?.amountKg && (
+                  <td className="px-6 py-4 text-right flex justify-end gap-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(batch);
+                      }}
+                      className="text-accent-content/60 hover:text-accent-content transition-colors"
+                    >
+                      <FaEdit />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpanded(expanded === batch._id ? null : batch._id);
+                      }}
+                      className="text-accent-content/60 hover:text-accent-content transition-colors"
+                    >
+                      {expanded === batch._id ? (
+                        <FaChevronUp />
+                      ) : (
+                        <FaChevronDown />
+                      )}
+                    </button>
+                  </td>
+                </tr>
+
+                {/* EXPANDED INFO */}
+                {expanded === batch._id && (
+                  <tr className="bg-accent/50">
+                    <td colSpan="8" className="px-16 py-10 text-secondary">
+                      <h3 className="font-bold text-accent-content text-3xl mb-8 text-center">
+                        Batch #{batch.batchNumber ?? batch._id.slice(-6)} Info
+                      </h3>
+
+                      <div className="flex justify-between gap-6">
+                        {/* COLUMN 1 — TIME */}
+                        <div className="flex-1">
+                          <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
+                            Time
+                          </h4>
+                          <p>
+                            <strong>Start:</strong>{" "}
+                            {batch.startTime
+                              ? new Date(batch.startTime).toLocaleString()
+                              : "—"}
+                            <br />
+                            <strong>Finish:</strong>{" "}
+                            {batch.finishTime
+                              ? new Date(batch.finishTime).toLocaleString()
+                              : "—"}
+                            <br />
+                            <br />
+                            <strong>Curing in salt:</strong>{" "}
+                            {batch.curingPhase?.timeInSaltHours ?? "—"} hrs
+                            <br />
+                            <strong>Curing in liquid:</strong>{" "}
+                            {batch.curingPhase?.timeInLiquidHours ?? "—"} hrs
+                            <br />
+                            <br />
+                            <strong>Total Work Time:</strong>{" "}
+                            {batch.totalWorkTime ?? "—"} hours
+                            <br />
+                            <strong>Total Production Time:</strong>{" "}
+                            {batch.totalElapsedTimeHours
+                              ? prettyNumber(batch.totalElapsedTimeHours, 2) +
+                                " hrs"
+                              : "—"}
+                          </p>
+                        </div>
+
+                        {/* COLUMN 2 — COST */}
+                        <div className="flex-1">
+                          <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
+                            Cost
+                          </h4>
+
+                          <div className="space-y-2">
+                            <div>
+                              <strong>Raw meat:</strong>{" "}
+                              {rawCost ? currency(rawCost) : currency(0)}{" "}
+                              <span className="text-sm text-secondary/70">
+                                ({rawKg ?? 0} kg @{" "}
+                                {batch.sourcingPhase?.pricePerKg
+                                  ? currency(batch.sourcingPhase.pricePerKg)
+                                  : "—"}
+                                /kg)
+                              </span>
+                            </div>
+
+                            <div>
+                              <strong>Salt used:</strong>{" "}
+                              {batch.curingPhase?.saltAmountKg
+                                ? `${batch.curingPhase.saltAmountKg} kg`
+                                : "—"}
+                            </div>
+
+                            <div>
+                              <strong>Spices</strong>{" "}
+                              <span className="text-sm text-secondary/70">
+                                ({seasoningEntries.length} entries)
+                              </span>
+                              <div className="mt-2 ml-3">
+                                {seasoningEntries.length === 0 && (
+                                  <div className="text-secondary/60">
+                                    No spices recorded
+                                  </div>
+                                )}
+                                {seasoningEntries.map((e, i) => {
+                                  const { cost, name } =
+                                    computeEntrySpiceCost(e);
+                                  return (
+                                    <div
+                                      key={i}
+                                      className="flex justify-between"
+                                    >
+                                      <div className="truncate text-sm">
+                                        {name} — {e.spiceAmountUsed ?? 0} g
+                                      </div>
+                                      <div className="text-sm">
+                                        {currency(cost)}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                                {seasoningEntries.length > 0 && (
+                                  <div className="mt-2 border-t pt-2">
+                                    <strong>Total spices:</strong>{" "}
+                                    {currency(spiceCost)}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div>
+                              <strong>Paper towels:</strong>{" "}
+                              {currency(paperTowelCost)}
+                            </div>
+
+                            <div>
+                              <strong>Vacuum rolls:</strong>{" "}
+                              {currency(vacuumRollCost)}
+                            </div>
+
+                            <div className="mt-3 border-t pt-2">
+                              <strong>Computed total:</strong>{" "}
+                              {currency(computedTotal)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* COLUMN 3 — DETAILS */}
+                        <div className="flex-1">
+                          <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
+                            Details
+                          </h4>
+                          <p>
+                            <strong>Raw meat:</strong>{" "}
+                            {batch.sourcingPhase?.amountKg ?? "—"} kg
+                            <br />
+                            <strong>Waste:</strong>{" "}
+                            {batch.preppingPhase?.wasteKg ?? "—"} kg
+                            <br />
+                            <strong>Cooking cuts:</strong>{" "}
+                            {batch.preppingPhase?.cookingCutsKg ?? "—"} kg
+                            <br />
+                            <br />
+                            {batch.curingPhase?.saltAmountKg &&
+                            batch.sourcingPhase?.amountKg ? (
                               <>
-                                Salt g/kg:{" "}
+                                <strong>Salt g/kg:</strong>{" "}
                                 {(
                                   (batch.curingPhase.saltAmountKg * 1000) /
                                   batch.sourcingPhase.amountKg
-                                ).toFixed(1)}{" "}
+                                ).toFixed(1) || 0}{" "}
                                 g/kg
                               </>
-                            )}
-                        </p>
+                            ) : null}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </Fragment>
-          ))}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            );
+          })}
         </tbody>
       </table>
     </motion.div>
