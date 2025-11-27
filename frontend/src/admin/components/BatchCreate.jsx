@@ -53,6 +53,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
     curing: {
       saltName: "",
       saltAmountKg: "",
+      saltCostPerKg: "",
       timeInSaltHours: "",
       liquidType: "",
       timeInLiquidHours: "",

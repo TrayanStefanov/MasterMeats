@@ -31,6 +31,7 @@ const PreppingPhaseSchema = new Schema({
 const CuringPhaseSchema = new Schema({
   saltName: { type: String },
   saltAmountKg: { type: Number, default: 0 },
+  saltCostPerKg: { type: Number, default: 0 },
   timeInSaltHours: { type: Number, default: 0 },
   liquidType: { type: String, default: null },
   timeInLiquidHours: { type: Number, default: 0 },
