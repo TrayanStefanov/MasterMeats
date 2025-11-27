@@ -1,3 +1,4 @@
+import TimeInput from "./TimeInput";
 const PhaseCuring = ({ data, onChange }) => {
   const update = (field, value) =>
     onChange({ ...data, [field]: value });
@@ -29,12 +30,10 @@ const PhaseCuring = ({ data, onChange }) => {
         onChange={(e) => update("saltCostPerKg", e.target.value)}
       />
 
-      <input
-        type="number"
-        className="input input-bordered"
-        placeholder="Time in salt (hours)"
-        value={data.timeInSaltHours}
-        onChange={(e) => update("timeInSaltHours", e.target.value)}
+      <label>Time in salt:</label>
+      <TimeInput
+        valueMinutes={data.timeInSaltMinutes}
+        onChange={(mins) => update("timeInSaltMinutes", mins)}
       />
 
       <input
@@ -44,28 +43,16 @@ const PhaseCuring = ({ data, onChange }) => {
         onChange={(e) => update("liquidType", e.target.value)}
       />
 
-      <input
-        type="number"
-        className="input input-bordered"
-        placeholder="Time in liquid (hours)"
-        value={data.timeInLiquidHours}
-        onChange={(e) => update("timeInLiquidHours", e.target.value)}
+      <label>Time in liquid:</label>
+      <TimeInput
+        valueMinutes={data.timeInLiquidMinutes}
+        onChange={(mins) => update("timeInLiquidMinutes", mins)}
       />
 
-      <input
-        type="number"
-        className="input input-bordered"
-        placeholder="Rinse time (minutes)"
-        value={data.rinseTime}
-        onChange={(e) => update("rinseTime", e.target.value)}
-      />
-
-      <input
-        type="number"
-        className="input input-bordered"
-        placeholder="Total time taken (minutes)"
-        value={data.timeTaken}
-        onChange={(e) => update("timeTaken", e.target.value)}
+      <label>Rinse time taken:</label>
+      <TimeInput
+        valueMinutes={data.workTimeMinutes}
+        onChange={(mins) => update("workTimeMinutes", mins)}
       />
     </div>
   );
