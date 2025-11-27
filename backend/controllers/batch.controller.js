@@ -67,7 +67,7 @@ const updatePhaseObject = async (req, res, field) => {
       ...(batch[field]?._doc || {}), // preserve existing phase fields
       ...req.body,                  // overwrite with new values
       entries: req.body.entries ?? batch[field]?.entries ?? [],
-      timeTaken: req.body.timeTaken ?? batch[field]?.timeTaken ?? 0,
+      workTimeMinutes: req.body.workTimeMinutes ?? batch[field]?.workTimeMinutes ?? 0,
       paperTowelCost:
         req.body.paperTowelCost ?? batch[field]?.paperTowelCost ?? 0,
       vacuumRollCost:
