@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSpiceStore } from "../stores/useSpiceStore";
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
+import TimeInput from "./TimeInput";
 
 const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
   const { spices, fetchSpices, loading: spicesLoading } = useSpiceStore();
-  const { spiceMixes, fetchSpiceMixes, loading: mixesLoading } = useSpiceMixStore();
+  const {
+    spiceMixes,
+    fetchSpiceMixes,
+    loading: mixesLoading,
+  } = useSpiceMixStore();
 
   const [initialized, setInitialized] = useState(false);
 
@@ -55,16 +60,31 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
           <h3 className="font-semibold mb-2">Entry #{idx + 1}</h3>
 
           <div className="flex flex-col gap-2">
-            <div><strong>Spice name:</strong> {entry.spiceName}</div>
-            <div><strong># of slices (seasoning):</strong> {entry.originalSlices}</div>
-            <div><strong>Rack positions:</strong> {entry.rackPositions.join(", ") || "N/A"}</div>
+            <div>
+              <strong>Spice name:</strong> {entry.spiceName}
+            </div>
+            <div>
+              <strong># of slices (seasoning):</strong> {entry.originalSlices}
+            </div>
+            <div>
+              <strong>Rack positions:</strong>{" "}
+              {entry.rackPositions.join(", ") || "N/A"}
+            </div>
+
+            <label className="mt-4 font-semibold">Time taken</label>
+            <TimeInput
+              valueMinutes={entry.timeDriedMinutes || 0}
+              onChange={(val) => updateEntry(idx, "timeDriedMinutes", val)}
+            />
 
             <input
               type="number"
               className="input input-bordered"
               placeholder="# of vacuumed slices"
               value={entry.vacuumedSlices}
-              onChange={(e) => updateEntry(idx, "vacuumedSlices", Number(e.target.value))}
+              onChange={(e) =>
+                updateEntry(idx, "vacuumedSlices", Number(e.target.value))
+              }
             />
 
             <input
@@ -72,18 +92,18 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
               className="input input-bordered"
               placeholder="Total dried KG"
               value={entry.driedKg}
-              onChange={(e) => updateEntry(idx, "driedKg", Number(e.target.value))}
+              onChange={(e) =>
+                updateEntry(idx, "driedKg", Number(e.target.value))
+              }
             />
           </div>
         </div>
       ))}
 
-      <input
-        type="number"
-        className="input input-bordered mt-4"
-        placeholder="Total time taken (minutes)"
-        value={data.timeTaken}
-        onChange={(e) => updateField("timeTaken", Number(e.target.value))}
+      <label className="mt-4 font-semibold">Time taken</label>
+      <TimeInput
+        valueMinutes={data.workTimeMinutes || 0}
+        onChange={(val) => updateField("workTimeMinutes", val)}
       />
 
       <input
