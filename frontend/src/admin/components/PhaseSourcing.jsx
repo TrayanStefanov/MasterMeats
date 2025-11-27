@@ -1,4 +1,5 @@
 import React from "react";
+import TimeInput from "./TimeInput";
 
 const meatTypes = ["Pork", "Chicken", "Veal"];
 const cutTypes = ["Loin", "Neck", "Leg", "Tenderloin"];
@@ -70,12 +71,10 @@ const PhaseSourcing = ({ data, onChange }) => {
       />
 
       {/* Time Taken (minutes*/}
-      <input
-        type="number"
-        className="input input-bordered"
-        placeholder="Time Taken (minutes)"
-        value={data.timeTaken || ""}
-        onChange={(e) => update("timeTaken", e.target.value)}
+      <label>Time Taken (minutes)</label>
+      <TimeInput
+        valueMinutes={data.workTimeMinutes || 0}
+        onChange={(val) => update("workTimeMinutes", val)}
       />
     </div>
   );
