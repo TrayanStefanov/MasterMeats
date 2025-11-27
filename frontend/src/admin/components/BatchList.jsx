@@ -54,7 +54,17 @@ const BatchList = ({ onEdit }) => {
         No batches created yet.
       </p>
     );
+  const formatWorkTime = (minutes) => {
+    if (!minutes && minutes !== 0) return "—";
 
+    const h = Math.floor(minutes / 60);
+    const m = Math.floor(minutes % 60);
+
+    if (h === 0) return `${m} min`;
+    if (m === 0) return `${h} h`;
+
+    return `${h}h ${m}m`;
+  };
   // helper to compute spice cost for a seasoning entry
   const computeEntrySpiceCost = (entry) => {
     const grams = Number(entry.spiceAmountUsed || 0); // grams
@@ -220,14 +230,19 @@ const BatchList = ({ onEdit }) => {
                             <br />
                             <br />
                             <strong>Curing in salt:</strong>{" "}
-                            {batch.curingPhase?.timeInSaltHours ?? "—"} hrs
+                            <p>
+                              {formatWorkTime(batch.curingPhase?.timeInSaltMinutes)}
+                              </p>
                             <br />
                             <strong>Curing in liquid:</strong>{" "}
-                            {batch.curingPhase?.timeInLiquidHours ?? "—"} hrs
+                            <p>
+                              {formatWorkTime(batch.curingPhase?.timeInLiquidMinutes)}
+                              </p>
+                              
                             <br />
                             <br />
                             <strong>Total Work Time:</strong>{" "}
-                            {batch.totalWorkTime ?? "—"} hours
+                            <p>{formatWorkTime(batch.totalWorkTime)}</p>
                             <br />
                             <strong>Total Production Time:</strong>{" "}
                             {batch.totalElapsedTimeHours
