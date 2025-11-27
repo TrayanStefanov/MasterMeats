@@ -47,21 +47,20 @@ const BatchCreate = ({ editBatch, onFinish }) => {
       supplier: "",
       amountKg: "",
       pricePerKg: "",
-      timeTaken: "",
+      workTimeMinutes: "",
     },
-    prepping: { wasteKg: "", cookingCutsKg: "", timeTaken: "" },
+    prepping: { wasteKg: "", cookingCutsKg: "", workTimeMinutes: "" },
     curing: {
       saltName: "",
       saltAmountKg: "",
       saltCostPerKg: "",
-      timeInSaltHours: "",
+      timeInSaltMinutes: "",
       liquidType: "",
-      timeInLiquidHours: "",
-      rinseTime: "",
-      timeTaken: "",
+      timeInLiquidMinutes: "",
+      workTimeMinutes: "",
     },
-    seasoning: { entries: [], timeTaken: "", paperTowelCost: "" },
-    vacuum: { entries: [], timeTaken: "", vacuumRollCost: "" },
+    seasoning: { entries: [], workTimeMinutes: "", paperTowelCost: "" },
+    vacuum: { entries: [], workTimeMinutes: "", vacuumRollCost: "" },
   });
 
   // ------------------ Prefill and set step ------------------
