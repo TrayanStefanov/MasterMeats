@@ -34,10 +34,9 @@ const BatchList = ({ onEdit }) => {
           <tr>
             <th className="px-6 py-3 text-left">Batch #</th>
             <th className="px-6 py-3 text-left">Dried KG</th>
-            <th className="px-6 py-3 text-left">Raw KG</th>
+            <th className="px-6 py-3 text-left">Total cost</th>
             <th className="px-6 py-3 text-left">Cost / KG</th>
             <th className="px-6 py-3 text-left">Status</th>
-            <th className="px-6 py-3 text-left">Started</th>
             <th className="px-6 py-3 text-left">Finished</th>
             <th className="px-6 py-3 text-right">Actions</th>
           </tr>
@@ -62,7 +61,7 @@ const BatchList = ({ onEdit }) => {
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
-                  {batch.sourcingPhase?.amountKg ?? "—"}
+                  {batch.totalCost ?? "—"}
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
@@ -81,10 +80,6 @@ const BatchList = ({ onEdit }) => {
                   >
                     {batch.finishTime ? "Complete" : "In Progress"}
                   </span>
-                </td>
-
-                <td className="px-6 py-4 text-secondary/70">
-                  {batch.startTime ? batch.startTime.split("T")[0] : "—"}
                 </td>
 
                 <td className="px-6 py-4 text-secondary/70">
@@ -121,32 +116,94 @@ const BatchList = ({ onEdit }) => {
               {/* EXPANDED INFO */}
               {expanded === batch._id && (
                 <tr className="bg-accent/50">
-                  <td colSpan="8" className="px-6 py-4 text-secondary">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <td colSpan="8" className="px-16 py-10 text-secondary">
+                    <h3 className="font-bold text-accent-content text-3xl mb-8 text-center">
+                      Batch #{batch.batchNumber || batch._id.slice(-6)} Info
+                    </h3>
+                    <div className="flex justify-between">
+                      {/* COLUMN 1 — TIME */}
                       <div>
-                        <h4 className="font-bold text-primary">Total Time</h4>
-                        <p>{batch.totalWorkTime ?? "—"} min</p>
-                      </div>
-
-                      <div>
-                        <h4 className="font-bold text-primary">Cost</h4>
+                        <h4 className="font-bold text-accent-content text-xl mb-2 text-center">Time</h4>
                         <p>
-                          {batch.totalCost
-                            ? "€" + batch.totalCost.toFixed(2)
+                          Start:{" "}
+                          {batch.startTime
+                            ? new Date(batch.startTime).toLocaleString()
+                            : "—"}
+                          <br />
+                          Finish:{" "}
+                          {batch.finishTime
+                            ? new Date(batch.finishTime).toLocaleString()
+                            : "—"}
+                          <br />
+                          <br />
+                          Curing in Salt:{" "}
+                          {batch.curingPhase?.timeInSaltHours ?? "—"} hrs
+                          <br />
+                          Curing in Liquid:{" "}
+                          {batch.curingPhase?.timeInLiquidHours ?? "—"} hrs
+                          <br />
+                          <br />
+                          Total Work Time: {batch.totalWorkTime ?? "—"} min
+                          <br />
+                          Total Production Time:
+                          {batch.totalElapsedTimeHours
+                            ? batch.totalElapsedTimeHours.toFixed(1) + " hrs"
                             : "—"}
                         </p>
                       </div>
 
+                      {/* COLUMN 2 — COST */}
                       <div>
-                        <h4 className="font-bold text-primary">
-                          Raw / Waste / Cooking
-                        </h4>
+                        <h4 className="font-bold text-accent-content text-xl mb-2 text-center">Cost</h4>
                         <p>
-                          Raw: {batch.sourcingPhase?.amountKg ?? "—"} kg
+                          Raw Meat: €
+                          {batch.sourcingPhase
+                            ? (
+                                batch.sourcingPhase.amountKg *
+                                batch.sourcingPhase.pricePerKg
+                              ).toFixed(2)
+                            : "—"}
+                          <br />
+                          Salt Used: {batch.curingPhase?.saltAmountKg ?? "—"} kg
+                          <br />
+                          Spices:
+                          <br />
+                          {(batch.seasoningPhase?.entries ?? []).map((e, i) => (
+                            <span key={i} className="ml-3 block">
+                              {e.spiceId?.name ||
+                                e.spiceMixId?.name ||
+                                "Unknown"}{" "}
+                              — {e.spiceAmountUsed} g
+                            </span>
+                          ))}
+                          <br />
+                          Vacuum Rolls: €
+                          {batch.vacuumPhase?.vacuumRollCost ?? "—"}
+                        </p>
+                      </div>
+
+                      {/* COLUMN 3 — DETAILS */}
+                      <div>
+                        <h4 className="font-bold text-accent-content text-xl mb-2 text-center">Details</h4>
+                        <p>
+                          Raw Meat: {batch.sourcingPhase?.amountKg ?? "—"} kg
                           <br />
                           Waste: {batch.preppingPhase?.wasteKg ?? "—"} kg
                           <br />
-                          Cooked: {batch.preppingPhase?.cookingCutsKg ?? "—"} kg
+                          Cooking Cuts:{" "}
+                          {batch.preppingPhase?.cookingCutsKg ?? "—"} kg
+                          <br />
+                          {batch.curingPhase?.saltAmountKg &&
+                            batch.sourcingPhase?.amountKg && (
+                              <>
+                                Salt g/kg:{" "}
+                                {(
+                                  (batch.curingPhase.saltAmountKg * 1000) /
+                                  batch.sourcingPhase.amountKg
+                                ).toFixed(1)}{" "}
+                                g/kg
+                              </>
+                            )}
                         </p>
                       </div>
                     </div>
