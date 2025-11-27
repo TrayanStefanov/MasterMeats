@@ -3,6 +3,7 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { useSpiceStore } from "../stores/useSpiceStore";
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 import CombinedSpiceSelector from "./CombinedSpiceSelector";
+import TimeInput from "./TimeInput";
 
 const PhaseSeasoning = ({ data, onChange }) => {
   const { spices, fetchSpices } = useSpiceStore();
@@ -147,12 +148,10 @@ const PhaseSeasoning = ({ data, onChange }) => {
         <FaPlus /> Add Entry
       </button>
 
-      <input
-        type="number"
-        className="input input-bordered mt-4"
-        placeholder="Time taken (minutes)"
-        value={data.timeTaken}
-        onChange={(e) => onChange({ ...data, timeTaken: e.target.value })}
+      <label className="mt-4 font-semibold">Time taken</label>
+      <TimeInput
+        valueMinutes={data.workTimeMinutes || 0}
+        onChange={(val) => onChange({ ...data, workTimeMinutes: val })}
       />
 
       <input
