@@ -7,11 +7,11 @@ import { useProductStore } from "../stores/useProductStore.js";
 
 const ProductsSection = () => {
   const { t } = useTranslation("productsSection");
-  const { products, fetchAllProducts, loading } = useProductStore();
+  const { products, fetchPublicProducts, loading } = useProductStore();
 
   useEffect(() => {
-    fetchAllProducts();
-  }, [fetchAllProducts, t]);
+    fetchPublicProducts();
+  }, [fetchPublicProducts, t]);
 
   return (
     <section id="products" className="py-4">
