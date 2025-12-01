@@ -110,7 +110,7 @@ const BatchList = ({ onEdit }) => {
         <tbody className="bg-accent/70 divide-y divide-accent-content">
           {batches.map((batch) => {
             // compute breakdown for this row (non-expensive)
-            const rawKg = batch.sourcingPhase?.amountKg || 0;
+            const rawKg = batch.sourcingPhase?.amountInGrams / 1000 || 0;
             const rawCost =
               rawKg && batch.sourcingPhase?.pricePerKg
                 ? rawKg * batch.sourcingPhase.pricePerKg
@@ -231,14 +231,17 @@ const BatchList = ({ onEdit }) => {
                             <br />
                             <strong>Curing in salt:</strong>{" "}
                             <p>
-                              {formatWorkTime(batch.curingPhase?.timeInSaltMinutes)}
-                              </p>
+                              {formatWorkTime(
+                                batch.curingPhase?.timeInSaltMinutes
+                              )}
+                            </p>
                             <br />
                             <strong>Curing in liquid:</strong>{" "}
                             <p>
-                              {formatWorkTime(batch.curingPhase?.timeInLiquidMinutes)}
-                              </p>
-                              
+                              {formatWorkTime(
+                                batch.curingPhase?.timeInLiquidMinutes
+                              )}
+                            </p>
                             <br />
                             <br />
                             <strong>Total Work Time:</strong>{" "}
@@ -273,8 +276,8 @@ const BatchList = ({ onEdit }) => {
 
                             <div>
                               <strong>Salt used:</strong>{" "}
-                              {batch.curingPhase?.saltAmountKg
-                                ? `${batch.curingPhase.saltAmountKg} kg`
+                              {batch.curingPhase?.saltAmountInGrams
+                                ? `${batch.curingPhase.saltAmountInGrams/1000} kg`
                                 : "—"}
                             </div>
 
@@ -339,21 +342,24 @@ const BatchList = ({ onEdit }) => {
                           </h4>
                           <p>
                             <strong>Raw meat:</strong>{" "}
-                            {batch.sourcingPhase?.amountKg ?? "—"} kg
+                            {(batch.sourcingPhase?.amountInGrams ?? 0) / 1000}{" "}
+                            kg
                             <br />
                             <strong>Waste:</strong>{" "}
-                            {batch.preppingPhase?.wasteKg ?? "—"} kg
+                            {(batch.preppingPhase?.wasteInGrams ?? 0) / 1000} kg
                             <br />
                             <strong>Cooking cuts:</strong>{" "}
-                            {batch.preppingPhase?.cookingCutsKg ?? "—"} kg
+                            {(batch.preppingPhase?.cookingCutsIngrams ?? 0) /
+                              1000}{" "}
+                            kg
                             <br />
                             <br />
-                            {batch.curingPhase?.saltAmountKg &&
+                            {batch.curingPhase?.saltAmountInGrams &&
                             batch.sourcingPhase?.amountKg ? (
                               <>
                                 <strong>Salt g/kg:</strong>{" "}
                                 {(
-                                  (batch.curingPhase.saltAmountKg * 1000) /
+                                  batch.curingPhase.saltAmountInGrams /
                                   batch.sourcingPhase.amountKg
                                 ).toFixed(1) || 0}{" "}
                                 g/kg
