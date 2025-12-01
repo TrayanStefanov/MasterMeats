@@ -10,10 +10,10 @@ export const useProductStore = create((set) => ({
 
   setProducts: (products) => set({ products, loading: false }),
 
-  fetchAllProducts: async () => {
+  fetchPublicProducts: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.get("/products");
+      const res = await axios.get("/products"); // only active
       const backendProducts = res.data.products || res.data;
 
       const localized = backendProducts.map((p) => ({
@@ -37,6 +37,39 @@ export const useProductStore = create((set) => ({
       set({ products: localized, loading: false });
     } catch (error) {
       console.error("Error fetching products:", error);
+      toast.error("Failed to fetch products");
+      set({ loading: false, error: error.message });
+    }
+  },
+
+  // ADMIN — used in dashboard
+  fetchAdminProducts: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axios.get("/products?showAll=true"); // all products
+      const backendProducts = res.data.products || res.data;
+
+      const localized = backendProducts.map((p) => ({
+        ...p,
+        title: i18next.t(`productsSection:${p.name}.title`, {
+          defaultValue: p.name,
+        }),
+        description: i18next.t(
+          `productsSection:${p.name}.description`,
+          { defaultValue: p.description || "" }
+        ),
+        ingredients: i18next.t(
+          `productsSection:${p.name}.ingredients`,
+          { defaultValue: "" }
+        ),
+        badge: i18next.t(`productsSection:${p.name}.badge`, {
+          defaultValue: "",
+        }),
+      }));
+
+      set({ products: localized, loading: false });
+    } catch (error) {
+      console.error("Error fetching admin products:", error);
       toast.error("Failed to fetch products");
       set({ loading: false, error: error.message });
     }
@@ -97,4 +130,19 @@ export const useProductStore = create((set) => ({
       set({ loading: false, error: error.message });
     }
   },
+
+  toggleProductActive: async (productId, isActive) => {
+  try {
+    if (isActive) {
+      await axios.patch(`/products/${productId}/enable`);
+    } else {
+      await axios.patch(`/products/${productId}/disable`);
+    }
+    toast.success(`Product ${isActive ? "enabled" : "disabled"}!`);
+  } catch (err) {
+    console.error("Failed to toggle active status:", err);
+    toast.error("Failed to toggle active status");
+  }
+}
+
 }));
