@@ -18,48 +18,55 @@ const PhaseSeasoning = ({ data, onChange }) => {
   const updateEntry = (idx, newFields) => {
     const entries = [...data.entries];
     entries[idx] = { ...entries[idx], ...newFields };
+    console.log(`[updateEntry] Before onChange, idx=${idx}:`, entries[idx]);
     onChange({ ...data, entries });
   };
 
   const addEntry = () => {
-    onChange({
-      ...data,
-      entries: [
-        ...data.entries,
-        {
-          cuts: "",
-          spiceId: null,
-          spiceMixId: null,
-          spiceAmountUsed: "",
-          rackPositions: [],
-        },
-      ],
-    });
+    const newEntry = {
+      cuts: "",
+      spiceId: null,
+      spiceMixId: null,
+      spiceAmountUsedInGrams: "",
+      rackPositions: [],
+    };
+    const updatedEntries = [...data.entries, newEntry];
+    console.log("[addEntry] Adding entry:", newEntry);
+    onChange({ ...data, entries: updatedEntries });
   };
 
   const removeEntry = (idx) => {
-    onChange({ ...data, entries: data.entries.filter((_, i) => i !== idx) });
+    const updatedEntries = data.entries.filter((_, i) => i !== idx);
+    console.log(
+      `[removeEntry] Removing index ${idx}, new entries:`,
+      updatedEntries
+    );
+    onChange({ ...data, entries: updatedEntries });
   };
 
   const validateEntries = () => {
     const errs = data.entries.map((entry, i) => {
       const e = {};
       if (!entry.spiceId && !entry.spiceMixId)
-        e.spice = "Select a spice or mix"; // mark as error
+        e.spice = "Select a spice or mix";
       if (!entry.cuts || entry.cuts <= 0) e.cuts = "Enter valid cuts";
-      if (!entry.spiceAmountUsed || entry.spiceAmountUsed <= 0)
+      if (!entry.spiceAmountUsedInGrams || entry.spiceAmountUsedInGrams <= 0)
         e.amount = "Enter spice amount";
       return Object.keys(e).length ? e : null;
     });
 
     setErrors(errs);
 
-    // Return true if there are any invalid entries
+    console.log("[validateEntries] Errors:", errs);
+    console.log("[validateEntries] Entries being validated:", data.entries);
+
     return errs.some(Boolean);
   };
 
+  // Watch for changes in entries
   useEffect(() => {
-    validateEntries(); // Call it
+    console.log("[useEffect] data.entries changed:", data.entries);
+    validateEntries();
   }, [data.entries]);
 
   return (
@@ -69,7 +76,9 @@ const PhaseSeasoning = ({ data, onChange }) => {
       {data.entries.map((entry, idx) => (
         <div key={idx} className="border-4 border-secondary p-4 rounded-xl">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-secondary/80">Entry #{idx + 1}</h3>
+            <h3 className="text-lg font-semibold text-secondary/80">
+              Entry #{idx + 1}
+            </h3>
             <button
               className="btn btn-error btn-sm"
               onClick={() => removeEntry(idx)}
@@ -110,7 +119,6 @@ const PhaseSeasoning = ({ data, onChange }) => {
                 })
               }
             />
-
             {errors[idx]?.spice && (
               <span className="text-red-500 text-sm">{errors[idx].spice}</span>
             )}
@@ -121,9 +129,9 @@ const PhaseSeasoning = ({ data, onChange }) => {
                 errors[idx]?.amount ? "input-error" : ""
               }`}
               placeholder="Spice used (grams)"
-              value={entry.spiceAmountUsed}
+              value={entry.spiceAmountUsedInGrams}
               onChange={(e) =>
-                updateEntry(idx, { spiceAmountUsed: e.target.value })
+                updateEntry(idx, { spiceAmountUsedInGrams: e.target.value })
               }
             />
             {errors[idx]?.amount && (
