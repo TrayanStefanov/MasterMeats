@@ -18,6 +18,8 @@ const productSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		defaultSpiceId: { type: mongoose.Schema.Types.ObjectId, ref: "Spice", default: null },
+		defaultSpiceMixId: { type: mongoose.Schema.Types.ObjectId, ref: "SpiceMix", default: null },
 		pricePerKg: {
 			type: Number,
 			required: [true, "Price per kilogram is required"],
@@ -38,7 +40,11 @@ const productSchema = new mongoose.Schema(
 		stockInGrams: {
 			type: Number,
 			min: [0, "Stock cannot be negative"],
-			default: null,
+			default: 0,
+		},
+		isActive: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	{ timestamps: true }
