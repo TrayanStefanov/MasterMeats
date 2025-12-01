@@ -91,9 +91,9 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
               type="number"
               className="input input-bordered"
               placeholder="Total dried KG"
-              value={entry.driedKg}
+              value={entry.driedInGrams}
               onChange={(e) =>
-                updateEntry(idx, "driedKg", Number(e.target.value))
+                updateEntry(idx, "driedInGrams", Number(e.target.value))
               }
             />
           </div>
