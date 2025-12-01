@@ -1,26 +1,37 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaTrash, FaEdit } from "react-icons/fa";
+import { MdDone, MdDoneOutline } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 
 import { useProductStore } from "../../stores/useProductStore";
 
 const ProductsList = ({ onEdit }) => {
-  const { products, fetchAllProducts, deleteProduct, loading } =
-    useProductStore();
+  const {
+    products,
+    fetchAdminProducts,
+    toggleProductActive,
+    deleteProduct,
+    loading,
+  } = useProductStore();
   const { t: tAdminProducts } = useTranslation("admin/products");
   const { t: tCommon } = useTranslation("admin/common");
   const { t: tProducts } = useTranslation("productsSection");
 
   useEffect(() => {
-    fetchAllProducts();
+    fetchAdminProducts();
 
-    const handleLangChange = () => fetchAllProducts();
+    const handleLangChange = () => fetchAdminProducts();
     i18next.on("languageChanged", handleLangChange);
 
     return () => i18next.off("languageChanged", handleLangChange);
-  }, [fetchAllProducts]);
+  }, [fetchAdminProducts]);
+
+  const handleToggleActive = async (productId, currentStatus) => {
+    await toggleProductActive(productId, !currentStatus);
+    fetchAdminProducts(); // refresh list after toggling
+  };
 
   if (loading && products.length === 0) {
     return (
@@ -57,6 +68,14 @@ const ProductsList = ({ onEdit }) => {
             <th className="px-6 py-3 text-left text-xs">
               {tAdminProducts("list.category")}
             </th>
+            <th className="px-6 py-3 text-left text-xs">
+              {tAdminProducts("list.stock")}
+            </th>{" "}
+            {/* new */}
+            <th className="px-6 py-3 text-center text-xs">
+              {tAdminProducts("list.active")}
+            </th>{" "}
+            {/* new */}
             <th className="px-6 py-3 text-right text-xs">
               {tAdminProducts("list.actions")}
             </th>
@@ -75,15 +94,13 @@ const ProductsList = ({ onEdit }) => {
             const title = tProducts(`${product.name}.title`, {
               defaultValue: product.title?.en || product.name,
             });
-            const description = tProducts(`${product.name}.description`, {
-              defaultValue: product.description?.en || "",
-            });
 
             return (
               <tr
                 key={product._id}
                 className="hover:bg-accent/90 transition-colors"
               >
+                {/* Name & Image */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-12 w-12">
@@ -98,30 +115,72 @@ const ProductsList = ({ onEdit }) => {
                         {title}
                       </div>
                       <div className="text-xs text-secondary/60 truncate max-w-[200px]">
-                        {description || "—"}
+                        {product.description?.en || "—"}
                       </div>
                     </div>
                   </div>
                 </td>
 
+                {/* Price */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-secondary/60">
                     €{product.pricePerKg?.toFixed(2) || "—"}
                   </div>
                 </td>
 
+                {/* Category */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-secondary/60">
                     {tAdminProducts(
                       "admin/forms:product.categoryDropdown.categories." +
                         product.category,
-                      {
-                        defaultValue: product.category,
-                      }
+                      { defaultValue: product.category }
                     )}
                   </div>
                 </td>
 
+                {/* Stock */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary/60">
+                  {product.stockInGrams ?? 0} g
+                </td>
+
+                {/* Active Toggle */}
+                <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <label
+                    title={product.isActive ? "Active" : "Inactive"}
+                    className={`inline-flex items-center cursor-pointer transition-colors ${
+                      product.isActive
+                        ? "text-accent-content"
+                        : "text-accent-content/60 hover:text-accent-content"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={product.isActive}
+                      onChange={() =>
+                        handleToggleActive(product._id, product.isActive)
+                      }
+                      className="hidden"
+                    />
+                    <span
+                      className={`w-5 h-5 flex items-center justify-center border rounded-md transition-colors
+                      ${
+                        product.isActive
+                          ? "bg-accent-content border-accent-content text-primary"
+                          : "bg-transparent border-accent-content text-accent-content/60 hover:text-accent-content"
+                      }
+                    `}
+                    >
+                      {product.isActive ? (
+                        <MdDone className="h-4 w-4" />
+                      ) : (
+                        <MdDoneOutline className="h-4 w-4" />
+                      )}
+                    </span>
+                  </label>
+                </td>
+
+                {/* Actions */}
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-middle">
                   <div className="flex justify-end items-center gap-3 h-full">
                     <button
