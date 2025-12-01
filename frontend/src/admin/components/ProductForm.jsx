@@ -6,10 +6,16 @@ import i18next from "i18next";
 
 import fetchLocales from "../../lib/fetchLocales.js";
 import { useProductStore } from "../../stores/useProductStore.js";
-import ProductImageUpload from "./ProductImageUpload.jsx";
+import { useSpiceStore } from "../stores/useSpiceStore.js";
+import { useSpiceMixStore } from "../stores/useSpiceMixStore.js";
 
-const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
+import ProductImageUpload from "./ProductImageUpload.jsx";
+import CombinedSpiceSelector from "./CombinedSpiceSelector.jsx";
+
+const ProductForm = ({ mode = "create", product = null, onFinish }) => {
   const { createProduct, updateProduct, loading } = useProductStore();
+  const { spices, fetchSpices } = useSpiceStore();
+  const { spiceMixes, fetchSpiceMixes } = useSpiceMixStore();
 
   const { t: tAdminProducts } = useTranslation("admin/products");
   const { t: tForms } = useTranslation("admin/forms");
@@ -25,10 +31,20 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     description: { en: "", bg: "" },
     ingredients: { en: "", bg: "" },
     badge: { en: "", bg: "" },
+    isActive: false,
+    defaultSpiceId: "",
+    defaultSpiceMixId: "",
   });
 
   const [localizedTitle, setLocalizedTitle] = useState("");
 
+  // Fetch spices and mixes on mount if creating or editing
+  useEffect(() => {
+    fetchSpices();
+    fetchSpiceMixes();
+  }, [fetchSpices, fetchSpiceMixes]);
+
+  // Load product data for edit
   useEffect(() => {
     if (mode === "edit" && product) {
       (async () => {
@@ -56,10 +72,15 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
             en: locales.en.badge || product.badge?.en || "",
             bg: locales.bg.badge || product.badge?.bg || "",
           },
+          isActive: product.isActive || false,
+          defaultSpiceId: product.defaultSpiceId || "",
+          defaultSpiceMixId: product.defaultSpiceMixId || "",
         });
 
         const lang = i18next.language;
-        setLocalizedTitle(locales[lang]?.title || product.title?.[lang] || product.name);
+        setLocalizedTitle(
+          locales[lang]?.title || product.title?.[lang] || product.name
+        );
       })();
     }
   }, [mode, product]);
@@ -67,7 +88,9 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
   useEffect(() => {
     if (mode === "edit" && product && formData.title) {
       const lang = i18next.language;
-      setLocalizedTitle(formData.title[lang] || product.title?.[lang] || product.name);
+      setLocalizedTitle(
+        formData.title[lang] || product.title?.[lang] || product.name
+      );
     }
   }, [formData.title, mode, product]);
 
@@ -98,7 +121,7 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     Promise.all(readers).then((base64Images) => {
       setFormData((prev) => ({
         ...prev,
-        images: [...prev.images, ...base64Images].slice(0, 5), // max 5
+        images: [...prev.images, ...base64Images].slice(0, 5),
       }));
     });
   };
@@ -135,13 +158,15 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
         description: { en: "", bg: "" },
         ingredients: { en: "", bg: "" },
         badge: { en: "", bg: "" },
+        isActive: false,
+        defaultSpiceId: "",
+        defaultSpiceMixId: "",
       });
     }
 
     if (typeof onFinish === "function") onFinish();
   };
 
-  // 🖋️ Render
   return (
     <motion.div
       className="p-8 max-w-4xl mx-auto"
@@ -151,13 +176,17 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
     >
       <h2 className="text-2xl lg:text-3xl font-semibold text-secondary text-center mb-6">
         {mode === "edit"
-          ? tAdminProducts("editTitle", { name: localizedTitle || product?.name || "Product" })
+          ? tAdminProducts("editTitle", {
+              name: localizedTitle || product?.name || "Product",
+            })
           : tAdminProducts("createTitle")}
       </h2>
 
       <form
         onSubmit={handleSubmit}
-        className={`space-y-6 ${loading ? "opacity-75 pointer-events-none" : ""}`}
+        className={`space-y-6 ${
+          loading ? "opacity-75 pointer-events-none" : ""
+        }`}
       >
         {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -197,9 +226,13 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
               className="input"
               required
             >
-              <option value="">{tForms("product.categoryDropdown.title")}</option>
+              <option value="">
+                {tForms("product.categoryDropdown.title")}
+              </option>
               {Object.keys(
-                tForms("product.categoryDropdown.categories", { returnObjects: true })
+                tForms("product.categoryDropdown.categories", {
+                  returnObjects: true,
+                })
               ).map((key) => (
                 <option key={key} value={key}>
                   {tForms(`product.categoryDropdown.categories.${key}`)}
@@ -219,6 +252,48 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
               min="0"
             />
           </div>
+        </div>
+
+        {/* Spice & Mix Select */}
+        <div className="flex flex-col">
+          <label className="label">Default Spice / Mix</label>
+          <CombinedSpiceSelector
+            spices={spices}
+            mixes={spiceMixes}
+            value={
+              formData.defaultSpiceId
+                ? { id: formData.defaultSpiceId, type: "spice" }
+                : formData.defaultSpiceMixId
+                ? { id: formData.defaultSpiceMixId, type: "mix" }
+                : null
+            }
+            onChange={(val) => {
+              if (!val) {
+                // Clear both
+                handleChange("defaultSpiceId", "");
+                handleChange("defaultSpiceMixId", "");
+                return;
+              }
+
+              if (val.type === "spice") {
+                handleChange("defaultSpiceId", val.id);
+                handleChange("defaultSpiceMixId", "");
+              } else if (val.type === "mix") {
+                handleChange("defaultSpiceMixId", val.id);
+                handleChange("defaultSpiceId", "");
+              }
+            }}
+          />
+        </div>
+
+        {/* Active Checkbox */}
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={formData.isActive}
+            onChange={(e) => handleChange("isActive", e.target.checked)}
+          />
+          <label className="label">Active Product</label>
         </div>
 
         {/* Images */}
@@ -241,7 +316,9 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 {tForms("product.langs.en.title")}
               </h4>
 
-              <label className="label">{tForms("product.langs.en.titleLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.en.titleLabel")}
+              </label>
               <input
                 type="text"
                 placeholder={tForms("product.langs.en.titlePlaceholder")}
@@ -250,16 +327,22 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 className="input"
               />
 
-              <label className="label">{tForms("product.langs.en.ingredientsLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.en.ingredientsLabel")}
+              </label>
               <input
                 type="text"
                 placeholder={tForms("product.langs.en.ingredientsPlaceholder")}
                 value={formData.ingredients.en}
-                onChange={(e) => handleChange("ingredients", e.target.value, "en")}
+                onChange={(e) =>
+                  handleChange("ingredients", e.target.value, "en")
+                }
                 className="input"
               />
 
-              <label className="label">{tForms("product.langs.en.badgeLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.en.badgeLabel")}
+              </label>
               <input
                 type="text"
                 placeholder={tForms("product.langs.en.badgePlaceholder")}
@@ -268,11 +351,15 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 className="input"
               />
 
-              <label className="label">{tForms("product.langs.en.descriptionLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.en.descriptionLabel")}
+              </label>
               <textarea
                 placeholder={tForms("product.langs.en.descriptionPlaceholder")}
                 value={formData.description.en}
-                onChange={(e) => handleChange("description", e.target.value, "en")}
+                onChange={(e) =>
+                  handleChange("description", e.target.value, "en")
+                }
                 className="input"
                 rows="6"
               />
@@ -284,7 +371,9 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 {tForms("product.langs.bg.title")}
               </h4>
 
-              <label className="label">{tForms("product.langs.bg.titleLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.bg.titleLabel")}
+              </label>
               <input
                 type="text"
                 placeholder={tForms("product.langs.bg.titlePlaceholder")}
@@ -293,16 +382,22 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 className="input"
               />
 
-              <label className="label">{tForms("product.langs.bg.ingredientsLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.bg.ingredientsLabel")}
+              </label>
               <input
                 type="text"
                 placeholder={tForms("product.langs.bg.ingredientsPlaceholder")}
                 value={formData.ingredients.bg}
-                onChange={(e) => handleChange("ingredients", e.target.value, "bg")}
+                onChange={(e) =>
+                  handleChange("ingredients", e.target.value, "bg")
+                }
                 className="input"
               />
 
-              <label className="label">{tForms("product.langs.bg.badgeLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.bg.badgeLabel")}
+              </label>
               <input
                 type="text"
                 placeholder={tForms("product.langs.bg.badgePlaceholder")}
@@ -311,11 +406,15 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
                 className="input"
               />
 
-              <label className="label">{tForms("product.langs.bg.descriptionLabel")}</label>
+              <label className="label">
+                {tForms("product.langs.bg.descriptionLabel")}
+              </label>
               <textarea
                 placeholder={tForms("product.langs.bg.descriptionPlaceholder")}
                 value={formData.description.bg}
-                onChange={(e) => handleChange("description", e.target.value, "bg")}
+                onChange={(e) =>
+                  handleChange("description", e.target.value, "bg")
+                }
                 className="input"
                 rows="6"
               />
@@ -350,4 +449,4 @@ const CreateProductForm = ({ mode = "create", product = null, onFinish }) => {
   );
 };
 
-export default CreateProductForm;
+export default ProductForm;
