@@ -18,8 +18,8 @@ const PhaseCuring = ({ data, onChange }) => {
         type="number"
         className="input input-bordered"
         placeholder="Amount of salt (KG)"
-        value={data.saltAmountKg}
-        onChange={(e) => update("saltAmountKg", e.target.value)}
+        value={data.saltAmountInGrams}
+        onChange={(e) => update("saltAmountInGrams", e.target.value)}
       />
 
       <input
