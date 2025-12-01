@@ -20,7 +20,7 @@ const PHASE_LABELS = [
 ];
 
 const REQUIRED_FIELDS = {
-  sourcing: ["meatType", "meatCutType", "supplier", "amountKg", "pricePerKg"],
+  sourcing: ["meatType", "meatCutType", "supplier", "amountInGrams", "pricePerKg"],
   prepping: [],
   curing: [],
   seasoning: [],
@@ -45,14 +45,14 @@ const BatchCreate = ({ editBatch, onFinish }) => {
       meatType: "",
       meatCutType: "",
       supplier: "",
-      amountKg: "",
+      amountInGrams: "",
       pricePerKg: "",
       workTimeMinutes: "",
     },
-    prepping: { wasteKg: "", cookingCutsKg: "", workTimeMinutes: "" },
+    prepping: { wasteInGrams: "", cookingCutsInGrams: "", workTimeMinutes: "" },
     curing: {
       saltName: "",
-      saltAmountKg: "",
+      saltAmountInGrams: "",
       saltCostPerKg: "",
       timeInSaltMinutes: "",
       liquidType: "",
@@ -124,7 +124,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
         if (phaseKey === "seasoning") {
           return {
             cuts: Number(entry.cuts) || 0,
-            spiceAmountUsed: Number(entry.spiceAmountUsed) || 0,
+            spiceAmountUsedInGrams: Number(entry.spiceAmountUsedInGrams) || 0,
             spiceId: entry.spiceId ? entry.spiceId.toString().trim() : null,
             spiceMixId: entry.spiceMixId
               ? entry.spiceMixId.toString().trim()
@@ -138,7 +138,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
           return {
             ...entry,
             vacuumedSlices: Number(entry.vacuumedSlices) || 0,
-            driedKg: Number(entry.driedKg) || 0,
+            driedInGrams: Number(entry.driedInGrams) || 0,
             rackPositions: Array.isArray(entry.rackPositions)
               ? entry.rackPositions
               : [],
@@ -151,10 +151,10 @@ const BatchCreate = ({ editBatch, onFinish }) => {
           return (
             (entry.spiceId || entry.spiceMixId) &&
             entry.cuts > 0 &&
-            entry.spiceAmountUsed > 0
+            entry.spiceAmountUsedInGrams > 0
           );
         if (phaseKey === "vacuum")
-          return entry.vacuumedSlices > 0 || entry.driedKg > 0;
+          return entry.vacuumedSlices > 0 || entry.driedInGrams > 0;
         return true;
       });
   };
@@ -168,7 +168,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
           errors.push(`Entry ${i + 1}: Must select a spice or mix`);
         if (!entry.cuts || entry.cuts <= 0)
           errors.push(`Entry ${i + 1}: Must have valid cuts`);
-        if (!entry.spiceAmountUsed || entry.spiceAmountUsed <= 0)
+        if (!entry.spiceAmountUsedInGrams || entry.spiceAmountUsedInGrams <= 0)
           errors.push(`Entry ${i + 1}: Must enter spice amount used`);
       }
     });
@@ -204,7 +204,7 @@ const BatchCreate = ({ editBatch, onFinish }) => {
           return;
         }
       }
-
+      console.log(phaseData)
       // Submit
       if (!currentBatch && step === 0) {
         await createBatch({ sourcingPhase: sanitize(phases.sourcing) });
