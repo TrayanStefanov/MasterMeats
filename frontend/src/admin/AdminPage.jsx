@@ -32,11 +32,11 @@ const AdminPage = () => {
     { id: "analytics", label: tCommon("tabs.analytics"), icon: <FaChartBar /> },
   ];
   const [activeTab, setActiveTab] = useState("products");
-  const { fetchAllProducts } = useProductStore();
+  const { fetchAdminProducts } = useProductStore();
 
   useEffect(() => {
-    fetchAllProducts();
-  }, [fetchAllProducts]);
+    fetchAdminProducts();
+  }, [fetchAdminProducts]);
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-secondary/80 via-secondary/40 to-secondary/80 p-8">
