@@ -57,8 +57,8 @@ const PhaseSourcing = ({ data, onChange }) => {
         type="number"
         className="input input-bordered"
         placeholder="Amount in Kg"
-        value={data.amountKg || ""}
-        onChange={(e) => update("amountKg", e.target.value)}
+        value={data.amountInGrams || ""}
+        onChange={(e) => update("amountInGrams", e.target.value)}
       />
 
       {/* Price per Kg */}
