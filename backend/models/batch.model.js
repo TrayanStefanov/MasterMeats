@@ -15,22 +15,22 @@ const SourcingPhaseSchema = new Schema({
   meatType: { type: String, required: true },
   meatCutType: { type: String, required: true },
   supplier: { type: String, required: true },
-  amountKg: { type: Number, required: true },
+  amountInGrams: { type: Number, required: true },
   pricePerKg: { type: Number, required: true },
   workTimeMinutes: { type: Number, default: 0 },
 });
 
 /** Prepping Phase */
 const PreppingPhaseSchema = new Schema({
-  wasteKg: { type: Number, default: 0 },
-  cookingCutsKg: { type: Number, default: 0 },
+  wasteInGrams: { type: Number, default: 0 },
+  cookingCutsInGrams: { type: Number, default: 0 },
   workTimeMinutes: { type: Number, default: 0 },
 });
 
 /** Curing Phase */
 const CuringPhaseSchema = new Schema({
   saltName: { type: String },
-  saltAmountKg: { type: Number, default: 0 },
+  saltAmountInGrams: { type: Number, default: 0 },
   saltCostPerKg: { type: Number, default: 0 },
   timeInSaltMinutes: { type: Number, default: 0 },
   liquidType: { type: String, default: null },
@@ -40,10 +40,11 @@ const CuringPhaseSchema = new Schema({
 
 /** Seasoning Entry (per spice/spiceMix) */
 const SeasoningEntrySchema = new Schema({
+  productId: { type: Schema.Types.ObjectId, ref: "Product", default: null },
   spiceId: { type: Schema.Types.ObjectId, ref: "Spice" },
   spiceMixId: { type: Schema.Types.ObjectId, ref: "SpiceMix" },
   cuts: { type: Number, required: true },
-  spiceAmountUsed: { type: Number, required: true },
+  spiceAmountUsedInGrams: { type: Number, required: true },
   rackPositions: [{ type: String }],
 });
 /**
@@ -54,7 +55,7 @@ SeasoningEntrySchema.pre("validate", function (next) {
   const hasSpice = this.spiceId || this.spiceMixId;
 
   // If cuts or spiceAmountUsed are present, then spiceId/spiceMixId is required
-  const meaningfulEntry = this.cuts || this.spiceAmountUsed;
+  const meaningfulEntry = this.cuts || this.spiceAmountUsedInGrams;
 
   if (meaningfulEntry && !hasSpice) {
     return next(
@@ -73,11 +74,12 @@ const SeasoningPhaseSchema = new Schema({
 
 /** Vacuum Phase **/
 const VacuumEntrySchema = new Schema({
+  productId: { type: Schema.Types.ObjectId, ref: "Product", default: null },
   spiceName: { type: String, required: true },
   originalSlices: { type: Number, required: true },
   rackPositions: [{ type: String }],
   vacuumedSlices: { type: Number, required: true },
-  driedKg: { type: Number, required: true },
+  driedInGrams: { type: Number, required: true },
   timeDriedMinutes: { type: Number, default: 0 },
 });
 
@@ -121,7 +123,7 @@ const BatchSchema = new Schema(
     totalElapsedTimeHours: { type: Number, default: 0 },
 
     totalCost: { type: Number, default: 0 },
-    driedTotal: { type: Number, default: 0 },
+    driedTotalInGrams: { type: Number, default: 0 },
     costPerKgDried: { type: Number, default: 0 },
   },
   { timestamps: true }
@@ -158,7 +160,7 @@ BatchSchema.pre("save", function (next) {
 
   // Cost
   if (this.sourcingPhase)
-    totalCost += this.sourcingPhase.amountKg * this.sourcingPhase.pricePerKg;
+    totalCost += (this.sourcingPhase.amountInGrams / 1000) * this.sourcingPhase.pricePerKg;
   if (this.seasoningPhase) totalCost += this.seasoningPhase.paperTowelCost || 0;
   if (this.vacuumPhase) totalCost += this.vacuumPhase.vacuumRollCost || 0;
 
@@ -170,11 +172,11 @@ BatchSchema.pre("save", function (next) {
       (this.finishTime - this.startTime) / (1000 * 60 * 60);
 
   // Dried total
-  this.driedTotal = (this.vacuumPhase?.entries || []).reduce(
-    (sum, v) => sum + (v.driedKg || 0),
+  this.driedTotalInGrams = (this.vacuumPhase?.entries || []).reduce(
+    (sum, v) => sum + (v.driedInGrams || 0),
     0
   );
-  this.costPerKgDried = this.driedTotal > 0 ? totalCost / this.driedTotal : 0;
+  this.costPerKgDried = this.driedTotalInGrams > 0 ? totalCost / (this.driedTotalInGrams/1000) : 0;
 
   next();
 });
