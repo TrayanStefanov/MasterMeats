@@ -91,7 +91,7 @@ const SpiceList = ({ onEdit }) => {
                   <td className="px-6 py-4 text-secondary/70">€{spice.costPerKg?.toFixed(2) ?? "—"}</td>
                   <td className="px-6 py-4 text-secondary/70">{spice.notes || "—"}</td>
                   <td className="px-6 py-4 text-secondary/70">
-                    <div className="flex items-center gap-2">
+                    <div className="flex justify-between gap-2">
                       <span>{spice.stockInGrams}</span>
                       <input
                         type="number"
@@ -120,6 +120,17 @@ const SpiceList = ({ onEdit }) => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        handleToggleActive(spice);
+                      }}
+                      className={`px-2 py-0.5 text-xs rounded ${
+                        spice.isActive ? "bg-green-600" : "bg-red-600"
+                      } text-white`}
+                    >
+                      {spice.isActive ? "Active" : "Inactive"}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         onEdit(spice);
                       }}
                       className="text-accent-content/60 hover:text-accent-content transition-colors"
@@ -134,17 +145,6 @@ const SpiceList = ({ onEdit }) => {
                       className="text-accent-content/60 hover:text-accent-content transition-colors"
                     >
                       <FaTrash />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleActive(spice);
-                      }}
-                      className={`px-2 py-0.5 text-xs rounded ${
-                        spice.isActive ? "bg-green-600" : "bg-red-600"
-                      } text-white`}
-                    >
-                      {spice.isActive ? "Active" : "Inactive"}
                     </button>
                   </td>
                 </tr>
