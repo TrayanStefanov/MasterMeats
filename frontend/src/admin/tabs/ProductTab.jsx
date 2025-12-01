@@ -3,46 +3,58 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaPlusCircle, FaArrowLeft } from "react-icons/fa";
 
 import { useProductStore } from "../../stores/useProductStore";
+import { useSpiceStore } from "../stores/useSpiceStore";
+import { useSpiceMixStore } from "../stores/useSpiceMixStore";
+
 import ProductForm from "../components/ProductForm";
 import ProductsList from "../components/ProductsList";
 import { useTranslation } from "react-i18next";
 
 const ProductTab = () => {
-  const { fetchAllProducts, products } = useProductStore();
+  const { fetchAdminProducts, products } = useProductStore();
+  const { fetchSpices } = useSpiceStore();
+  const { fetchSpiceMixes } = useSpiceMixStore();
+
   const [mode, setMode] = useState("list"); // "list" | "create" | "edit"
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const { t: tProducts } = useTranslation('admin/products');
-  const { t: tCommon } = useTranslation('admin/common');
+  const { t: tProducts } = useTranslation("admin/products");
+  const { t: tCommon } = useTranslation("admin/common");
 
   useEffect(() => {
-    fetchAllProducts();
-  }, [fetchAllProducts]);
+    fetchAdminProducts();
+  }, [fetchAdminProducts]);
 
   const handleEdit = (product) => {
-  // Normalize image data
-  const normalizedProduct = {
-    ...product,
-    images: product.images?.map((img) =>
-      typeof img === "string" ? img : img.url
-    ),
-  };
+    // Normalize image data
+    const normalizedProduct = {
+      ...product,
+      images: product.images?.map((img) => (typeof img === "string" ? img : img.url)),
+    };
 
-  setSelectedProduct(normalizedProduct);
-  setMode("edit");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-};
+    setSelectedProduct(normalizedProduct);
+    setMode("edit");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Fetch spices and spice mixes for dropdowns
+    fetchSpices();
+    fetchSpiceMixes();
+  };
 
   const handleCreate = () => {
     setMode("create");
     setSelectedProduct(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Fetch spices and spice mixes for dropdowns
+    fetchSpices();
+    fetchSpiceMixes();
   };
 
   const handleBack = async () => {
     setMode("list");
     setSelectedProduct(null);
-    await fetchAllProducts(); // refresh after create/update
+    await fetchAdminProducts(); // refresh after create/update
   };
 
   return (
@@ -63,10 +75,12 @@ const ProductTab = () => {
             className="flex flex-col gap-6"
           >
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-accent-content">{tProducts('title')}</h2>
+              <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-accent-content">
+                {tProducts("title")}
+              </h2>
               <button
                 onClick={handleCreate}
-                className="flex items-center text-base lg:text-xl xl:text-2xl  gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
+                className="flex items-center text-base lg:text-xl xl:text-2xl gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
               >
                 <FaPlusCircle /> {tCommon("buttons.createProduct")}
               </button>
@@ -87,9 +101,8 @@ const ProductTab = () => {
             <button
               onClick={handleBack}
               className="mb-4 flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
-              
             >
-              <FaArrowLeft /> {tProducts('back')}
+              <FaArrowLeft /> {tProducts("back")}
             </button>
 
             <ProductForm
