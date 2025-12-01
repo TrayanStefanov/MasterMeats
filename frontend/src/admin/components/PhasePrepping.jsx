@@ -13,17 +13,17 @@ const PhasePrepping = ({ data, onChange }) => {
         type="number"
         className="input input-bordered"
         placeholder="Waste cuts (trash) in KG"
-        value={data.wasteKg}
-        onChange={(e) => update("wasteKg", e.target.value)}
+        value={data.wasteInGrams}
+        onChange={(e) => update("wasteInGrams", e.target.value)}
       />
 
       {/* Cooking Cuts KG */}
       <input
         type="number"
         className="input input-bordered"
-        placeholder="Cooking cuts (imperfect fillets) in KG"
-        value={data.cookingCutsKg}
-        onChange={(e) => update("cookingCutsKg", e.target.value)}
+        placeholder="Cooking cuts (imperfect fillets) in Grams"
+        value={data.cookingCutsInGrams}
+        onChange={(e) => update("cookingCutsInGrams", e.target.value)}
       />
 
       {/* Time Taken */}
