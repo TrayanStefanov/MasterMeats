@@ -4,7 +4,7 @@ import { updateLocaleKey, deleteLocaleKey } from "../lib/localeUtils.js";
 
 export const getAllProducts = async (req, res) => {
 	try {
-		const products = await Product.find({});
+		const products = await Product.find(req.query.showAll ? {} : { isActive: true });
 		res.json(products);
 	} catch (error) {
 		console.error("Error in getAllProducts controller:", error.message);
@@ -43,6 +43,9 @@ export const createProduct = async (req, res) => {
 				.json({ message: "Missing required fields for product creation." });
 		}
 
+		if (req.body.defaultSpiceId === "") req.body.defaultSpiceId = null;
+		if (req.body.defaultSpiceMixId === "") req.body.defaultSpiceMixId = null;
+
 		const uploadedImages = [];
 		for (const img of images.slice(0, 5)) {
 			if (img.startsWith("data:")) {
@@ -65,6 +68,9 @@ export const createProduct = async (req, res) => {
 			images: uploadedImages,
 			category,
 			stockInGrams: stockInGrams || null,
+			defaultSpiceId: req.body.defaultSpiceId || null,
+			defaultSpiceMixId: req.body.defaultSpiceMixId || null,
+			isActive: req.body.isActive || false,
 		});
 
 		const i18nData = {
@@ -167,6 +173,8 @@ export const updateProduct = async (req, res) => {
 		if (updates.category === undefined) delete updates.category;
 		if (updates.stockInGrams === undefined) delete updates.stockInGrams;
 
+		if (updates.defaultSpiceId === "") updates.defaultSpiceId = null;
+		if (updates.defaultSpiceMixId === "") updates.defaultSpiceMixId = null;
 		const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
 			new: true,
 		});
@@ -277,6 +285,38 @@ export const deleteProduct = async (req, res) => {
 		res.json({ message: "Product deleted successfully", product });
 	} catch (error) {
 		console.error("Error in deleteProduct controller:", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
+
+export const enableProduct = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const product = await Product.findByIdAndUpdate(
+			id,
+			{ isActive: true },
+			{ new: true }
+		);
+		if (!product) return res.status(404).json({ message: "Product not found" });
+		res.json({ message: "Product enabled", product });
+	} catch (error) {
+		console.error("Error enabling product:", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
+
+export const disableProduct = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const product = await Product.findByIdAndUpdate(
+			id,
+			{ isActive: false },
+			{ new: true }
+		);
+		if (!product) return res.status(404).json({ message: "Product not found" });
+		res.json({ message: "Product disabled", product });
+	} catch (error) {
+		console.error("Error disabling product:", error.message);
 		res.status(500).json({ message: "Server error", error: error.message });
 	}
 };
