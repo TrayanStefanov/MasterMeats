@@ -101,7 +101,7 @@ const IRLReservationsList = ({ onEdit }) => {
               <th className="px-6 py-3 text-left text-xs">
                 {tReservations("list.name")}
               </th>
-              <th className="px-6 py-3 text-left text-xs">
+              <th className="px-6 py-3 text-left text-xs hidden lg:table-cell">
                 {tReservations("list.items")}
               </th>
               <th className="px-6 py-3 text-left text-xs">
@@ -140,7 +140,7 @@ const IRLReservationsList = ({ onEdit }) => {
                       )}
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-secondary/70 align-middle">
+                    <td className="px-6 py-4 text-sm text-secondary/70 align-middle hidden lg:table-cell">
                       {firstProduct && (
                         <>
                           {tProducts(
