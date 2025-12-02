@@ -31,7 +31,7 @@ const ProductionTab = () => {
       className="w-full"
     >
       {/* Sub-tabs */}
-      <div className="flex gap-4 mb-6 justify-center">
+      <div className="flex flex-col md:flex-row gap-4 mb-6 justify-center">
         {tabs.map((tab) => (
           <button
             key={tab.id}
