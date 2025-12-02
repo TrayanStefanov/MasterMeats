@@ -59,7 +59,7 @@ const BatchTab = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-6 min-h-[60vh]"
           >
             <div className="flex justify-between items-center">
               <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-accent-content">
