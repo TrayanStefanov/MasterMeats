@@ -1,46 +1,58 @@
 import { useEffect, useState } from "react";
 import { useSpiceStore } from "../stores/useSpiceStore";
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
+import { useProductStore } from "../../stores/useProductStore";
 import TimeInput from "./TimeInput";
 
 const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
-  const { spices, fetchSpices, loading: spicesLoading } = useSpiceStore();
-  const {
-    spiceMixes,
-    fetchSpiceMixes,
-    loading: mixesLoading,
-  } = useSpiceMixStore();
+  const { spices, fetchSpices } = useSpiceStore();
+  const { spiceMixes, fetchSpiceMixes } = useSpiceMixStore();
+  const { products, fetchAdminProducts } = useProductStore();
 
   const [initialized, setInitialized] = useState(false);
 
-  // Fetch spices and mixes on mount
+  /* ------------ LOAD ALL DATA ------------ */
   useEffect(() => {
     fetchSpices();
     fetchSpiceMixes();
+    fetchAdminProducts();
   }, []);
 
-  // Initialize vacuum entries from seasoning phase
+  /* ------------ INITIALIZE VACUUM ENTRIES ------------ */
   useEffect(() => {
-    if (!initialized && previousPhaseEntries?.length && !data.entries.length) {
-      const mappedEntries = previousPhaseEntries.map((e) => {
-        const spice = spices.find((s) => s._id === e.spiceId);
-        const mix = spiceMixes.find((m) => m._id === e.spiceMixId);
+  if (initialized) return;
+  if (!previousPhaseEntries?.length) return;
+  if (data.entries.length) return;
+  if (!spices.length && !spiceMixes.length) return;
 
-        return {
-          spiceName: spice ? spice.name : mix ? mix.name : "Unknown Spice",
-          originalSlices: Number(e.cuts) || 0,
-          rackPositions: Array.isArray(e.rackPositions) ? e.rackPositions : [],
-          vacuumedSlices: "",
-          driedKg: "",
-        };
-      });
+  const mapped = previousPhaseEntries.map((e) => {
+    const spice = spices.find((s) => s._id === e.spiceId);
+    const mix = spiceMixes.find((m) => m._id === e.spiceMixId);
 
-      onChange({ ...data, entries: mappedEntries });
-      setInitialized(true);
-    }
-  }, [previousPhaseEntries, spices, spiceMixes, data.entries, initialized]);
+    const product = products.find(
+      (p) =>
+        p.defaultSpiceId === e.spiceId ||
+        p.defaultSpiceMixId === e.spiceMixId
+    );
 
-  // Helper to update individual entries
+    return {
+      spiceId: e.spiceId ?? null,
+      spiceMixId: e.spiceMixId ?? null,
+      spiceName: spice ? spice.name : mix ? mix.name : "Unknown Spice",
+      productName: product?.name || "Unknown Product",
+      originalSlices: Number(e.cuts) || 0,
+      rackPositions: e.rackPositions || [],
+      vacuumedSlices: "",
+      driedInGrams: "",
+      timeDriedMinutes: 0,
+    };
+  });
+
+  onChange({ ...data, entries: mapped });
+  setInitialized(true);
+}, [previousPhaseEntries, spices, spiceMixes, products, initialized]);
+
+  /* ------------ HELPERS ------------ */
   const updateEntry = (idx, field, value) => {
     const newEntries = [...data.entries];
     newEntries[idx] = { ...newEntries[idx], [field]: value };
@@ -48,8 +60,6 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
   };
 
   const updateField = (field, value) => onChange({ ...data, [field]: value });
-
-  if (spicesLoading || mixesLoading) return <p>Loading spices...</p>;
 
   return (
     <div className="flex flex-col gap-6">
@@ -61,26 +71,29 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
 
           <div className="flex flex-col gap-2">
             <div>
+              <strong>Product:</strong> {entry.productName}
+            </div>
+            <div>
               <strong>Spice name:</strong> {entry.spiceName}
             </div>
             <div>
-              <strong># of slices (seasoning):</strong> {entry.originalSlices}
+              <strong>Slices (seasoning):</strong> {entry.originalSlices}
             </div>
             <div>
               <strong>Rack positions:</strong>{" "}
-              {entry.rackPositions.join(", ") || "N/A"}
+              {entry.rackPositions.join(", ") || "None"}
             </div>
 
-            <label className="mt-4 font-semibold">Time taken</label>
+            <label className="mt-4 font-semibold">Dry Time</label>
             <TimeInput
-              valueMinutes={entry.timeDriedMinutes || 0}
+              valueMinutes={entry.timeDriedMinutes}
               onChange={(val) => updateEntry(idx, "timeDriedMinutes", val)}
             />
 
             <input
               type="number"
               className="input input-bordered"
-              placeholder="# of vacuumed slices"
+              placeholder="Vacuumed slices"
               value={entry.vacuumedSlices}
               onChange={(e) =>
                 updateEntry(idx, "vacuumedSlices", Number(e.target.value))
@@ -90,7 +103,7 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
             <input
               type="number"
               className="input input-bordered"
-              placeholder="Total dried KG"
+              placeholder="Dried weight (grams)"
               value={entry.driedInGrams}
               onChange={(e) =>
                 updateEntry(idx, "driedInGrams", Number(e.target.value))
@@ -100,7 +113,7 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
         </div>
       ))}
 
-      <label className="mt-4 font-semibold">Time taken</label>
+      <label className="mt-4 font-semibold">Total Vacuum Work Time</label>
       <TimeInput
         valueMinutes={data.workTimeMinutes || 0}
         onChange={(val) => updateField("workTimeMinutes", val)}
