@@ -67,7 +67,7 @@ const AdminPage = () => {
       </div>
 
       {/* Content */}
-      <div className="w-full max-w-6xl bg-primary/80 border-4 border-accent rounded-2xl p-8 shadow-xl">
+      <div className="w-full max-w-6xl bg-primary/80 border-4 border-accent rounded-2xl p-4 md:p-8 shadow-xl">
         <Suspense
           fallback={
             <p className="text-center text-secondary/70 py-8">
