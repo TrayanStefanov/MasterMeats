@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTrash, FaEdit, FaChevronDown, FaEye } from "react-icons/fa";
+import { FaTrash, FaEdit, FaChevronDown, FaChevronUp, FaEye } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useClientStore } from "../stores/useClientStore";
@@ -78,7 +78,7 @@ const ClientsList = ({ onEdit }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <table className="min-w-full divide-y divide-accent-content">
+        <table className="min-w-full divide-y divide-accent-content hidden md:table">
           <thead className="bg-secondary/80 font-semibold text-primary uppercase tracking-wider">
             <tr>
               <th className="px-6 py-3 text-left text-xs">
@@ -287,7 +287,152 @@ const ClientsList = ({ onEdit }) => {
             ))}
           </tbody>
         </table>
+        <div className="md:hidden space-y-4 p-2 bg-secondary/80">
+          {clients.map((client) => {
+            const isExpanded = expandedClient === client._id;
+            return (
+              <motion.div
+                key={client._id}
+                className="bg-accent rounded-lg overflow-hidden"
+                layout
+              >
+                {/* Card Header */}
+                <div className="flex items-center justify-between p-3 cursor-pointer">
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-semibold text-secondary">
+                      {client.name}
+                    </p>
+                    {client.orderStatus && (
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full font-medium w-fit ${getStatusBadgeColor(
+                          client.orderStatus
+                        )}`}
+                      >
+                        {tCommon(`status.${client.orderStatus}`, {
+                          defaultValue: client.orderStatus,
+                        })}
+                      </span>
+                    )}
+                  </div>
 
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(client);
+                      }}
+                      className="text-accent-content/60 hover:text-accent-content"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteClient(client._id);
+                      }}
+                      className="text-accent-content/60 hover:text-accent-content"
+                    >
+                      <FaTrash />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedClient(isExpanded ? null : client._id);
+                      }}
+                      className="text-accent-content/60 hover:text-accent-content"
+                    >
+                      {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Expandable Info */}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      key={`${client._id}-details`}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm space-y-2"
+                    >
+                      <p>Phone: {client.phone || "—"}</p>
+                      <p>Paid: €{client.totalPaid?.toFixed(2) ?? "—"}</p>
+
+                      {client.reservations &&
+                        client.reservations.length > 0 && (
+                          <div className="space-y-2">
+                            <p className="font-semibold text-secondary">
+                              Reservations:
+                            </p>
+                            {client.reservations.map((r) => (
+                              <div
+                                key={r._id}
+                                className="flex justify-between items-center bg-gray-800/40 p-2 rounded"
+                              >
+                                <div>
+                                  <p className="text-secondary/70 text-xs">
+                                    {new Date(
+                                      r.dateOfDelivery
+                                    ).toLocaleDateString()}{" "}
+                                    —{" "}
+                                    <span
+                                      className={`font-semibold rounded px-1 ${
+                                        r.status === "completed"
+                                          ? "bg-green-500/80 text-white"
+                                          : r.status === "reserved"
+                                          ? "bg-blue-500/80 text-white"
+                                          : r.status === "inProcess"
+                                          ? "bg-yellow-500/80 text-white"
+                                          : "bg-gray-500/60 text-white"
+                                      }`}
+                                    >
+                                      {tCommon(`status.${r.status}`, {
+                                        defaultValue: r.status,
+                                      })}
+                                    </span>
+                                  </p>
+                                  <p className="text-xs text-secondary/50 mt-1">
+                                    {tReservations("details.totalAmount")}: €
+                                    {r.calculatedTotalAmount?.toFixed(2) ?? "—"}
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setModalReservation(r);
+                                  }}
+                                  className="text-accent-content/70 hover:text-accent-content"
+                                >
+                                  <FaEye />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                      <div>
+                        <p className="font-semibold text-secondary mb-1">
+                          Notes:
+                        </p>
+                        {client.notes ? (
+                          <p className="text-secondary/70 whitespace-pre-wrap">
+                            {client.notes}
+                          </p>
+                        ) : (
+                          <p className="text-secondary/40 italic">
+                            No notes provided.
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
         <Pagination
           totalPages={totalPages}
           currentPage={currentPage}
