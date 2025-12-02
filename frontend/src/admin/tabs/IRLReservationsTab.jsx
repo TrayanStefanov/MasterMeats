@@ -64,8 +64,8 @@ const IRLReservationsTab = () => {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-6 min-h-[60vh]"
           >
-            <div className="flex justify-between px-8 items-center">
-              <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-accent-content">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <h2 className="mb-2 md:mt-0 text-2xl lg:text-3xl xl:text-4xl font-bold text-accent-content">
                 {tReservations("tabs.irl")}
               </h2>
               <button
