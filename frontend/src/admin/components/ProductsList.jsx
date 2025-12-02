@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaTrash, FaEdit, FaChevronDown, FaChevronUp  } from "react-icons/fa";
 import { MdDone, MdDoneOutline } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
@@ -19,6 +19,8 @@ const ProductsList = ({ onEdit }) => {
   const { t: tCommon } = useTranslation("admin/common");
   const { t: tProducts } = useTranslation("productsSection");
 
+  const [expandedRows, setExpandedRows] = useState([]);
+
   useEffect(() => {
     fetchAdminProducts();
 
@@ -32,6 +34,28 @@ const ProductsList = ({ onEdit }) => {
     await toggleProductActive(productId, !currentStatus);
     fetchAdminProducts(); // refresh list after toggling
   };
+
+  const toggleExpand = (id) => {
+    setExpandedRows((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  if (loading && products.length === 0) {
+    return (
+      <p className="text-center py-8 text-secondary/60">
+        {tCommon("loading.loading")}
+      </p>
+    );
+  }
+
+  if (!products || products.length === 0) {
+    return (
+      <p className="text-center py-8 text-secondary/60">
+        {tAdminProducts("empty")}
+      </p>
+    );
+  }
 
   if (loading && products.length === 0) {
     return (
@@ -56,7 +80,7 @@ const ProductsList = ({ onEdit }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <table className="min-w-full divide-y divide-accent-content">
+      <table className="min-w-full divide-y divide-accent-content hidden md:table">
         <thead className="bg-secondary/80 font-semibold text-primary uppercase tracking-wider">
           <tr>
             <th className="px-6 py-3 text-left text-xs">
@@ -204,6 +228,104 @@ const ProductsList = ({ onEdit }) => {
           })}
         </tbody>
       </table>
+      <div className="md:hidden space-y-4 p-2 bg-secondary">
+        {products.map((product) => {
+          const isExpanded = expandedRows.includes(product._id);
+          const firstImage =
+            typeof product.images?.[0] === "string"
+              ? product.images[0]
+              : product.images?.[0]?.url || product.image || "/placeholder.png";
+          const title = tProducts(`${product.name}.title`, {
+            defaultValue: product.title?.en || product.name,
+          });
+
+          return (
+            <motion.div
+              key={product._id}
+              className="bg-accent rounded-lg overflow-hidden"
+              layout
+            >
+              {/* Card Header */}
+              <div className="flex items-center justify-between p-3 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={firstImage}
+                    alt={title}
+                    className="w-12 h-12 rounded-md object-cover border border-gray-600"
+                  />
+                  <div>
+                    <div className="text-sm font-medium text-secondary">
+                      {title}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={product.isActive}
+                      onChange={() =>
+                        handleToggleActive(product._id, product.isActive)
+                      }
+                      className="hidden"
+                    />
+                    <span
+                      className={`w-5 h-5 flex items-center justify-center border rounded-md ${
+                        product.isActive
+                          ? "bg-accent-content border-accent-content text-primary"
+                          : "bg-transparent border-accent-content text-accent-content/60 hover:text-accent-content"
+                      }`}
+                    >
+                      {product.isActive ? (
+                        <MdDone className="h-4 w-4" />
+                      ) : (
+                        <MdDoneOutline className="h-4 w-4" />
+                      )}
+                    </span>
+                  </label>
+                  <button
+                    onClick={() => onEdit(product)}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => deleteProduct(product._id)}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    <FaTrash />
+                  </button>
+                  <button
+                    onClick={() => toggleExpand(product._id)}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Expandable Info */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    key={`${product._id}-details`}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm"
+                  >
+                    <p>Price: €{product.pricePerKg?.toFixed(2) || "—"}</p>
+                    <p>Category: {product.category}</p>
+                    <p>Stock: {product.stockInGrams ?? 0} g</p>
+                    <p>Description: {product.description?.en || "—"}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
     </motion.div>
   );
 };
