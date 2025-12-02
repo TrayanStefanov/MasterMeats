@@ -24,7 +24,7 @@ const filterValidEntries = (phase, entries) => {
   if (!entries || !entries.length) return [];
   return entries.filter((e) => {
     if (phase === "seasoning") {
-      return (e.spiceId || e.spiceMixId) && Number(e.cuts) > 0 && Number(e.spiceAmountUsed) > 0;
+      return (e.spiceId || e.spiceMixId) && Number(e.cuts) > 0 && Number(e.spiceAmountUsedInGrams) > 0;
     }
     if (phase === "vacuum") {
       return Number(e.vacuumedSlices) > 0 || Number(e.driedKg) > 0;
@@ -85,13 +85,16 @@ export const useBatchStore = create((set, get) => ({
   // ---------------- Phase Update ----------------
   updatePhase: async (batchId, phase, data) => {
     // Sanitize numeric fields
+    console.log("data", data);
     data = sanitizePhaseData(data);
 
     // If phase has entries array, filter out incomplete entries
     if (phase === "seasoning" || phase === "vacuum") {
       data.entries = filterValidEntries(phase, data.entries);
     }
+    console.log("phase", phase);
 
+    console.log("data", data);
     const updatedBatch = await get().apiCall(
       () => axios.put(`/batches/${batchId}/${phase}`, data),
       `${PHASE_NAMES[phase] || phase} phase updated`,
