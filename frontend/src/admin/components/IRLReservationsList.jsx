@@ -8,10 +8,9 @@ import {
   FaChevronUp,
 } from "react-icons/fa";
 import { MdDone, MdDoneOutline  } from "react-icons/md";
-
-
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+
 import { useReservationStore } from "../stores/useReservationStore";
 import Pagination from "./Pagination";
 import ReservationFilters from "./ReservationFilters";
@@ -85,7 +84,7 @@ const IRLReservationsList = ({ onEdit }) => {
 
   return (
     <motion.div
-      className="shadow-xl rounded-md overflow-hidden max-w-6xl mx-auto mt-8"
+      className="flex flex-col shadow-xl rounded-md overflow-hidden max-w-6xl mx-auto gap-8 mt-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -94,7 +93,7 @@ const IRLReservationsList = ({ onEdit }) => {
       <ReservationFilters />
 
       {/* Reservations Table */}
-      <div className="overflow-x-auto mt-4">
+      <div className="overflow-x-auto mt-4 hidden md:block">
         <table className="min-w-full divide-y divide-accent-content">
           <thead className="bg-secondary/60 font-semibold text-primary uppercase tracking-wider">
             <tr>
@@ -107,7 +106,7 @@ const IRLReservationsList = ({ onEdit }) => {
               <th className="px-6 py-3 text-left text-xs">
                 {tReservations("list.total")}
               </th>
-              <th className="px-6 py-3 text-left text-xs">
+              <th className="px-6 py-3 text-left text-xs hidden lg:table-cell">
                 {tReservations("list.amountDue")}
               </th>
               <th className="px-6 py-3 text-left text-xs">
@@ -168,7 +167,7 @@ const IRLReservationsList = ({ onEdit }) => {
                       €{res.calculatedTotalAmount?.toFixed(2) || "0.00"}
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-medium align-middle">
+                    <td className="px-6 py-4 text-sm font-medium align-middle hidden lg:table-cell">
                       <span
                         className={
                           res.amountDue > 0
@@ -328,7 +327,113 @@ const IRLReservationsList = ({ onEdit }) => {
           </tbody>
         </table>
       </div>
+      {/* Mobile cards using same collapsed style as ClientsList */}
+      <div className="md:hidden space-y-4 p-2 bg-secondary/80">
+        {reservations.map((res) => {
+          const isExpanded = expandedRows.includes(res._id);
+          return (
+            <motion.div key={res._id} className="bg-accent rounded-lg overflow-hidden" layout>
+              {/* Card Header */}
+              <div className="flex items-center justify-between p-3 cursor-pointer">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm font-semibold text-secondary">{res.client?.name}</p>
+                  <span className={`px-2 py-0.5 text-xs rounded-full font-medium w-fit ${getStatusBadgeColor(res.status)}`}>
+                    {tCommon(`status.${res.status}`)}
+                  </span>
+                </div>
 
+                <div className="flex items-center gap-2">
+                  <span className="text-secondary/70 font-medium">€{res.calculatedTotalAmount?.toFixed(2) || "0.00"}</span>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      completeReservation(res._id);
+                    }}
+                    disabled={res.completed}
+                    className={`transition-colors ${
+                      res.completed
+                        ? "text-primary cursor-default"
+                        : "text-accent-content/60 hover:text-accent-content"
+                    }`}
+                  >
+                    {res.completed ? <MdDone className="h-6 w-6" /> : <MdDoneOutline className="h-6 w-6" />}
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit && onEdit(res);
+                    }}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    <FaEdit />
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteReservation(res._id);
+                    }}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    <FaTrash />
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpand(res._id);
+                    }}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Expanded section */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    key={`${res._id}-details`}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm space-y-2"
+                  >
+                    <p>Phone: {res.client?.phone || "—"}</p>
+                    <p>Amount Due: €{res.amountDue?.toFixed(2) || "0.00"}</p>
+                    <p>Delivery: {new Date(res.dateOfDelivery).toLocaleDateString()}</p>
+
+                    {res.products?.length > 0 && (
+                      <div>
+                        <p className="font-semibold text-secondary mb-1">Products:</p>
+                        {res.products.map((p, idx) => (
+                          <div key={idx} className="flex justify-between text-secondary/70 text-sm">
+                            <span>{tProducts(`${p.product?.key || p.product?.name}.title`, { defaultValue: p.product?.name || "—" })} ({p.quantityInGrams} g)</span>
+                            <span className="text-secondary/50">€{p.priceAtReservation?.toFixed(2) || "0.00"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="font-semibold text-secondary mb-1">Notes:</p>
+                      {res.notes ? (
+                        <p className="text-secondary/70 whitespace-pre-wrap">{res.notes}</p>
+                      ) : (
+                        <p className="text-secondary/40 italic">No notes provided.</p>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
