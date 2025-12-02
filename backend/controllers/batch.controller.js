@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Batch from "../models/batch.model.js";
 import Spice from "../models/spice.model.js";
 import SpiceMix from "../models/spiceMix.model.js";
+import Product from "../models/product.model.js";
 
 /* --------------------------- HELPER --------------------------- */
 const handleError = (res, context, err) => {
@@ -52,32 +53,28 @@ export const getBatch = async (req, res) => {
 /* --------------------------- UPDATE PHASES WITH STOCK ADJUSTMENT --------------------------- */
 const updatePhaseObject = async (req, res, field) => {
   try {
-    console.log('req body', req.body);
     const batch = await Batch.findById(req.params.id);
     if (!batch) return res.status(404).json({ error: "Batch not found" });
-    // Previous entries for delta calculation
-    const prevEntries = batch[field]?.entries || [];
-    const newEntries = req.body.entries ?? [];
 
-    // Only handle stock deduction for seasoningPhase
+    const prevEntries = batch[field]?.entries || [];
+    const newEntries = req.body.entries || [];
+
+    /* ---------------- SEASONING STOCK DEDUCTION ---------------- */
     if (field === "seasoningPhase") {
       for (let i = 0; i < newEntries.length; i++) {
         const prev = prevEntries[i] || {};
         const curr = newEntries[i];
 
-        const prevAmount = prev.spiceAmountUsedInGrams || 0;
-        const currAmount = curr.spiceAmountUsedInGrams || 0;
+        const prevAmount = Number(prev.spiceAmountUsedInGrams || 0);
+        const currAmount = Number(curr.spiceAmountUsedInGrams || 0);
         const delta = currAmount - prevAmount;
-
-        if (delta === 0) continue;
+        if (!delta) continue;
 
         if (curr.spiceId) {
-          // Deduct from individual spice
           await Spice.findByIdAndUpdate(curr.spiceId, {
             $inc: { stockInGrams: -delta },
           });
         } else if (curr.spiceMixId) {
-          // Deduct from spice mix itself
           await SpiceMix.findByIdAndUpdate(curr.spiceMixId, {
             $inc: { stockInGrams: -delta },
           });
@@ -85,21 +82,48 @@ const updatePhaseObject = async (req, res, field) => {
       }
     }
 
-    // overwrite phase object, preserving unspecified fields
+    /* ---------------- VACUUM → PRODUCT STOCK DEDUCTION ---------------- */
+    if (field === "vacuumPhase") {
+      for (let i = 0; i < newEntries.length; i++) {
+        const prev = prevEntries[i] || {};
+        const curr = newEntries[i];
+
+        const prevDried = Number(prev.driedInGrams || 0);
+        const currDried = Number(curr.driedInGrams || 0);
+        const delta = currDried - prevDried;
+        if (!delta) continue;
+
+        // Spice or mix association from seasoning
+        const spiceId = curr.spiceId;
+        const mixId = curr.spiceMixId;
+
+        console.log("request", req.body);
+        let product;
+        if (spiceId) {
+          product = await Product.findOne({ defaultSpiceId: spiceId });
+        } else if (mixId) {
+          product = await Product.findOne({ defaultSpiceMixId: mixId });
+        }
+
+        if (product) {
+          await Product.findByIdAndUpdate(product._id, {
+            $inc: { stockInGrams: delta },
+          });
+        }
+      }
+    }
+
+    /* ---------------- UPDATE PHASE DATA ---------------- */
     batch[field] = {
       ...(batch[field]?._doc || {}),
       ...req.body,
       entries: newEntries,
-      workTimeMinutes: req.body.workTimeMinutes ?? batch[field]?.workTimeMinutes ?? 0,
-      paperTowelCost: req.body.paperTowelCost ?? batch[field]?.paperTowelCost ?? 0,
-      vacuumRollCost: req.body.vacuumRollCost ?? batch[field]?.vacuumRollCost ?? 0,
     };
 
     await batch.save();
     res.json(batch);
   } catch (err) {
-    console.error(`[updatePhaseObject ${field}]`, err);
-    res.status(500).json({ error: err.message || "Server Error" });
+    handleError(res, `updatePhaseObject(${field})`, err);
   }
 };
 
