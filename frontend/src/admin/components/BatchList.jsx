@@ -1,5 +1,5 @@
 import { useState, Fragment, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaEdit, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useBatchStore } from "../stores/useBatchStore";
 import { useSpiceStore } from "../stores/useSpiceStore";
@@ -89,12 +89,12 @@ const BatchList = ({ onEdit }) => {
 
   return (
     <motion.div
-      className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto mt-4"
+      className="bg-gray-800 shadow-xl rounded-lg overflow-hidden max-w-6xl md:mx-auto mt-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <table className="min-w-full divide-y divide-accent-content">
+      <table className="min-w-full divide-y divide-accent-conten hidden md:table">
         <thead className="bg-secondary/80 font-semibold text-primary uppercase text-xs tracking-wider">
           <tr>
             <th className="px-6 py-3 text-left">Batch #</th>
@@ -277,7 +277,9 @@ const BatchList = ({ onEdit }) => {
                             <div>
                               <strong>Salt used:</strong>{" "}
                               {batch.curingPhase?.saltAmountInGrams
-                                ? `${batch.curingPhase.saltAmountInGrams/1000} kg`
+                                ? `${
+                                    batch.curingPhase.saltAmountInGrams / 1000
+                                  } kg`
                                 : "—"}
                             </div>
 
@@ -376,6 +378,211 @@ const BatchList = ({ onEdit }) => {
           })}
         </tbody>
       </table>
+      <div className="md:hidden space-y-4 p-2 bg-secondary/80">
+        {batches.map((batch) => {
+          const isExpanded = expanded === batch._id;
+
+          const rawKg = batch.sourcingPhase?.amountInGrams / 1000 || 0;
+          const rawCost =
+            rawKg && batch.sourcingPhase?.pricePerKg
+              ? rawKg * batch.sourcingPhase.pricePerKg
+              : 0;
+          const paperTowelCost = batch.seasoningPhase?.paperTowelCost || 0;
+          const vacuumRollCost = batch.vacuumPhase?.vacuumRollCost || 0;
+          const seasoningEntries = batch.seasoningPhase?.entries || [];
+          const spiceLines = seasoningEntries.map((e) =>
+            computeEntrySpiceCost(e)
+          );
+          const spiceCost = spiceLines.reduce((s, l) => s + (l.cost || 0), 0);
+          const computedTotal =
+            rawCost + paperTowelCost + vacuumRollCost + spiceCost;
+
+          return (
+            <motion.div
+              key={batch._id}
+              className="bg-accent rounded-lg overflow-hidden"
+              layout
+            >
+              {/* HEADER */}
+              <div
+                className={`flex items-center justify-between p-3 ${rowClass(
+                  batch._id
+                )}`}
+                onClick={() => setExpanded(isExpanded ? null : batch._id)}
+              >
+                <div className="flex flex-col">
+                  <span className="font-semibold text-secondary">
+                    Batch #{batch.batchNumber ?? batch._id.slice(-6)}
+                  </span>
+                  <span className="text-secondary/70">
+                    Dried: {batch.driedTotal ?? "—"} kg
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-2 py-0.5 text-xs rounded ${
+                      batch.finishTime
+                        ? "bg-green-600 text-white"
+                        : "bg-yellow-600 text-white"
+                    }`}
+                  >
+                    {batch.finishTime ? "Complete" : "In Progress"}
+                  </span>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(batch);
+                    }}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    <FaEdit />
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpanded(isExpanded ? null : batch._id);
+                    }}
+                    className="text-accent-content/60 hover:text-accent-content"
+                  >
+                    {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+                </div>
+              </div>
+
+              {/* EXPANDED INFO */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    key={`${batch._id}-details`}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-primary/40 px-4 py-3 text-secondary/80 text-sm space-y-2"
+                  >
+                    <div>
+                      <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
+                        Time:
+                      </h4>
+                      <p>
+                        <strong>Start:</strong>{" "}
+                        {batch.startTime
+                          ? new Date(batch.startTime).toLocaleString()
+                          : "—"}
+                        <br />
+                        <strong>Finish:</strong>{" "}
+                        {batch.finishTime
+                          ? new Date(batch.finishTime).toLocaleString()
+                          : "—"}
+                      </p>
+                    </div>
+
+                    <div className="flex-1">
+                      <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
+                        Cost
+                      </h4>
+
+                      <div className="space-y-2">
+                        <div>
+                          <strong>Raw meat:</strong>{" "}
+                          {rawCost ? currency(rawCost) : currency(0)}{" "}
+                          <span className="text-sm text-secondary/70">
+                            ({rawKg ?? 0} kg @{" "}
+                            {batch.sourcingPhase?.pricePerKg
+                              ? currency(batch.sourcingPhase.pricePerKg)
+                              : "—"}
+                            /kg)
+                          </span>
+                        </div>
+
+                        <div>
+                          <strong>Salt used:</strong>{" "}
+                          {batch.curingPhase?.saltAmountInGrams
+                            ? `${batch.curingPhase.saltAmountInGrams / 1000} kg`
+                            : "—"}
+                        </div>
+
+                        <div>
+                          <strong>Spices</strong>{" "}
+                          <span className="text-sm text-secondary/70">
+                            ({seasoningEntries.length} entries)
+                          </span>
+                          <div className="mt-2 ml-3">
+                            {seasoningEntries.length === 0 && (
+                              <div className="text-secondary/60">
+                                No spices recorded
+                              </div>
+                            )}
+                            {seasoningEntries.map((e, i) => {
+                              const { cost, name } = computeEntrySpiceCost(e);
+                              return (
+                                <div key={i} className="flex justify-between">
+                                  <div className="truncate text-sm">
+                                    {name} — {e.spiceAmountUsed ?? 0} g
+                                  </div>
+                                  <div className="text-sm">
+                                    {currency(cost)}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            {seasoningEntries.length > 0 && (
+                              <div className="mt-2 border-t pt-2">
+                                <strong>Total spices:</strong>{" "}
+                                {currency(spiceCost)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <strong>Paper towels:</strong>{" "}
+                          {currency(paperTowelCost)}
+                        </div>
+
+                        <div>
+                          <strong>Vacuum rolls:</strong>{" "}
+                          {currency(vacuumRollCost)}
+                        </div>
+
+                        <div className="mt-3 border-t pt-2">
+                          <strong>Computed total:</strong>{" "}
+                          {currency(computedTotal)}
+                          <br />
+                          <strong>Cost per kg:</strong>{" "}
+                          {batch.costPerKgDried
+                            ? currency(batch.costPerKgDried)
+                            : "—"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
+                        Details:
+                      </h4>
+                      <p>
+                        <strong>Raw meat:</strong>{" "}
+                        {(batch.sourcingPhase?.amountInGrams ?? 0) / 1000} kg
+                        <br />
+                        <strong>Waste:</strong>{" "}
+                        {(batch.preppingPhase?.wasteInGrams ?? 0) / 1000} kg
+                        <br />
+                        <strong>Cooking cuts:</strong>{" "}
+                        {(batch.preppingPhase?.cookingCutsIngrams ?? 0) / 1000}{" "}
+                        kg
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
     </motion.div>
   );
 };
