@@ -6,6 +6,8 @@
         "name": "Име на мезе",
         "category": "Категория",
         "price": "Цена",
+        "stock": "Наличност",
+        "isActive": "Активeн",
         "actions": "Действия"
     },
     "upload": {

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaTrash, FaEdit, FaChevronDown, FaChevronUp  } from "react-icons/fa";
 import { MdDone, MdDoneOutline } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import i18next from "i18next";
+import i18next, { t } from "i18next";
 
 import { useProductStore } from "../../stores/useProductStore";
 
@@ -97,7 +97,7 @@ const ProductsList = ({ onEdit }) => {
             </th>{" "}
             {/* new */}
             <th className="px-6 py-3 text-center text-xs">
-              {tAdminProducts("list.active")}
+              {tAdminProducts("list.isActive")}
             </th>{" "}
             {/* new */}
             <th className="px-6 py-3 text-right text-xs">
@@ -171,7 +171,7 @@ const ProductsList = ({ onEdit }) => {
                 {/* Active Toggle */}
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <label
-                    title={product.isActive ? "Active" : "Inactive"}
+                    title={product.isActive ? tCommon("status.active") : tCommon("status.inactive")}
                     className={`inline-flex items-center cursor-pointer transition-colors ${
                       product.isActive
                         ? "text-accent-content"
@@ -315,10 +315,10 @@ const ProductsList = ({ onEdit }) => {
                     transition={{ duration: 0.25 }}
                     className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm"
                   >
-                    <p>Price: €{product.pricePerKg?.toFixed(2) || "—"}</p>
-                    <p>Category: {product.category}</p>
-                    <p>Stock: {product.stockInGrams ?? 0} g</p>
-                    <p>Description: {product.description?.en || "—"}</p>
+                    <p>{tAdminProducts("list.price")}: €{product.pricePerKg?.toFixed(2) || "—"}</p>
+                    <p>{tAdminProducts("list.category")}: {product.category}</p>
+                    <p>{tAdminProducts("list.stock")}: {product.stockInGrams ?? 0} g</p>
+                    <p>{tAdminProducts("list.description")}: {product.description?.en || "—"}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
