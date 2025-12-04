@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlusCircle, FaArrowLeft, FaSpinner, FaSave } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 import SpiceMixList from "../components/SpiceMixList";
 import SpiceMixForm from "../components/SpiceMixForm";
@@ -8,6 +10,9 @@ import SpiceMixForm from "../components/SpiceMixForm";
 const SpiceMixesTab = () => {
   const { fetchSpiceMixes, createSpiceMix, updateSpiceMix, loading, filters } =
     useSpiceMixStore();
+
+  const {t: tCommon} = useTranslation("admin/common");
+  const {t: tProduction} = useTranslation("admin/production");
 
   useEffect(() => {
     fetchSpiceMixes();
@@ -90,13 +95,14 @@ const SpiceMixesTab = () => {
           >
             <div className="flex justify-between items-center">
               <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-accent-content">
-                Spice Mixes
+                {tProduction("spiceMix.title")}
               </h2>
               <button
                 onClick={handleCreate}
                 className="flex items-center text-base lg:text-xl xl:text-2xl gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
+                title={tCommon("buttons.createSpiceMix")}
               >
-                <FaPlusCircle /> Create Mix
+                <FaPlusCircle /> {tCommon("buttons.createSpiceMix")}
               </button>
             </div>
             <SpiceMixList onEdit={handleEdit} />
@@ -114,8 +120,9 @@ const SpiceMixesTab = () => {
             <button
               onClick={handleBack}
               className="mb-4 flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
+              title={tProduction("spiceMix.back")}
             >
-              <FaArrowLeft /> Back
+              <FaArrowLeft /> {tProduction("spiceMix.back")}
             </button>
 
             <form
@@ -134,9 +141,10 @@ const SpiceMixesTab = () => {
                 type="submit"
                 disabled={loading}
                 className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
+                title={mode === "edit" ? tCommon("buttons.updateSpiceMix") : tCommon("buttons.createSpiceMix")}
               >
                 {loading ? <FaSpinner className="animate-spin" /> : <FaSave />}
-                {mode === "edit" ? "Update Mix" : "Create Mix"}
+                {mode === "edit" ? tCommon("buttons.updateSpiceMix") : tCommon("buttons.createSpiceMix")}
               </button>
             </form>
           </motion.div>
