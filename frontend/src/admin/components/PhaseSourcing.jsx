@@ -1,16 +1,20 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 import TimeInput from "./TimeInput";
 
 const meatTypes = ["Pork", "Chicken", "Veal"];
 const cutTypes = ["Loin", "Neck", "Leg", "Tenderloin"];
 
 const PhaseSourcing = ({ data, onChange }) => {
+
+  const {t: tBatches} = useTranslation("admin/batches");
   const update = (field, value) =>
     onChange({ ...data, [field]: value });
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold indent-2 text-secondary">Sourcing</h2>
+      <h2 className="text-2xl font-bold indent-2 text-secondary">{tBatches("sourcing.title")}</h2>
 
       {/* Meat Type Dropdown */}
       <select
@@ -19,7 +23,7 @@ const PhaseSourcing = ({ data, onChange }) => {
         onChange={(e) => update("meatType", e.target.value)}
       >
         <option value="" disabled>
-          Select Meat Type
+          {tBatches("sourcing.meatType")}
         </option>
         {meatTypes.map((type) => (
           <option key={type} value={type}>
@@ -35,7 +39,7 @@ const PhaseSourcing = ({ data, onChange }) => {
         onChange={(e) => update("meatCutType", e.target.value)}
       >
         <option value="" disabled>
-          Select Cut Type
+          {tBatches("sourcing.meatCutType")}
         </option>
         {cutTypes.map((cut) => (
           <option key={cut} value={cut}>
@@ -45,33 +49,36 @@ const PhaseSourcing = ({ data, onChange }) => {
       </select>
 
       {/* Supplier */}
+      <label>{tBatches("sourcing.supplier")}</label>
       <input
         className="input input-bordered"
-        placeholder="Supplier"
+        placeholder={tBatches("sourcing.supplierPlaceholder")}
         value={data.supplier || ""}
         onChange={(e) => update("supplier", e.target.value)}
       />
 
       {/* Amount in Kg */}
+      <label>{tBatches("sourcing.amountInKg")}</label>
       <input
         type="number"
         className="input input-bordered"
-        placeholder="Amount in Kg"
+        placeholder="0.00"
         value={data.amountInGrams || ""}
         onChange={(e) => update("amountInGrams", e.target.value)}
       />
 
       {/* Price per Kg */}
+      <label>{tBatches("sourcing.pricePerKg")}</label>
       <input
         type="number"
         className="input input-bordered"
-        placeholder="Price per Kg"
+        placeholder="0.00€"
         value={data.pricePerKg || ""}
         onChange={(e) => update("pricePerKg", e.target.value)}
       />
 
       {/* Time Taken (minutes*/}
-      <label>Time Taken (minutes)</label>
+      <label>{tBatches("sourcing.timeTaken")}</label>
       <TimeInput
         valueMinutes={data.workTimeMinutes || 0}
         onChange={(val) => update("workTimeMinutes", val)}
