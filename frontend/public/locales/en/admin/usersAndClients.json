@@ -16,8 +16,8 @@
     "name": "Client Name",
     "phone": "Phone:",
     "items": "Last Reserved Items",
-    "total": "Total # of Reservations",
-    "status": "Last Reservation Status",
+    "total": "Paid (€)",
+    "status": "Last Res. Status",
     "actions": "Actions"
   },
   "editTitle": "Edit Client",

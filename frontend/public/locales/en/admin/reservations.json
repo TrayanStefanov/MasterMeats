@@ -38,6 +38,7 @@
         "deliveryDate": "Date of Delivery",
         "totalAmount": "Total Amount (€)",
         "itemList": "Items in Reservation",
+        "items": "Items",
         "notes": "Notes",
         "noNotes": "No notes provided.",
         "noProducts": "No products found."
