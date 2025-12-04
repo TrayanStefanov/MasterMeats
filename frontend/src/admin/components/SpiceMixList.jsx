@@ -7,9 +7,12 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 import Pagination from "./Pagination";
 import SpiceMixFilters from "./SpiceMixFilters";
+import { t } from "i18next";
 
 const SpiceMixList = ({ onEdit }) => {
   const {
@@ -24,6 +27,9 @@ const SpiceMixList = ({ onEdit }) => {
     filters,
     fetchSpiceMixes,
   } = useSpiceMixStore();
+
+  const {t:tProduction} = useTranslation("admin/production");
+  const {t:tCommon} = useTranslation("admin/common");
 
   const [expandedMix, setExpandedMix] = useState(null);
   const [showPercent, setShowPercent] = useState(false);
@@ -53,13 +59,13 @@ const SpiceMixList = ({ onEdit }) => {
     const names = ingredients.slice(0, 2).map((i) => i.spice?.name);
     const remaining = ingredients.length - 2;
     return remaining > 0
-      ? `${names.join(", ")}, +${remaining} more...`
+      ? `${names.join(", ")}, +${remaining} ${tCommon("loading.more")}`
       : names.join(", ");
   };
 
   if (loading && spiceMixes.length === 0)
     return (
-      <p className="text-center py-8 text-secondary/60">Loading mixes...</p>
+      <p className="text-center py-8 text-secondary/60">{tCommon("loading.loading")}.</p>
     );
 
   if (!spiceMixes.length)
@@ -67,7 +73,7 @@ const SpiceMixList = ({ onEdit }) => {
       <>
         <SpiceMixFilters />
         <p className="text-center py-8 text-secondary/60">
-          No spice mixes found.
+          {tProduction("spiceMix.empty")}
         </p>
       </>
     );
@@ -84,15 +90,13 @@ const SpiceMixList = ({ onEdit }) => {
         <table className="min-w-full divide-y divide-accent-content hidden md:table">
           <thead className="bg-secondary/80 font-semibold text-primary uppercase text-xs tracking-wider">
             <tr>
-              <th className="px-6 py-3 text-left">Name</th>
-              <th className="px-6 py-3 text-left">Tags</th>
-              <th className="px-6 py-3 text-left">Stock</th>
-              <th className="px-6 py-3 text-left">Cost / 100g</th>
-              <th className="px-6 py-3 text-left hidden lg:table-cell">
-                Formula
-              </th>
-              <th className="px-6 py-3 text-right">Actions</th>
-              <th className="px-6 py-3 text-right">Active</th>
+              <th className="px-6 py-3 text-left">{tProduction("spiceMix.list.name")}</th>
+              <th className="px-6 py-3 text-left">{tProduction("spiceMix.list.tags")}</th>
+              <th className="px-6 py-3 text-left">{tProduction("spiceMix.list.stock")}</th>
+              <th className="px-6 py-3 text-left">{tProduction("spiceMix.list.cost")}</th>
+              <th className="px-6 py-3 text-left hidden lg:table-cell">{tProduction("spiceMix.list.ingredients")}</th>
+              <th className="px-6 py-3 text-right">{tProduction("spiceMix.list.actions")}</th>
+              <th className="px-6 py-3 text-right">{tProduction("spiceMix.list.isActive")}</th>
             </tr>
           </thead>
 
@@ -121,12 +125,12 @@ const SpiceMixList = ({ onEdit }) => {
                     </td>
                     <td className="px-6 py-4 text-secondary/70">
                       <div className="flex items-center gap-2">
-                        <span>{mix.stockInGrams}</span>
+                        <span>{mix.stockInGrams} {tCommon("units.grams")}</span>
                         <input
                           type="number"
                           min="0"
                           step="0.01"
-                          placeholder="Add"
+                          placeholder={tProduction("spiceMix.list.addStockPlaceholder")}
                           value={stockInputs[mix._id] || ""}
                           onChange={(e) =>
                             setStockInputs((prev) => ({
@@ -143,6 +147,7 @@ const SpiceMixList = ({ onEdit }) => {
                             handleIncreaseStock(mix._id);
                           }}
                           className="p-1 bg-accent text-accent-content rounded hover:bg-accent/80 text-xs"
+                          title={tCommon("buttons.addSpiceMixStock")}
                         >
                           <FaPlus />
                         </button>
@@ -161,6 +166,7 @@ const SpiceMixList = ({ onEdit }) => {
                           onEdit(mix);
                         }}
                         className="text-accent-content/60 hover:text-accent-content transition-colors"
+                        title={tCommon("buttons.updateSpiceMix")}
                       >
                         <FaEdit />
                       </button>
@@ -170,6 +176,7 @@ const SpiceMixList = ({ onEdit }) => {
                           deleteSpiceMix(mix._id);
                         }}
                         className="text-accent-content/60 hover:text-accent-content transition-colors"
+                        title={tCommon("buttons.deleteSpiceMix")}
                       >
                         <FaTrash />
                       </button>
@@ -183,13 +190,13 @@ const SpiceMixList = ({ onEdit }) => {
                         className={`px-2 py-0.5 text-xs rounded ${
                           mix.isActive ? "bg-green-600" : "bg-red-600"
                         } text-white`}
+                        title={mix.isActive ? tCommon("buttons.deactivate") : tCommon("buttons.activate")}
                       >
-                        {mix.isActive ? "Active" : "Inactive"}
+                        {mix.isActive ? tCommon("status.active") : tCommon("status.inactive")}
                       </button>
                     </td>
                   </tr>
 
-                  {/* Expanded ingredient table */}
                   {/* Expanded ingredient table */}
                   <AnimatePresence>
                     {expandedMix === mix._id && (
@@ -207,14 +214,14 @@ const SpiceMixList = ({ onEdit }) => {
                         >
                           {/* Header */}
                           <p className="text-center text-secondary font-semibold text-base mb-4 border-b border-accent/40 pb-2">
-                            {mix.name} Details
+                            {tProduction("spiceMix.list.details")} {mix.name}
                           </p>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Ingredients */}
                             <div>
                               <h4 className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">
-                                Ingredients
+                                {tProduction("spiceMix.list.ingredients")}
                               </h4>
                               <div className="space-y-1 bg-primary p-3 rounded-lg border border-accent/30">
                                 {mix.ingredients.map((i) => (
@@ -229,7 +236,7 @@ const SpiceMixList = ({ onEdit }) => {
                                             (i.grams / totalGrams) *
                                             100
                                           ).toFixed(1) + "%"
-                                        : i.grams + " g"}
+                                        : i.grams + ' ' + tCommon("units.grams")}
                                     </span>
                                   </div>
                                 ))}
@@ -237,15 +244,16 @@ const SpiceMixList = ({ onEdit }) => {
                               <button
                                 onClick={() => setShowPercent(!showPercent)}
                                 className="mt-2 px-2 py-1 bg-accent text-accent-content rounded text-xs"
-                              >
-                                {showPercent ? "Show grams" : "Show %"}
+                                title={showPercent ? tCommon("buttons.showGrams") : tCommon("buttons.showPercent")}
+                                >
+                                {showPercent ? tCommon("buttons.showGrams") : tCommon("buttons.showPercent")}
                               </button>
                             </div>
 
                             {/* Notes */}
                             <div>
                               <h4 className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">
-                                Notes
+                                {tProduction("spiceMix.list.notes")}
                               </h4>
                               <div className="bg-primary p-3 rounded-lg border border-accent/30 min-h-[100px]">
                                 {mix.note ? (
@@ -254,7 +262,7 @@ const SpiceMixList = ({ onEdit }) => {
                                   </p>
                                 ) : (
                                   <p className="text-secondary/40 italic">
-                                    No notes provided.
+                                    {tProduction("spiceMix.list.noNotes")}
                                   </p>
                                 )}
                               </div>
@@ -294,7 +302,7 @@ const SpiceMixList = ({ onEdit }) => {
                   </p>
                   <div className="flex items-center gap-2">
                     <span className="text-secondary/70 font-medium">
-                      {mix.stockInGrams}
+                      {mix.stockInGrams} {tCommon("units.grams")}
                     </span>
 
                     <button
@@ -305,8 +313,9 @@ const SpiceMixList = ({ onEdit }) => {
                       className={`px-2 py-0.5 text-xs rounded ${
                         mix.isActive ? "bg-green-600" : "bg-red-600"
                       } text-white`}
+                      title={mix.isActive ? tCommon("buttons.deactivate") : tCommon("buttons.deactivate")}
                     >
-                      {mix.isActive ? "Active" : "Inactive"}
+                      {mix.isActive ? tCommon("buttons.activate") : tCommon("buttons.deactivate")}
                     </button>
 
                     <button
@@ -315,6 +324,7 @@ const SpiceMixList = ({ onEdit }) => {
                         onEdit(mix);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={tCommon("buttons.updateSpiceMix")}
                     >
                       <FaEdit />
                     </button>
@@ -325,6 +335,7 @@ const SpiceMixList = ({ onEdit }) => {
                         deleteSpiceMix(mix._id);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={tCommon("buttons.deleteSpiceMix")}
                     >
                       <FaTrash />
                     </button>
@@ -335,6 +346,7 @@ const SpiceMixList = ({ onEdit }) => {
                         setExpandedMix(isExpanded ? null : mix._id);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                     >
                       {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                     </button>
@@ -352,15 +364,15 @@ const SpiceMixList = ({ onEdit }) => {
                       transition={{ duration: 0.25 }}
                       className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm space-y-2"
                     >
-                      <p>Tags: {mix.tags?.join(", ") || "—"}</p>
+                      <p>{tProduction("spiceMix.list.tags")}: {mix.tags?.join(", ") || "—"}</p>
                       <p>
-                        Cost per 100g: €{mix.costPer100g?.toFixed(2) ?? "—"}
+                        {tProduction("spiceMix.list.cost")} {' '} : €{mix.costPer100g?.toFixed(2) ?? "—"}
                       </p>
 
                       {/* Ingredients */}
                       {mix.ingredients?.length > 0 && (
                         <div>
-                          <h4 className="font-semibold mb-1">Ingredients</h4>
+                          <h4 className="font-semibold mb-1">{tProduction("spiceMix.list.ingredients")}</h4>
                           <div className="space-y-1 bg-primary p-2 rounded border border-accent/30">
                             {mix.ingredients.map((i) => (
                               <div
@@ -373,7 +385,7 @@ const SpiceMixList = ({ onEdit }) => {
                                     ? ((i.grams / totalGrams) * 100).toFixed(
                                         1
                                       ) + "%"
-                                    : i.grams + " g"}
+                                    : i.grams + " " + tCommon("units.grams")}
                                 </span>
                               </div>
                             ))}
@@ -381,15 +393,16 @@ const SpiceMixList = ({ onEdit }) => {
                           <button
                             onClick={() => setShowPercent(!showPercent)}
                             className="mt-2 px-2 py-1 bg-accent text-accent-content rounded text-xs"
-                          >
-                            {showPercent ? "Show grams" : "Show %"}
+                            title={showPercent ? tCommon("buttons.showGrams") : tCommon("buttons.showPercent")}
+                            >
+                            {showPercent ? tCommon("buttons.showGrams") : tCommon("buttons.showPercent")}
                           </button>
                         </div>
                       )}
 
                       {/* Notes */}
                       <div>
-                        <h4 className="font-semibold mb-1">Notes</h4>
+                        <h4 className="font-semibold mb-1">{tProduction("spiceMix.list.notes")}</h4>
                         <div className="bg-primary p-2 rounded border border-accent/30 min-h-[80px]">
                           {mix.note ? (
                             <p className="text-secondary/70 whitespace-pre-wrap">
@@ -397,7 +410,7 @@ const SpiceMixList = ({ onEdit }) => {
                             </p>
                           ) : (
                             <p className="text-secondary/40 italic">
-                              No notes provided.
+                              {tProduction("spiceMix.list.noNotes")}
                             </p>
                           )}
                         </div>
@@ -405,12 +418,12 @@ const SpiceMixList = ({ onEdit }) => {
 
                       {/* Stock input inside expanded section */}
                       <div className="flex items-center gap-2 mt-2">
-                        <span>Stock: {mix.stockInGrams}</span>
+                        <span>{tProduction("spiceMix.list.stockMobile")}: {mix.stockInGrams} {tCommon("units.grams")}</span>
                         <input
                           type="number"
                           min="0"
                           step="0.01"
-                          placeholder="Add stock"
+                          placeholder = {tProduction("spiceMix.list.addStockPlaceholder")}
                           value={stockInputs[mix._id] || ""}
                           onChange={(e) =>
                             setStockInputs((prev) => ({
@@ -423,8 +436,10 @@ const SpiceMixList = ({ onEdit }) => {
                         <button
                           onClick={() => handleIncreaseStock(mix._id)}
                           className="p-1 bg-accent text-accent-content rounded hover:bg-accent/80 text-xs"
+                          title={tCommon("buttons.addSpiceMixStock")}
                         >
                           <FaPlus />
+
                         </button>
                       </div>
                     </motion.div>
