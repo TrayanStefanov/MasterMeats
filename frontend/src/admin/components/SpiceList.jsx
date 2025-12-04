@@ -1,6 +1,12 @@
 import { useState, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTrash, FaEdit, FaPlus, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import {
+  FaTrash,
+  FaEdit,
+  FaPlus,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useSpiceStore } from "../stores/useSpiceStore";
 import Pagination from "./Pagination";
@@ -128,7 +134,7 @@ const SpiceList = ({ onEdit }) => {
                         type="number"
                         min="0"
                         step="0.01"
-                        placeholder="Add"
+                        placeholder={tProduction("spices.list.addStockPlaceholder")}
                         value={stockInputs[spice._id] || ""}
                         onChange={(e) =>
                           setStockInputs((prev) => ({
@@ -145,6 +151,7 @@ const SpiceList = ({ onEdit }) => {
                           handleIncreaseStock(spice._id);
                         }}
                         className="p-1 bg-accent text-accent-content rounded hover:bg-accent/80 text-xs"
+                        title={tCommon("buttons.addSpiceStock")}
                       >
                         <FaPlus />
                       </button>
@@ -159,8 +166,11 @@ const SpiceList = ({ onEdit }) => {
                       className={`px-2 py-0.5 text-xs rounded ${
                         spice.isActive ? "bg-green-600" : "bg-red-600"
                       } text-white`}
+                      title={tCommon("buttons.toggleSpice")}
                     >
-                      {spice.isActive ? "Active" : "Inactive"}
+                      {spice.isActive
+                        ? tCommon("status.activeA")
+                        : tCommon("status.inactiveA")}
                     </button>
                     <button
                       onClick={(e) => {
@@ -168,6 +178,7 @@ const SpiceList = ({ onEdit }) => {
                         onEdit(spice);
                       }}
                       className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      title={tCommon("buttons.updateSpice")}
                     >
                       <FaEdit />
                     </button>
@@ -177,6 +188,7 @@ const SpiceList = ({ onEdit }) => {
                         deleteSpice(spice._id);
                       }}
                       className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      title={tCommon("buttons.deleteSpice")}
                     >
                       <FaTrash />
                     </button>
@@ -217,8 +229,11 @@ const SpiceList = ({ onEdit }) => {
                       className={`px-2 py-0.5 text-xs rounded ${
                         spice.isActive ? "bg-green-600" : "bg-red-600"
                       } text-white`}
+                      title={tCommon("buttons.toggleSpice")}
                     >
-                      {spice.isActive ? "Active" : "Inactive"}
+                      {spice.isActive
+                        ? tCommon("status.activeA")
+                        : tCommon("status.inactiveA")}
                     </button>
                     <button
                       onClick={(e) => {
@@ -226,6 +241,7 @@ const SpiceList = ({ onEdit }) => {
                         onEdit(spice);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={tCommon("buttons.updateSpice")}
                     >
                       <FaEdit />
                     </button>
@@ -235,6 +251,7 @@ const SpiceList = ({ onEdit }) => {
                         deleteSpice(spice._id);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={tCommon("buttons.deleteSpice")}
                     >
                       <FaTrash />
                     </button>
@@ -261,16 +278,16 @@ const SpiceList = ({ onEdit }) => {
                       transition={{ duration: 0.25 }}
                       className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm space-y-2"
                     >
-                      <p>Supplier: {spice.supplier || "—"}</p>
-                      <p>Cost per kg: €{spice.costPerKg?.toFixed(2) ?? "—"}</p>
-                      <p>Notes: {spice.notes || "—"}</p>
+                      <p>{tProduction("spices.list.supplier")}: {spice.supplier || "—"}</p>
+                      <p>{tProduction("spices.list.costPerKg")}: €{spice.costPerKg?.toFixed(2) ?? "—"}</p>
+                      <p>{tProduction("spices.list.notes")}: {spice.notes || "—"}</p>
                       <div className="flex items-center gap-2">
-                        <span>Stock: {spice.stockInGrams}</span>
+                        <span>{tProduction("spices.list.stockMobile")}: {spice.stockInGrams} {tCommon("units.grams")}</span>
                         <input
                           type="number"
                           min="0"
                           step="0.01"
-                          placeholder="Add stock"
+                          placeholder={tProduction("spices.list.addStockPlaceholder")}
                           value={stockInputs[spice._id] || ""}
                           onChange={(e) =>
                             setStockInputs((prev) => ({
