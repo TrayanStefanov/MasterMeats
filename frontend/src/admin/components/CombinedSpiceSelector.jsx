@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const CombinedSpiceSelector = ({ spices = [], mixes = [], value, onChange }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef(null);
-
+  
+  const { t: tCommon } = useTranslation("admin/common");
+  const { t: tBatches } = useTranslation("admin/batches");
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -33,10 +36,10 @@ const CombinedSpiceSelector = ({ spices = [], mixes = [], value, onChange }) => 
   });
 
   const selectedLabel = (() => {
-    if (!value) return "Select spice or mix";
+    if (!value) return tBatches("seasoning.validation.selectSpice");
     if (value.type === "spice") return spices.find((s) => s._id === value.id)?.name || "Unknown spice";
     if (value.type === "mix") return mixes.find((m) => m._id === value.id)?.name || "Unknown mix";
-    return "Select spice or mix";
+    return tBatches("seasoning.validation.selectSpice");
   })();
 
   return (
@@ -69,11 +72,12 @@ const CombinedSpiceSelector = ({ spices = [], mixes = [], value, onChange }) => 
       {open && (
         <div className="absolute z-50 mt-1 w-full bg-secondary border border-accent rounded-xl shadow-lg max-h-64 overflow-y-auto p-2">
           {/* Search Box */}
+          <label className="mb-4">{tBatches("seasoning.spiceSelector.searchLabel")}:</label>
           <input
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search spices/mixes..."
+            placeholder={tBatches("seasoning.spiceSelector.searchPlaceholder")}
             className="input input-bordered w-full mb-2"
           />
 
@@ -94,13 +98,13 @@ const CombinedSpiceSelector = ({ spices = [], mixes = [], value, onChange }) => 
                 }}
               >
                 {item.name}
-                <span className="opacity-60 ml-1 text-sm">({item.stockInGrams} g)</span>
+                <span className="opacity-60 ml-1 text-sm">({item.stockInGrams} {tCommon("units.grams")})</span>
               </div>
             )
           )}
 
           {filtered.filter((i) => i.type !== "header").length === 0 && (
-            <div className="p-2 text-center opacity-50">No matches</div>
+            <div className="p-2 text-center opacity-50">{tBatches("seasoning.spiceSelector.empty")}</div>
           )}
         </div>
       )}
