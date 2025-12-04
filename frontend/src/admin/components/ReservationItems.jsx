@@ -6,19 +6,19 @@ import i18next from "i18next";
 import { useProductStore } from "../../stores/useProductStore.js";
 
 const ReservationItems = ({ products, setProducts, setDetails }) => {
-  const { products: allProducts, fetchAllProducts } = useProductStore();
+  const { products: allProducts, fetchPublicProducts } = useProductStore();
   const { t: tCommon } = useTranslation("admin/common");
   const { t: tReservation } = useTranslation("admin/reservations");
   const { t: tForms } = useTranslation("admin/forms");
   const { t: tProducts } = useTranslation("productsSection"); // added
 
   useEffect(() => {
-    fetchAllProducts();
+    fetchPublicProducts();
 
-    const handleLangChange = () => fetchAllProducts();
+    const handleLangChange = () => fetchPublicProducts();
     i18next.on("languageChanged", handleLangChange);
     return () => i18next.off("languageChanged", handleLangChange);
-  }, [fetchAllProducts]);
+  }, [fetchPublicProducts]);
 
   const handleAddProduct = (productId) => {
     const product = allProducts.find((p) => p._id === productId);
