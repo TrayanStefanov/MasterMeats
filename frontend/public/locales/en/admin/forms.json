@@ -46,6 +46,8 @@
         },
         "stock": "Stock in grams(optional)",
         "subtitle": "Localization Info",
+        "spiceChoice": "Spice/SpiceMix Choice(optional)",
+        "isActive": "Is this product active?",
         "langs": {
             "bg": {
                 "title": "Bulgarian (BG)",
@@ -70,5 +72,43 @@
                 "badgePlaceholder": "New"
             }
         }
+    },
+    "spice": {
+        "nameLabel":"Spice Name",
+        "namePlaceholder":"Example spice",
+        "costPerKgLabel":"Cost per kg in Euro",
+        "costPerKgPlaceholder":"0.00",
+        "stockLabel":"Stock in grams",
+        "stockPlaceholder":"0.00 (optional)",
+        "supplierLabel":"Supplier",
+        "supplierPlaceholder":"(Оptional)",
+        "notesLabel":"Notes(optional)",
+        "notesPlaceholder":"Additional notes...",
+        "isActive": "Is this spice active?"
+    },
+    "spiceMix": {
+        "nameLabel":"Spice Mix Name",
+        "namePlaceholder":"Example spice mix",
+        "notesLabel":"Notes",
+        "notesPlaceholder":"Additional notes...(optional)",
+        "tagsLabel":"Spice Mix Tags",
+        "tagsPlaceholder":"Type and press Enter...(optional)",
+        "tagsEmpty":"No spice mix tags added yet",
+        "addTag" : "Add Spice Tag",
+        "removeTag": "Remove Spice Tag",
+        "mixBuilder": {
+            "title": "Spices",
+            "addSpice": "Add Spice",
+            "removeSpice": "Remove Spice",
+            "spice": "Spice",
+            "grams": "Grams",
+            "adjust": "Adjust",
+            "selectSpice": "Select Spice",
+            "stock": "Stock"
+        },
+        "cost":"Cost per 100 grams in Euro",
+        "totalGrams":"Total Grams",
+        "warning" :"Please add quantity for all spices or remove invalid ones."
+
     }
 }

@@ -45,6 +45,8 @@
             }
         },
         "stock": "Наличност в грамове (по желание)",
+        "spiceChoice": "Подправка/Микс (по желание)",
+        "isActive": "Активен ли е този продукт?",
         "subtitle": "Информация за превод",
         "langs": {
             "bg": {
@@ -70,5 +72,42 @@
                 "badgePlaceholder": "New"
             }
         }
+    },
+    "spice": {
+        "nameLabel":"Име на подправка",
+        "namePlaceholder":"Примерна подправка",
+        "costPerKg":"Цена за кг в евро",
+        "costPerKgPlaceholder":"0.00",
+        "stockLabel":"Наличност в грамове",
+        "stockPlaceholder":"0.00 (по желание)",
+        "supplierLabel":"Производител",
+        "supplierPlaceholder":"(По желание)",
+        "notesLabel":"Бележки (по желание)",
+        "notesPlaceholder":"Допълнителни бележки...",
+        "isActive": "Активна ли е тази подправка?"
+    },
+    "spiceMix": {
+        "nameLabel":"Име на микса",
+        "namePlaceholder":"Примерен микс",
+        "notesLabel":"Бележки",
+        "notesPlaceholder":"Допълнителни бележки...(по желание)",
+        "tagsLabel":"Тагове на микса",
+        "tagsPlaceholder":"Напишете и натиснете Enter...(по желание)",
+        "tagsEmpty":"Няма добавени тагове",
+        "addTag" : "Добавяне на таг",
+        "removeTag": "Премахване на таг",
+        "mixBuilder": {
+            "title": "Подправки",
+            "addSpice": "Добавяне на подправка",
+            "removeSpice": "Премахване на подправка",
+            "spice": "Подправка",
+            "grams": "Грамове",
+            "adjust": "Избери",
+            "selectSpice": "Изберете подправка",
+            "stock": "Наличност"
+        },
+        "cost":"Цена за 100 грама в евро",
+        "totalGrams":"Общо грамове",
+        "warning" :"Моля добавете количество на всички подправки или премахнете невалидните."
     }
 }
