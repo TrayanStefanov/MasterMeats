@@ -256,7 +256,7 @@ const ProductForm = ({ mode = "create", product = null, onFinish }) => {
 
         {/* Spice & Mix Select */}
         <div className="flex flex-col">
-          <label className="label">Default Spice / Mix</label>
+          <label className="label">{tForms("product.spiceChoice")}</label>
           <CombinedSpiceSelector
             spices={spices}
             mixes={spiceMixes}
@@ -293,7 +293,7 @@ const ProductForm = ({ mode = "create", product = null, onFinish }) => {
             checked={formData.isActive}
             onChange={(e) => handleChange("isActive", e.target.checked)}
           />
-          <label className="label">Active Product</label>
+          <label className="label">{tForms("product.isActive")}</label>
         </div>
 
         {/* Images */}
