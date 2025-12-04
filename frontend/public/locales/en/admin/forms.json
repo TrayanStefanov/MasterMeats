@@ -109,6 +109,5 @@
         "cost":"Cost per 100 grams in Euro",
         "totalGrams":"Total Grams",
         "warning" :"Please add quantity for all spices or remove invalid ones."
-
     }
 }
