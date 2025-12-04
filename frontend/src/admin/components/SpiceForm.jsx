@@ -130,7 +130,7 @@ const SpiceForm = ({ spice = {}, onChange, mode = "create" }) => {
             htmlFor="spice-isActive"
             className="text-secondary font-medium"
           >
-            {tForms("spice.isActiveLabel", "Active")}
+            {tForms("spice.isActive")}
           </label>
         </div>
       </div>
