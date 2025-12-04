@@ -133,6 +133,7 @@ export default function ClientFilters() {
                       ? "bg-accent-content text-primary"
                       : "bg-secondary text-primary/70 hover:bg-secondary/70"
                   }`}
+                  title= {tCommon(`status.${filterOption.key}`, filterOption.label)}
                 >
                   {filterOption.label}
                 </button>
