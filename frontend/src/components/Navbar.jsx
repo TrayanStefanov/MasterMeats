@@ -93,6 +93,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
                   onClick={onCartClick}
                   className="relative btn btn-ghost btn-circle"
                   aria-label="Shopping Basket"
+                  title={t("nav.cart")}
                 >
                   <FaShoppingBasket className="w-6 h-6" />
                   {totalItems > 0 && (
@@ -108,7 +109,7 @@ const Navbar = ({ onLoginClick, onCartClick }) => {
                   onClick={() => navigate("/admin")}
                   className="btn btn-ghost text-accent hover:text-accent/80 font-bold text-lg lg:text-xl 2xl:text-2xl flex items-center gap-1"
                 >
-                  <FaTools /> Admin
+                  <FaTools /> {t("nav.admin")}
                 </button>
               )}
 

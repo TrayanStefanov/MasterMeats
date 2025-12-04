@@ -32,7 +32,9 @@
     "home": "Home",
     "products": "Products",
     "about": "About Us",
-    "contacts": "Contacts"
+    "contacts": "Contacts",
+    "admin": "Admin",
+    "cart": "Cart"
   },
   "lang": {
     "bg": {
