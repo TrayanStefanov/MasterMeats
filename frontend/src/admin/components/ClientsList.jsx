@@ -84,9 +84,9 @@ const ClientsList = ({ onEdit }) => {
               <th className="px-6 py-3 text-left text-xs">
                 {tUAC("list.name")}
               </th>
-              <th className="px-6 py-3 text-left text-xs">Phone</th>
-              <th className="px-6 py-3 text-left text-xs">Paid (€)</th>
-              <th className="px-6 py-3 text-left text-xs">Status</th>
+              <th className="px-6 py-3 text-left text-xs">{tUAC("list.phone")}</th>
+              <th className="px-6 py-3 text-left text-xs">{tUAC("list.total")}</th>
+              <th className="px-6 py-3 text-left text-xs">{tUAC("list.status")}</th>
               <th className="px-6 py-3 text-right text-xs">
                 {tUAC("list.actions")}
               </th>
@@ -160,6 +160,7 @@ const ClientsList = ({ onEdit }) => {
                           onEdit(client);
                         }}
                         className="text-accent-content/60 hover:text-accent-content transition-colors"
+                        title={tCommon("buttons.updateClient")}
                       >
                         <FaEdit />
                       </button>
@@ -169,6 +170,7 @@ const ClientsList = ({ onEdit }) => {
                           deleteClient(client._id);
                         }}
                         className="text-accent-content/60 hover:text-accent-content transition-colors"
+                        title={tCommon("buttons.deleteClient")}
                       >
                         <FaTrash />
                       </button>
@@ -176,6 +178,7 @@ const ClientsList = ({ onEdit }) => {
                         className={`transition-transform ${
                           expandedClient === client._id ? "rotate-180" : ""
                         }`}
+                        title={expandedClient === client._id ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                       />
                     </div>
                   </td>
@@ -250,6 +253,7 @@ const ClientsList = ({ onEdit }) => {
                                       setModalReservation(r);
                                     }}
                                     className="text-accent-content/70 hover:text-accent-content"
+                                    title={tCommon("buttons.showOrder")}
                                   >
                                     <FaEye />
                                   </button>
@@ -322,6 +326,7 @@ const ClientsList = ({ onEdit }) => {
                         onEdit(client);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={tCommon("buttons.updateClient")}
                     >
                       <FaEdit />
                     </button>
@@ -331,6 +336,7 @@ const ClientsList = ({ onEdit }) => {
                         deleteClient(client._id);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={tCommon("buttons.deleteClient")}
                     >
                       <FaTrash />
                     </button>
@@ -340,6 +346,7 @@ const ClientsList = ({ onEdit }) => {
                         setExpandedClient(isExpanded ? null : client._id);
                       }}
                       className="text-accent-content/60 hover:text-accent-content"
+                      title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                     >
                       {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                     </button>
@@ -357,14 +364,14 @@ const ClientsList = ({ onEdit }) => {
                       transition={{ duration: 0.25 }}
                       className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm space-y-2"
                     >
-                      <p>Phone: {client.phone || "—"}</p>
-                      <p>Paid: €{client.totalPaid?.toFixed(2) ?? "—"}</p>
+                      <p>{tUAC("list.phone")} {client.phone || "—"}</p>
+                      <p>{tUAC("list.total")}: €{client.totalPaid?.toFixed(2) ?? "—"}</p>
 
                       {client.reservations &&
                         client.reservations.length > 0 && (
                           <div className="space-y-2">
                             <p className="font-semibold text-secondary">
-                              Reservations:
+                              {tUAC("details.title")}
                             </p>
                             {client.reservations.map((r) => (
                               <div
@@ -404,6 +411,7 @@ const ClientsList = ({ onEdit }) => {
                                     setModalReservation(r);
                                   }}
                                   className="text-accent-content/70 hover:text-accent-content"
+                                  title={tCommon("buttons.showOrder")}
                                 >
                                   <FaEye />
                                 </button>
@@ -414,7 +422,7 @@ const ClientsList = ({ onEdit }) => {
 
                       <div>
                         <p className="font-semibold text-secondary mb-1">
-                          Notes:
+                          {tUAC("details.notes")} :
                         </p>
                         {client.notes ? (
                           <p className="text-secondary/70 whitespace-pre-wrap">
@@ -422,7 +430,7 @@ const ClientsList = ({ onEdit }) => {
                           </p>
                         ) : (
                           <p className="text-secondary/40 italic">
-                            No notes provided.
+                            {tUAC("details.noNotes")}
                           </p>
                         )}
                       </div>
