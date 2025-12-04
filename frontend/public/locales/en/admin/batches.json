@@ -1,0 +1,63 @@
+{
+    "sourcing":{
+        "title": "Sourcing",
+        "meatType": "Select Meat Type",
+        "meatCutType": "Select Meat Cut Type",
+        "supplier": "Select Supplier",
+        "supplierPlaceholder": "(Optional)",
+        "amountInKg": "Amount in grams",
+        "pricePerKg": "Price per Kg",
+        "timeTaken": "Time for transport (in minutes)"
+    },
+    "prepping":{
+        "title": "Prepping",
+        "wasteCuts": "Waste cuts (trash) in grams",
+        "cookingCuts": "Cooking cuts (imperfect fillets) in grams",
+        "timeTaken": "Time taken filletting (in minutes)"
+    },
+    "curing":{
+        "title": "Curing",
+        "saltName": "Salt name",
+        "saltNamePlaceholder": "(Optional)",
+        "saltAmount": "Salt amount (in grams)",
+        "saltCost": "Salt cost (per Kg)",
+        "saltTime": "Salt time (in minutes)",
+        "liquidName": "Liquid name",
+        "liquidNamePlaceholder": "Example: Vinegar, water, wine",
+        "liquidTime": "Liquid time (in minutes)", 
+        "timeTaken": "Time taken rinsing (in minutes)"
+    },
+    "seasoning":{
+        "title": "Seasoning",
+        "entry": "Entry #",
+        "numberOfCuts": "Number of cuts",
+        "spiceAmountUsed": "Spice amount used (in grams)",
+        "rackPositions": "Rack positions (comma separated)",
+        "rackPositionsPlaceholder": "e.g. top-left, bottom-right, 1st row, 2nd row",
+        "timeTaken": "Time taken seasoning (in minutes)",
+        "paperTowelCost": "Paper towel cost in euros",
+        "spiceSelector": {
+            "searchLabel": "Search spices/mixes by name",
+            "searchPlaceholder": "Example: Paprika",
+            "empty": "No matches found."
+        },
+        "validation": {
+            "selectSpice": "Please select spice or spice mix",
+            "validCuts": "Please enter valid cuts",
+            "spiceAmount": "Please enter spice amount"
+        }
+    },
+    "vacuumSealing":{
+        "title": "Vacuum Sealing",
+        "entry": "Entry #",
+        "productName": "Product name:",
+        "spiceName": "Spice name:",
+        "seasonedSlices": "Number of slices seasoned:",
+        "rackPositions": "Rack positions:",
+        "dryingTime": "Drying time (in minutes)",
+        "vacuumedSlices": "Number of vacuumed slices",
+        "driedWeight": "Dry weight (in grams)",
+        "vacuumRollCost": "Vacuum roll cost in euros",
+        "timeTaken": "Time taken vacuum sealing (in minutes)"
+    }
+}
