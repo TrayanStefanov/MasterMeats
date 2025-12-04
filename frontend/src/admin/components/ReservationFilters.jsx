@@ -121,6 +121,10 @@ export default function ReservationFilters() {
                       ? "bg-accent-content text-primary"
                       : "bg-secondary text-primary/70 hover:bg-secondary/70"
                   }`}
+                  title={tCommon(
+                    `filters.quick.filters.${key}.title`,
+                    quickFilters[key]
+                  )}
                 >
                   {quickFilters[key]}
                 </button>
