@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { FaPlus, FaTrash } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 import { useSpiceStore } from "../stores/useSpiceStore";
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
@@ -9,6 +10,10 @@ const ADJUST_STEPS = [-50, -25, -10, -5, -2, -1, 0, 1, 2, 5, 10, 25, 50];
 const SpiceMixForm = ({ mix, onChange }) => {
   const { availableTags } = useSpiceMixStore();
   const { spices, fetchSpices } = useSpiceStore();
+
+  const {t: tProduction} = useTranslation("admin/production");
+  const {t: tCommon} = useTranslation("admin/common");
+  const { t: tForms } = useTranslation("admin/forms");
 
   useEffect(() => {
     fetchSpices(); // Load all active spices
@@ -134,29 +139,31 @@ const SpiceMixForm = ({ mix, onChange }) => {
       {/* Name, Notes, Tags */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col">
-          <label className="mb-1 text-sm lg:text-lg text-secondary">Name</label>
+          <label className="mb-1 text-sm lg:text-lg text-secondary">{tForms("spiceMix.nameLabel")}</label>
           <input
             type="text"
             value={localMix.name || ""}
             onChange={(e) => handleFieldChange("name", e.target.value)}
+            placeholder={tForms("spiceMix.namePlaceholder")}
             className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 outline-none"
           />
         </div>
 
         <div className="flex flex-col">
           <label className="mb-1 text-sm lg:text-lg text-secondary">
-            Notes
+            {tForms("spiceMix.notesLabel")}
           </label>
           <textarea
             value={localMix.notes || ""}
             onChange={(e) => handleFieldChange("notes", e.target.value)}
             className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 outline-none"
+            placeholder={tForms("spiceMix.notesPlaceholder")}
           />
         </div>
 
         {/* Tags */}
         <div className="flex flex-col md:col-span-2">
-          <label className="mb-1 text-sm lg:text-lg text-secondary">Tags</label>
+          <label className="mb-1 text-sm lg:text-lg text-secondary">{tForms("spiceMix.tagsLabel")}</label>
           <div className="flex flex-wrap items-center gap-2 p-3 rounded-md bg-secondary border border-accent/20">
             {(localMix.tags || []).map((tag, idx) => (
               <span
@@ -167,6 +174,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
                 <button
                   onClick={() => handleRemoveTag(tag)}
                   className="text-accent-content/70 hover:text-accent-content text-xs"
+                  title={tForms("spiceMix.removeTag")}
                 >
                   ✕
                 </button>
@@ -178,7 +186,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddTag(e)}
-              placeholder="Type and press Enter..."
+              placeholder={tForms("spiceMix.tagsPlaceholder")}
               className="flex-1 w-full p-3 bg-transparent text-primary outline-none text-sm"
             />
           </div>
@@ -190,6 +198,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
                   key={tag}
                   onClick={(e) => handleAddTag(e, tag)}
                   className="px-3 py-1 bg-accent-content/10 text-primary rounded-full text-xs hover:bg-accent-content/30 transition"
+                  title={tForms("spiceMix.addTag")}
                 >
                   + {tag}
                 </button>
@@ -202,23 +211,24 @@ const SpiceMixForm = ({ mix, onChange }) => {
       {/* Ingredients Builder */}
       <div className="border border-accent/30 rounded-md p-4 space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-lg text-secondary">Ingredients</h3>
+          <h3 className="font-semibold text-lg text-secondary">{tForms("spiceMix.mixBuilder.title")}</h3>
           <button
             type="button"
             onClick={addIngredient}
             className="flex items-center gap-2 bg-accent text-accent-content px-3 py-1 rounded hover:bg-accent/80"
+            title={tForms("spiceMix.mixBuilder.addSpice")}
           >
-            <FaPlus /> Add Ingredient
+            <FaPlus /> {tForms("spiceMix.mixBuilder.addSpice")}
           </button>
         </div>
 
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-accent text-accent-content">
-              <th className="border-secondary border-2 px-2 py-1">Spice</th>
-              <th className="border-secondary border-2 px-2 py-1">Grams</th>
-              <th className="border-secondary border-2 px-2 py-1">Adjust</th>
-              <th className="border-secondary border-2 px-2 py-1">Remove</th>
+              <th className="border-secondary border-2 px-2 py-1">{tForms("spiceMix.mixBuilder.spice")} </th>
+              <th className="border-secondary border-2 px-2 py-1">{tForms("spiceMix.mixBuilder.grams")}</th>
+              <th className="border-secondary border-2 px-2 py-1">{tForms("spiceMix.mixBuilder.adjust")}</th>
+              <th className="border-secondary border-2 px-2 py-1">{tForms("spiceMix.mixBuilder.removeSpice")}</th>
             </tr>
           </thead>
           <tbody>
@@ -232,12 +242,12 @@ const SpiceMixForm = ({ mix, onChange }) => {
                     }
                     className="w-full bg-secondary text-primary border border-accent/30 rounded px-2 py-1"
                   >
-                    <option value="">Select spice...</option>
+                    <option value="">{tForms("spiceMix.mixBuilder.selectSpice")}</option>
                     {spices
                       .filter((s) => s.isActive)
                       .map((s) => (
                         <option key={s._id} value={s._id}>
-                          {s.name} (Stock: {s.stockInGrams}g)
+                          {s.name} ({tForms("spiceMix.mixBuilder.stock")}: {s.stockInGrams}{tCommon("units.grams")})
                         </option>
                       ))}
                   </select>
@@ -256,7 +266,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
                   />
                   {ing.spice && (
                     <p className="text-xs text-red-400 mt-1">
-                      Max available: {getAvailableForSpice(ing.spice)} g
+                      {tForms("spiceMix.mixBuilder.stock")}: {getAvailableForSpice(ing.spice)} {tCommon("units.grams")}
                     </p>
                   )}
                 </td>
@@ -281,6 +291,7 @@ const SpiceMixForm = ({ mix, onChange }) => {
                     type="button"
                     onClick={() => removeIngredient(idx)}
                     className="text-accent-content/60 hover:text-accent-content transition"
+                    title={tForms("spiceMix.mixBuilder.removeSpice")}
                   >
                     <FaTrash />
                   </button>
@@ -291,16 +302,16 @@ const SpiceMixForm = ({ mix, onChange }) => {
         </table>
 
         <p className="text-sm text-secondary">
-          Total: <strong>{totalGrams} g</strong>
+          {tForms("spiceMix.totalGrams")}: <strong>{totalGrams} {tCommon("units.grams")}</strong>
         </p>
 
         <p className="text-sm text-secondary">
-          Cost per 100g: <strong>€{costPer100g}</strong>
+          {tForms("spiceMix.cost")}: <strong>€{costPer100g}</strong>
         </p>
 
         {!validate() && (
           <p className="text-red-500 text-sm">
-            ⚠ Please fill all spices and amounts before saving.
+            {tForms("spiceMix.warning")}
           </p>
         )}
       </div>
