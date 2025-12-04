@@ -18,7 +18,7 @@ const ReservationDetailsModal = ({ reservation, onClose }) => {
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="bg-gray-900 rounded-2xl p-6 w-full max-w-2xl shadow-lg relative border border-accent/30"
+          className="bg-accent/70 rounded-2xl p-6 w-full max-w-2xl shadow-lg relative border-4 border-secondary/30"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
