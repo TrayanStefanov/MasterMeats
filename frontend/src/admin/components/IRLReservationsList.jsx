@@ -231,8 +231,8 @@ const IRLReservationsList = ({ onEdit }) => {
                         <button
                           type="button"
                           onClick={() => toggleExpand(res._id)}
-                          title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                           className="text-accent-content/60 hover:text-accent-content transition-colors"
+                          title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                         >
                           {isExpanded ? (
                             <FaChevronUp className="h-4 w-4" />
@@ -356,6 +356,7 @@ const IRLReservationsList = ({ onEdit }) => {
                         ? "text-primary cursor-default"
                         : "text-accent-content/60 hover:text-accent-content"
                     }`}
+                    title={res.completed ? tCommon("status.completed") : tCommon("buttons.markAsCompleted")}
                   >
                     {res.completed ? <MdDone className="h-6 w-6" /> : <MdDoneOutline className="h-6 w-6" />}
                   </button>
@@ -366,6 +367,7 @@ const IRLReservationsList = ({ onEdit }) => {
                       onEdit && onEdit(res);
                     }}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={tCommon("buttons.updateReservation")}
                   >
                     <FaEdit />
                   </button>
@@ -376,6 +378,7 @@ const IRLReservationsList = ({ onEdit }) => {
                       deleteReservation(res._id);
                     }}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={tCommon("buttons.deleteReservation")}
                   >
                     <FaTrash />
                   </button>
@@ -386,6 +389,7 @@ const IRLReservationsList = ({ onEdit }) => {
                       toggleExpand(res._id);
                     }}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                   >
                     {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                   </button>
@@ -403,16 +407,16 @@ const IRLReservationsList = ({ onEdit }) => {
                     transition={{ duration: 0.25 }}
                     className="bg-primary/40 px-4 py-2 text-secondary/80 text-sm space-y-2"
                   >
-                    <p>Phone: {res.client?.phone || "—"}</p>
-                    <p>Amount Due: €{res.amountDue?.toFixed(2) || "0.00"}</p>
-                    <p>Delivery: {new Date(res.dateOfDelivery).toLocaleDateString()}</p>
+                    <p>{tReservations("list.phone")} {res.client?.phone || "—"}</p>
+                    <p>{tReservations("list.amountDue")}: €{res.amountDue?.toFixed(2) || "0.00"}</p>
+                    <p>{tReservations("list.dateOfDelivery")}: {new Date(res.dateOfDelivery).toLocaleDateString()}</p>
 
                     {res.products?.length > 0 && (
                       <div>
-                        <p className="font-semibold text-secondary mb-1">Products:</p>
+                        <p className="font-semibold text-secondary mb-1">{tReservations("details.items")}</p>
                         {res.products.map((p, idx) => (
                           <div key={idx} className="flex justify-between text-secondary/70 text-sm">
-                            <span>{tProducts(`${p.product?.key || p.product?.name}.title`, { defaultValue: p.product?.name || "—" })} ({p.quantityInGrams} g)</span>
+                            <span>{tProducts(`${p.product?.key || p.product?.name}.title`, { defaultValue: p.product?.name || "—" })} ({p.quantityInGrams} {tCommon("units.grams")})</span>
                             <span className="text-secondary/50">€{p.priceAtReservation?.toFixed(2) || "0.00"}</span>
                           </div>
                         ))}
@@ -420,11 +424,11 @@ const IRLReservationsList = ({ onEdit }) => {
                     )}
 
                     <div>
-                      <p className="font-semibold text-secondary mb-1">Notes:</p>
+                      <p className="font-semibold text-secondary mb-1">{tReservations("details.notes")}</p>
                       {res.notes ? (
                         <p className="text-secondary/70 whitespace-pre-wrap">{res.notes}</p>
                       ) : (
-                        <p className="text-secondary/40 italic">No notes provided.</p>
+                        <p className="text-secondary/40 italic">{tReservations("details.noNotes")}</p>
                       )}
                     </div>
                   </motion.div>
