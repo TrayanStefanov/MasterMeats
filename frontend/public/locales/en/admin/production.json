@@ -12,12 +12,57 @@
             "supplier": "Supplier",
             "costPerKg": "Cost Per Kg",
             "stock": "Stock(Add)",
+            "stockMobile": "Stock",
             "notes": "Notes",
             "isActive": "Activity",
-            "actions": "Actions"
+            "actions": "Actions",
+            "addStockPlaceholder": "Add"
+        },
+        "filters": {
+            "title": "Spice Filters",
+            "isActive": "Spice Status",
+            "search" :{
+                "label": "Search by Name or Supplier",
+                "placeholder": "Type name or supplier"
+            }
         },
         "back": "Back to Spices",
         "createTitle": "Create New Spice",
+        "editTitle": "Editing: {{name}}"
+    },
+    "spiceMix": {
+        "title": "Spice Mixes",
+        "empty": "No spice mixes found.",
+        "list":{
+            "name": "Spice Mix",
+            "tags": "Tags",
+            "stock": "Stock(Add)",
+            "stockMobile": "Stock",
+            "cost": "Cost per 100g",
+            "ingredients": "Spices",
+            "notes": "Notes",
+            "noNotes": "No notes provided",
+            "isActive": "Activity",
+            "actions": "Actions",
+            "addStockPlaceholder": "Add",
+            "details": "Details for"
+        },
+        "filters": {
+            "title": "Spice Mix Filters",
+            "isActive": "Is Spice Mix active?",
+            "search" :{
+                "label": "Search by Spice Mix",
+                "placeholder": "Type spice mix name"
+            },
+            "searchSpiceOrTag" :{
+                "label": "Search by Spice or Tag",
+                "placeholder": "Type for spice or tag suggestions",
+                "removeTag": "Remove Tag",
+                "addTag": "Add Tag"
+            }
+        },
+        "back": "Back to Spice Mixes",
+        "createTitle": "Create New Spice Mix",
         "editTitle": "Editing: {{name}}"
     }
 }
