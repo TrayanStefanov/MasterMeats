@@ -99,6 +99,7 @@ const SpiceTab = () => {
               <button
                 onClick={handleCreate}
                 className="flex items-center text-base lg:text-xl xl:text-2xl gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
+                title={tCommon("buttons.createSpice")}
               >
                 <FaPlusCircle /> {tCommon("buttons.createSpice")}
               </button>
@@ -119,6 +120,7 @@ const SpiceTab = () => {
             <button
               onClick={handleBack}
               className="mb-4 flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
+              title={tProduction("spices.back")}
             >
               <FaArrowLeft /> {tProduction("spices.back")}
             </button>
@@ -135,13 +137,18 @@ const SpiceTab = () => {
                 type="submit"
                 disabled={loading}
                 className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-accent text-accent-content font-medium rounded-xl shadow-md hover:bg-accent/80 transition disabled:opacity-50"
+                title={
+                  mode === "edit"
+                    ? tCommon("buttons.updateSpice")
+                    : tCommon("buttons.createSpice")
+                }
               >
                 {loading ? (
                   <>
                     <FaSpinner className="animate-spin" />
                     {mode === "edit"
-                      ? tCommon("buttons.updating")
-                      : tCommon("buttons.creating")}
+                      ? tCommon("loading.updating")
+                      : tCommon("loading.creating")}
                   </>
                 ) : (
                   <>
