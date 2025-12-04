@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { useSpiceStore } from "../stores/useSpiceStore";
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 import { useProductStore } from "../../stores/useProductStore";
@@ -8,6 +10,8 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
   const { spices, fetchSpices } = useSpiceStore();
   const { spiceMixes, fetchSpiceMixes } = useSpiceMixStore();
   const { products, fetchAdminProducts } = useProductStore();
+
+  const { t: tBatches } = useTranslation("admin/batches");
 
   const [initialized, setInitialized] = useState(false);
 
@@ -63,47 +67,49 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-xl font-bold">Vacuum Sealing</h2>
+      <h2 className="text-xl font-bold">{tBatches("vacuumSealing.title")}</h2>
 
       {data.entries.map((entry, idx) => (
         <div key={idx} className="bg-base-300 p-4 rounded-xl">
-          <h3 className="font-semibold mb-2">Entry #{idx + 1}</h3>
+          <h3 className="font-semibold mb-2">{tBatches("vacuumSealing.entry")}{idx + 1}</h3>
 
           <div className="flex flex-col gap-2">
             <div>
-              <strong>Product:</strong> {entry.productName}
+              <strong>{tBatches("vacuumSealing.productName")}</strong> {entry.productName}
             </div>
             <div>
-              <strong>Spice name:</strong> {entry.spiceName}
+              <strong>{tBatches("vacuumSealing.spiceName")}</strong> {entry.spiceName}
             </div>
             <div>
-              <strong>Slices (seasoning):</strong> {entry.originalSlices}
+              <strong>{tBatches("vacuumSealing.seasonedSlices")}</strong> {entry.originalSlices}
             </div>
             <div>
-              <strong>Rack positions:</strong>{" "}
+              <strong>{tBatches("vacuumSealing.rackPositions")}</strong>{" "}
               {entry.rackPositions.join(", ") || "None"}
             </div>
 
-            <label className="mt-4 font-semibold">Dry Time</label>
+            <label className="mt-4 font-semibold">{tBatches("vacuumSealing.dryingTime")}</label>
             <TimeInput
               valueMinutes={entry.timeDriedMinutes}
               onChange={(val) => updateEntry(idx, "timeDriedMinutes", val)}
             />
 
+            <label>{tBatches("vacuumSealing.vacuumedSlices")}</label>
             <input
               type="number"
               className="input input-bordered"
-              placeholder="Vacuumed slices"
+              placeholder="1,2,3..."
               value={entry.vacuumedSlices}
               onChange={(e) =>
                 updateEntry(idx, "vacuumedSlices", Number(e.target.value))
               }
             />
 
+            <label>{tBatches("vacuumSealing.driedWeight")}</label>
             <input
               type="number"
               className="input input-bordered"
-              placeholder="Dried weight (grams)"
+              placeholder="0"
               value={entry.driedInGrams}
               onChange={(e) =>
                 updateEntry(idx, "driedInGrams", Number(e.target.value))
@@ -113,12 +119,14 @@ const PhaseVacuumSealing = ({ data, onChange, previousPhaseEntries }) => {
         </div>
       ))}
 
-      <label className="mt-4 font-semibold">Total Vacuum Work Time</label>
+
+      <label className="mt-4 font-semibold">{tBatches("vacuumSealing.timeTaken")}</label>
       <TimeInput
         valueMinutes={data.workTimeMinutes || 0}
         onChange={(val) => updateField("workTimeMinutes", val)}
       />
 
+      <label>{tBatches("vacuumSealing.vacuumRollCost")}</label>
       <input
         type="number"
         className="input input-bordered"
