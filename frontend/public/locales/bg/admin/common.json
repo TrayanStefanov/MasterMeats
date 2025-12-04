@@ -13,27 +13,38 @@
         "createSpice": "Създай подправка",
         "updateSpice": "Обнови подправката",
         "deleteSpice": "Изтрий подправка",
+        "toggleSpice": "Активност на подправката",
+        "addSpiceStock": "Добави от подправката",
         "createSpiceMix": "Създай микс",
         "updateSpiceMix": "Обнови микса",
         "deleteSpiceMix": "Изтрий микс",
+        "toggleSpiceMix": "Активност на микса",
+        "addSpiceMixStock": "Добави от микса",
         "createBatch": "Създай партида",
         "updateBatch": "Обнови партидата",
         "deleteBatch": "Изтрий партида",
         "showDetails": "Покажи детайли",
         "hideDetails": "Скрий детайли",
-        "markAsCompleted":"Отбележи като завършена"
+        "showOrder": "Покажи поръчката",
+        "markAsCompleted":"Отбележи като завършена",
+        "showPercent": "Покажи %",
+        "showGrams": "Покажи гр.",
+        "activate": "Активирай",
+        "deactivate": "Деактивирай"
     },
     "units": {
         "grams": "гр.",
         "kg": "кг.",
-        "of": "от"
+        "of": "от",
+        "euroSign": "€"
     },
     "loading": {
         "loading": "Зареждане...",
         "updating": "Обновяване...",
         "creating": "Създаване...",
         "deleting": "Изтриване...",
-        "uploading": "Качване..."
+        "uploading": "Качване...",
+        "more": "Още..."
     },
     "tabs": {
         "products": "Продукти",
@@ -44,12 +55,17 @@
     },
     "status": {
         "status": "Статус",
+        "active": "Активен",
+        "activeA": "Активна",
+        "inactive": "Неактивен",
+        "inactiveA": "Неактивна",
         "pending": "Чакаща",
-        "completed": "Завършена",
-        "cancelled": "Отказана",
+        "completed": "Завършени",
+        "cancelled": "Отказани",
         "inProcess": "В процес",
         "reserved": "Резервирана",
         "none": "Няма",
+        "all": "Всички",
         "deliveredNotPaid": "Доставена (Неплатена)",
         "paidNotDelivered": "Платена (Недоставена)"
     },
