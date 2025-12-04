@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { FaTimes } from "react-icons/fa";
 import { useDebounce } from "../../hooks/useDebounce";
+import { useTranslation } from "react-i18next";
+
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
 
 export default function SpiceMixFilters() {
   const { filters, setFilter, availableTags } = useSpiceMixStore();
+
+  const {t: tProduction} = useTranslation("admin/production");
+  const {t: tCommon} = useTranslation("admin/common");
 
   const [searchInput, setSearchInput] = useState(filters.search || "");
   const [statusFilter, setStatusFilter] = useState(filters.isActive || "all");
@@ -55,14 +60,14 @@ export default function SpiceMixFilters() {
   return (
     <div className="min-w-[90%] mx-auto rounded-md border-4 border-accent-content/60 p-4 mb-4 space-y-4">
       <h2 className="text-accent-content text-2xl xl:text-3xl text-center font-bold mb-4">
-        Spice Mix Filters
+        {tProduction("spiceMix.filters.title")}
       </h2>
 
       <div className="flex flex-col">
-        <label className="text-secondary/70 mb-1 text-sm lg:text-lg">Search by Name</label>
+        <label className="text-secondary/70 mb-1 text-sm lg:text-lg">{tProduction("spiceMix.filters.search.label")}</label>
         <input
           type="text"
-          placeholder="Type mix name..."
+          placeholder={tProduction("spiceMix.filters.search.placeholder")}
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           className="bg-secondary text-primary border border-accent/30 rounded-md px-3 py-2 outline-none"
@@ -70,10 +75,10 @@ export default function SpiceMixFilters() {
       </div>
 
       <div className="flex flex-col">
-        <label className="text-secondary/70 mb-1 text-sm lg:text-lg">Filter by Status</label>
+        <label className="text-secondary/70 mb-1 text-sm lg:text-lg">{tProduction("spiceMix.filters.isActive")}</label>
         <div className="flex items-center gap-2">
           {["all", "true", "false"].map((val) => {
-            const label = val === "all" ? "All" : val === "true" ? "Active" : "Inactive";
+            const label = val === "all" ? tCommon("status.all") : val === "true" ? tCommon("status.active") : tCommon("status.inactive");
             const isSelected = statusFilter === val;
             return (
               <button
@@ -82,6 +87,7 @@ export default function SpiceMixFilters() {
                 className={`px-3 py-1 rounded-full text-xs ${
                   isSelected ? "bg-accent-content text-primary" : "bg-secondary text-primary/70"
                 }`}
+                title={tCommon(`status.${val}`)}
               >
                 {label}
               </button>
@@ -91,7 +97,7 @@ export default function SpiceMixFilters() {
       </div>
 
       <div className="flex flex-col relative">
-        <label className="text-secondary/70 mb-1 text-sm lg:text-lg">Filter by Tag / Ingredient</label>
+        <label className="text-secondary/70 mb-1 text-sm lg:text-lg">{tProduction("spiceMix.filters.searchSpiceOrTag.label")}</label>
         <div className="flex flex-wrap border border-secondary rounded-lg p-1 focus-within:ring-2 focus-within:ring-accent transition">
           {(filters.tags || []).map((tag) => (
             <span
@@ -103,6 +109,7 @@ export default function SpiceMixFilters() {
                 type="button"
                 onClick={() => handleRemoveTag(tag)}
                 className="ml-1 text-secondary hover:text-accent-content"
+                title={tProduction("spiceMix.filters.searchSpiceOrTag.removeTag")}
               >
                 <FaTimes className="w-3 h-3" />
               </button>
@@ -114,7 +121,7 @@ export default function SpiceMixFilters() {
             type="text"
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
-            placeholder="Type to search tags..."
+            placeholder={tProduction("spiceMix.filters.searchSpiceOrTag.placeholder")}
             className="flex-1 min-w-[120px] border-none rounded-lg bg-secondary placeholder:text-primary/60 outline-none px-1 py-1 text-sm lg:text-base xl:text-lg indent-2"
           />
         </div>
@@ -127,6 +134,7 @@ export default function SpiceMixFilters() {
                 type="button"
                 onClick={() => handleAddTag(t)}
                 className="w-full text-left px-3 py-1 hover:bg-accent/20"
+                title={tProduction("spiceMix.filters.searchSpiceOrTag.addTag")}
               >
                 {t}
               </button>
