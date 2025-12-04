@@ -194,6 +194,7 @@ const ProductsList = ({ onEdit }) => {
                           : "bg-transparent border-accent-content text-accent-content/60 hover:text-accent-content"
                       }
                     `}
+                      title={product.isActive ? tCommon("buttons.activate") : tCommon("buttons.deactivate")}
                     >
                       {product.isActive ? (
                         <MdDone className="h-4 w-4" />
@@ -275,6 +276,7 @@ const ProductsList = ({ onEdit }) => {
                           ? "bg-accent-content border-accent-content text-primary"
                           : "bg-transparent border-accent-content text-accent-content/60 hover:text-accent-content"
                       }`}
+                      title={product.isActive ? tCommon("buttons.activate") : tCommon("buttons.deactivate")}
                     >
                       {product.isActive ? (
                         <MdDone className="h-4 w-4" />
@@ -286,18 +288,21 @@ const ProductsList = ({ onEdit }) => {
                   <button
                     onClick={() => onEdit(product)}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={tCommon("buttons.updateProduct")}
                   >
                     <FaEdit />
                   </button>
                   <button
                     onClick={() => deleteProduct(product._id)}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={tCommon("buttons.deleteProduct")}
                   >
                     <FaTrash />
                   </button>
                   <button
                     onClick={() => toggleExpand(product._id)}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                   >
                     {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                   </button>
