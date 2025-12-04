@@ -71,7 +71,7 @@ const BatchTab = () => {
                 className="flex items-center text-base lg:text-xl xl:text-2xl gap-2 bg-accent text-accent-content px-4 py-2 rounded-xl hover:bg-accent/80 transition"
               >
                 <FaPlusCircle />
-                {tCommon("buttons.create") || "Create Batch"}
+                {tCommon("buttons.createBatch") || "Create Batch"}
               </button>
             </div>
 
