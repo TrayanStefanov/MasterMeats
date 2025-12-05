@@ -2,12 +2,12 @@
     "tabs": {
         "batches": "Batches",
         "spiceMixes": "Spice Mixes",
-        "spices" : "Spices"
+        "spices": "Spices"
     },
     "spices": {
         "empty": "No spices found.",
         "title": "Spices",
-        "list":{
+        "list": {
             "name": "Spice Name",
             "supplier": "Supplier",
             "costPerKg": "Cost Per Kg",
@@ -21,7 +21,7 @@
         "filters": {
             "title": "Spice Filters",
             "isActive": "Spice Status",
-            "search" :{
+            "search": {
                 "label": "Search by Name or Supplier",
                 "placeholder": "Type name or supplier"
             }
@@ -33,7 +33,7 @@
     "spiceMix": {
         "title": "Spice Mixes",
         "empty": "No spice mixes found.",
-        "list":{
+        "list": {
             "name": "Spice Mix",
             "tags": "Tags",
             "stock": "Stock(Add)",
@@ -50,11 +50,11 @@
         "filters": {
             "title": "Spice Mix Filters",
             "isActive": "Is Spice Mix active?",
-            "search" :{
+            "search": {
                 "label": "Search by Spice Mix",
                 "placeholder": "Type spice mix name"
             },
-            "searchSpiceOrTag" :{
+            "searchSpiceOrTag": {
                 "label": "Search by Spice or Tag",
                 "placeholder": "Type for spice or tag suggestions",
                 "removeTag": "Remove Tag",
@@ -64,5 +64,52 @@
         "back": "Back to Spice Mixes",
         "createTitle": "Create New Spice Mix",
         "editTitle": "Editing: {{name}}"
+    },
+    "batches": {
+        "title": "Batches",
+        "empty": "No batches found.",
+        "warning": {
+            "unknown": "Unknown",
+            "spice": "Unknown spice",
+            "spiceMix": "Unknown spice mix"
+        },
+        "list": {
+            "id": "Batch #",
+            "driedKg": "Dried Kg",
+            "totalCost": "Total Cost",
+            "costPerKg": "Cost/Kg",
+            "status": "Status",
+            "finished": "Finished at",
+            "actions": "Actions",
+            "detailsFor": "Details for",
+            "time": {
+                "title": "Time",
+                "start": "Start time",
+                "finish": "Finish time",
+                "curingSalt": "Curing in salt",
+                "curingLiquid": "Curing in liquid",
+                "totalWorkTime": "Total work time",
+                "totalProductionTime": "Total production time"
+            },
+            "cost": {
+                "title": "Cost",
+                "rawMeat": "Raw meat cost",
+                "salt": "Salt cost",
+                "liquid": "Liquid cost",
+                "spices": "Spices",
+                "noSpices": "No spices used",
+                "totalSpice": "Total spice cost",
+                "paperTowel": "Paper towel cost",
+                "vacuumRolls": "Vacuum rolls cost",
+                "totalCost": "Total cost"
+            },
+            "details": {
+                "title": "Details",
+                "rawMeat": "Raw meat",
+                "wasteMeat": "Waste meat",
+                "meatForCooking": "Meat for cooking",
+                "salt": "Salt g/kg"
+            }
+        }
     }
 }
