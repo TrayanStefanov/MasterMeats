@@ -38,7 +38,11 @@
         "grams": "g",
         "kg": "kg",
         "of": "of",
-        "euroSign": "€"
+        "euroSign": "€",
+        "hours": "h",
+        "minutes": "min",
+        "seconds": "sec",
+        "days": "days"
     },
     "loading": {
         "loading": "Loading...",
@@ -53,7 +57,7 @@
         "reservations": "Reservations",
         "analytics": "Analytics",
         "usersAndClients": "Users & Clients",
-        "production" : "Production"
+        "production": "Production"
     },
     "status": {
         "status": "Status",
@@ -64,10 +68,11 @@
         "pending": "Pending",
         "completed": "Completed",
         "cancelled": "Cancelled",
+        "complete": "Complete",
         "inProcess": "In Process",
         "reserved": "Reserved",
         "none": "None",
-        "all" : "All",
+        "all": "All",
         "deliveredNotPaid": "Delivered (Not Paid)",
         "paidNotDelivered": "Paid (Not Delivered)"
     },
