@@ -1,6 +1,8 @@
 import { useState, Fragment, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaEdit, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import { useBatchStore } from "../stores/useBatchStore";
 import { useSpiceStore } from "../stores/useSpiceStore";
 import { useSpiceMixStore } from "../stores/useSpiceMixStore";
@@ -13,6 +15,8 @@ const prettyNumber = (v, digits = 1) =>
 const BatchList = ({ onEdit }) => {
   const { batches = [], loading } = useBatchStore();
 
+  const { t: tCommon } = useTranslation("admin/common");
+  const { t: tProduction } = useTranslation("admin/production");
   // spice stores
   const { spices, fetchSpices } = useSpiceStore();
   const { spiceMixes, fetchSpiceMixes } = useSpiceMixStore();
@@ -45,13 +49,13 @@ const BatchList = ({ onEdit }) => {
 
   if (loading && batches.length === 0)
     return (
-      <p className="text-center py-8 text-secondary/60">Loading batches…</p>
+      <p className="text-center py-8 text-secondary/60">{tCommon("loading.loading")}</p>
     );
 
   if (!batches || batches.length === 0)
     return (
       <p className="text-center py-8 text-secondary/60">
-        No batches created yet.
+        {tProduction("batchList.empty")}
       </p>
     );
   const formatWorkTime = (minutes) => {
@@ -60,10 +64,10 @@ const BatchList = ({ onEdit }) => {
     const h = Math.floor(minutes / 60);
     const m = Math.floor(minutes % 60);
 
-    if (h === 0) return `${m} min`;
-    if (m === 0) return `${h} h`;
+    if (h === 0) return `${m}${tCommon("units.minutes")}`;
+    if (m === 0) return `${h}${tCommon("units.hours")}`;
 
-    return `${h}h ${m}m`;
+    return `${h}${tCommon("units.hours")} ${m}${tCommon("units.minutes")}`;
   };
   // helper to compute spice cost for a seasoning entry
   const computeEntrySpiceCost = (entry) => {
@@ -71,20 +75,20 @@ const BatchList = ({ onEdit }) => {
     if (entry.spiceId) {
       const spice = spicesById.get(entry.spiceId?.toString());
       if (!spice || typeof spice.costPerKg !== "number")
-        return { cost: 0, name: "Unknown spice" };
+        return { cost: 0, name: tProduction("batches.warning.spice") };
       // costPerKg -> cost per gram = /1000
       const cost = (spice.costPerKg / 1000) * grams;
-      return { cost, name: spice.name || "Unknown spice" };
+      return { cost, name: spice.name || tProduction("batches.warning.spice") };
     }
     if (entry.spiceMixId) {
       const mix = mixesById.get(entry.spiceMixId?.toString());
       if (!mix || typeof mix.costPer100g !== "number")
-        return { cost: 0, name: "Unknown mix" };
+        return { cost: 0, name: tProduction("batches.warning.spiceMix") };
       // costPer100g -> cost per gram = /100
       const cost = (mix.costPer100g / 100) * grams;
-      return { cost, name: mix.name || "Unknown mix" };
+      return { cost, name: mix.name || tProduction("batches.warning.spiceMix") };
     }
-    return { cost: 0, name: "Unknown" };
+    return { cost: 0, name: tProduction("batches.warning.unknown") };
   };
 
   return (
@@ -97,13 +101,13 @@ const BatchList = ({ onEdit }) => {
       <table className="min-w-full divide-y divide-accent-conten hidden md:table">
         <thead className="bg-secondary/80 font-semibold text-primary uppercase text-xs tracking-wider">
           <tr>
-            <th className="px-6 py-3 text-left">Batch #</th>
-            <th className="px-6 py-3 text-left">Dried KG</th>
-            <th className="px-6 py-3 text-left">Total cost</th>
-            <th className="px-6 py-3 text-left">Cost / KG</th>
-            <th className="px-6 py-3 text-left">Status</th>
-            <th className="px-6 py-3 text-left">Finished</th>
-            <th className="px-6 py-3 text-right">Actions</th>
+            <th className="px-6 py-3 text-left">{tProduction("batches.list.id")}</th>
+            <th className="px-6 py-3 text-left">{tProduction("batches.list.driedKg")}</th>
+            <th className="px-6 py-3 text-left">{tProduction("batches.list.totalCost")}</th>
+            <th className="px-6 py-3 text-left">{tProduction("batches.list.costPerKg")}</th>
+            <th className="px-6 py-3 text-left">{tProduction("batches.list.status")}</th>
+            <th className="px-6 py-3 text-left">{tProduction("batches.list.finished")}</th>
+            <th className="px-6 py-3 text-right">{tProduction("batches.list.actions")}</th>
           </tr>
         </thead>
 
@@ -168,7 +172,7 @@ const BatchList = ({ onEdit }) => {
                           : "bg-yellow-600 text-white"
                       }`}
                     >
-                      {batch.finishTime ? "Complete" : "In Progress"}
+                    {batch.finishTime ? tCommon("status.complete") : tCommon("status.inProcess")}
                     </span>
                   </td>
 
@@ -183,6 +187,7 @@ const BatchList = ({ onEdit }) => {
                         onEdit(batch);
                       }}
                       className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      titel={tCommon("buttons.updateBatch")}
                     >
                       <FaEdit />
                     </button>
@@ -193,6 +198,7 @@ const BatchList = ({ onEdit }) => {
                         setExpanded(expanded === batch._id ? null : batch._id);
                       }}
                       className="text-accent-content/60 hover:text-accent-content transition-colors"
+                      title={expanded === batch._id ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                     >
                       {expanded === batch._id ? (
                         <FaChevronUp />
@@ -208,35 +214,35 @@ const BatchList = ({ onEdit }) => {
                   <tr className="bg-accent/50">
                     <td colSpan="8" className="px-16 py-10 text-secondary">
                       <h3 className="font-bold text-accent-content text-3xl mb-8 text-center">
-                        Batch #{batch.batchNumber ?? batch._id.slice(-6)} Info
+                        {tProduction("batches.list.detailsFor")} {tProduction("batches.list.id")}{batch.batchNumber ?? batch._id.slice(-6)}
                       </h3>
 
                       <div className="flex justify-between gap-6">
                         {/* COLUMN 1 — TIME */}
                         <div className="flex-1">
                           <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
-                            Time
+                            {tProduction("batches.list.time.title")}
                           </h4>
                           <p>
-                            <strong>Start:</strong>{" "}
+                            <strong>{tProduction("batches.list.time.start")}:</strong>{" "}
                             {batch.startTime
                               ? new Date(batch.startTime).toLocaleString()
                               : "—"}
                             <br />
-                            <strong>Finish:</strong>{" "}
+                            <strong>{tProduction("batches.list.time.finish")}:</strong>{" "}
                             {batch.finishTime
                               ? new Date(batch.finishTime).toLocaleString()
                               : "—"}
                             <br />
                             <br />
-                            <strong>Curing in salt:</strong>{" "}
+                            <strong>{tProduction("batches.list.time.curingSalt")}:</strong>{" "}
                             <p>
                               {formatWorkTime(
                                 batch.curingPhase?.timeInSaltMinutes
                               )}
                             </p>
                             <br />
-                            <strong>Curing in liquid:</strong>{" "}
+                            <strong>{tProduction("batches.list.time.curingLiquid")}:</strong>{" "}
                             <p>
                               {formatWorkTime(
                                 batch.curingPhase?.timeInLiquidMinutes
@@ -244,13 +250,13 @@ const BatchList = ({ onEdit }) => {
                             </p>
                             <br />
                             <br />
-                            <strong>Total Work Time:</strong>{" "}
+                            <strong>{tProduction("batches.list.time.totalWorkTime")}:</strong>{" "}
                             <p>{formatWorkTime(batch.totalWorkTime)}</p>
                             <br />
-                            <strong>Total Production Time:</strong>{" "}
+                            <strong>{tProduction("batches.list.time.totalProductionTime")}</strong>{" "}
                             {batch.totalElapsedTimeHours
                               ? prettyNumber(batch.totalElapsedTimeHours, 2) +
-                                " hrs"
+                                "" + tCommon("units.hours")
                               : "—"}
                           </p>
                         </div>
@@ -258,40 +264,40 @@ const BatchList = ({ onEdit }) => {
                         {/* COLUMN 2 — COST */}
                         <div className="flex-1">
                           <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
-                            Cost
+                            {tProduction("batches.list.cost.title")}
                           </h4>
 
                           <div className="space-y-2">
                             <div>
-                              <strong>Raw meat:</strong>{" "}
+                              <strong>{tProduction("batches.list.cost.rawMeat")}:</strong>{" "}
                               {rawCost ? currency(rawCost) : currency(0)}{" "}
                               <span className="text-sm text-secondary/70">
-                                ({rawKg ?? 0} kg @{" "}
+                                ({rawKg ?? 0} {tCommon("units.kg")} @{" "}
                                 {batch.sourcingPhase?.pricePerKg
                                   ? currency(batch.sourcingPhase.pricePerKg)
                                   : "—"}
-                                /kg)
+                                /{tCommon("units.kg")})
                               </span>
                             </div>
 
                             <div>
-                              <strong>Salt used:</strong>{" "}
+                              <strong>{tProduction("batches.list.cost.salt")}:</strong>{" "}
                               {batch.curingPhase?.saltAmountInGrams
                                 ? `${
                                     batch.curingPhase.saltAmountInGrams / 1000
-                                  } kg`
+                                  } ${tCommon("units.kg")}`
                                 : "—"}
                             </div>
 
                             <div>
-                              <strong>Spices</strong>{" "}
+                              <strong>{tProduction("batches.list.cost.spices")}:</strong>{" "}
                               <span className="text-sm text-secondary/70">
                                 ({seasoningEntries.length} entries)
                               </span>
                               <div className="mt-2 ml-3">
                                 {seasoningEntries.length === 0 && (
                                   <div className="text-secondary/60">
-                                    No spices recorded
+                                    {tProduction("batches.list.cost.noSpices")}
                                   </div>
                                 )}
                                 {seasoningEntries.map((e, i) => {
@@ -303,7 +309,7 @@ const BatchList = ({ onEdit }) => {
                                       className="flex justify-between"
                                     >
                                       <div className="truncate text-sm">
-                                        {name} — {e.spiceAmountUsed ?? 0} g
+                                        {name} — {e.spiceAmountUsed ?? 0} {tCommon("units.g")}
                                       </div>
                                       <div className="text-sm">
                                         {currency(cost)}
@@ -313,7 +319,7 @@ const BatchList = ({ onEdit }) => {
                                 })}
                                 {seasoningEntries.length > 0 && (
                                   <div className="mt-2 border-t pt-2">
-                                    <strong>Total spices:</strong>{" "}
+                                    <strong>{tProduction("batches.list.cost.totalSpice")}</strong>{" "}
                                     {currency(spiceCost)}
                                   </div>
                                 )}
@@ -321,17 +327,17 @@ const BatchList = ({ onEdit }) => {
                             </div>
 
                             <div>
-                              <strong>Paper towels:</strong>{" "}
+                              <strong>{tProduction("batches.list.cost.paperTowel")}:</strong>{" "}
                               {currency(paperTowelCost)}
                             </div>
 
                             <div>
-                              <strong>Vacuum rolls:</strong>{" "}
+                              <strong>{tProduction("batches.list.cost.vacuumRolls")}:</strong>{" "}
                               {currency(vacuumRollCost)}
                             </div>
 
                             <div className="mt-3 border-t pt-2">
-                              <strong>Computed total:</strong>{" "}
+                              <strong>{tProduction("batches.list.cost.totalCost")}</strong>{" "}
                               {currency(computedTotal)}
                             </div>
                           </div>
@@ -340,31 +346,30 @@ const BatchList = ({ onEdit }) => {
                         {/* COLUMN 3 — DETAILS */}
                         <div className="flex-1">
                           <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
-                            Details
+                            {tProduction("batches.list.details.title")}
                           </h4>
                           <p>
-                            <strong>Raw meat:</strong>{" "}
+                            <strong>{tProduction("batches.list.details.rawMeat")}:</strong>{" "}
                             {(batch.sourcingPhase?.amountInGrams ?? 0) / 1000}{" "}
-                            kg
+                            {tCommon("units.kg")}
                             <br />
-                            <strong>Waste:</strong>{" "}
-                            {(batch.preppingPhase?.wasteInGrams ?? 0) / 1000} kg
+                            <strong>{tProduction("batches.list.details.wasteMeat")}:</strong>{" "}
+                            {(batch.preppingPhase?.wasteInGrams ?? 0) / 1000} {tCommon("units.kg")}
                             <br />
-                            <strong>Cooking cuts:</strong>{" "}
+                            <strong>{tProduction("batches.list.details.meatForCooking")}</strong>{" "}
                             {(batch.preppingPhase?.cookingCutsIngrams ?? 0) /
-                              1000}{" "}
-                            kg
+                              1000}{" "} {tCommon("units.kg")}                            
                             <br />
                             <br />
                             {batch.curingPhase?.saltAmountInGrams &&
                             batch.sourcingPhase?.amountKg ? (
                               <>
-                                <strong>Salt g/kg:</strong>{" "}
+                                <strong>{tProduction("batches.list.details.salt")}</strong>{" "}
                                 {(
                                   batch.curingPhase.saltAmountInGrams /
                                   batch.sourcingPhase.amountKg
                                 ).toFixed(1) || 0}{" "}
-                                g/kg
+                                {tCommon("units.g")}/{tCommon("units.kg")}
                               </>
                             ) : null}
                           </p>
@@ -412,10 +417,10 @@ const BatchList = ({ onEdit }) => {
               >
                 <div className="flex flex-col">
                   <span className="font-semibold text-secondary">
-                    Batch #{batch.batchNumber ?? batch._id.slice(-6)}
+                    {tProduction("batches.list.id")}{batch.batchNumber ?? batch._id.slice(-6)}
                   </span>
                   <span className="text-secondary/70">
-                    Dried: {batch.driedTotal ?? "—"} kg
+                    {tProduction("batches.list.driedKg")} {batch.driedTotal ?? "—"} {tCommon("units.kg")}
                   </span>
                 </div>
 
@@ -427,7 +432,7 @@ const BatchList = ({ onEdit }) => {
                         : "bg-yellow-600 text-white"
                     }`}
                   >
-                    {batch.finishTime ? "Complete" : "In Progress"}
+                    {batch.finishTime ? tCommon("status.complete") : tCommon("status.inProcess")}
                   </span>
 
                   <button
@@ -436,6 +441,7 @@ const BatchList = ({ onEdit }) => {
                       onEdit(batch);
                     }}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={tCommon("buttons.updateBatch")}
                   >
                     <FaEdit />
                   </button>
@@ -446,6 +452,7 @@ const BatchList = ({ onEdit }) => {
                       setExpanded(isExpanded ? null : batch._id);
                     }}
                     className="text-accent-content/60 hover:text-accent-content"
+                    title={isExpanded ? tCommon("buttons.hideDetails") : tCommon("buttons.showDetails")}
                   >
                     {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                   </button>
@@ -465,116 +472,152 @@ const BatchList = ({ onEdit }) => {
                   >
                     <div>
                       <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
-                        Time:
+                        {tProduction("batches.list.time.title")}
                       </h4>
                       <p>
-                        <strong>Start:</strong>{" "}
-                        {batch.startTime
-                          ? new Date(batch.startTime).toLocaleString()
-                          : "—"}
-                        <br />
-                        <strong>Finish:</strong>{" "}
-                        {batch.finishTime
-                          ? new Date(batch.finishTime).toLocaleString()
-                          : "—"}
-                      </p>
+                            <strong>{tProduction("batches.list.time.start")}:</strong>{" "}
+                            {batch.startTime
+                              ? new Date(batch.startTime).toLocaleString()
+                              : "—"}
+                            <br />
+                            <strong>{tProduction("batches.list.time.finish")}:</strong>{" "}
+                            {batch.finishTime
+                              ? new Date(batch.finishTime).toLocaleString()
+                              : "—"}
+                            <br />
+                            <br />
+                            <strong>{tProduction("batches.list.time.curingSalt")}:</strong>{" "}
+                            <p>
+                              {formatWorkTime(
+                                batch.curingPhase?.timeInSaltMinutes
+                              )}
+                            </p>
+                            <strong>{tProduction("batches.list.time.curingLiquid")}:</strong>{" "}
+                            <p>
+                              {formatWorkTime(
+                                batch.curingPhase?.timeInLiquidMinutes
+                              )}
+                            </p>
+                            <strong>{tProduction("batches.list.time.totalWorkTime")}:</strong>{" "}
+                            <p>{formatWorkTime(batch.totalWorkTime)}</p>
+                            <strong>{tProduction("batches.list.time.totalProductionTime")}</strong>{" "}
+                            {batch.totalElapsedTimeHours
+                              ? prettyNumber(batch.totalElapsedTimeHours, 2) +
+                                "" + tCommon("units.hours")
+                              : "—"}
+                          </p>
                     </div>
 
                     <div className="flex-1">
                       <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
-                        Cost
-                      </h4>
+                            {tProduction("batches.list.cost.title")}
+                          </h4>
 
-                      <div className="space-y-2">
-                        <div>
-                          <strong>Raw meat:</strong>{" "}
-                          {rawCost ? currency(rawCost) : currency(0)}{" "}
-                          <span className="text-sm text-secondary/70">
-                            ({rawKg ?? 0} kg @{" "}
-                            {batch.sourcingPhase?.pricePerKg
-                              ? currency(batch.sourcingPhase.pricePerKg)
-                              : "—"}
-                            /kg)
-                          </span>
-                        </div>
+                          <div className="space-y-2">
+                            <div>
+                              <strong>{tProduction("batches.list.cost.rawMeat")}:</strong>{" "}
+                              {rawCost ? currency(rawCost) : currency(0)}{" "}
+                              <span className="text-sm text-secondary/70">
+                                ({rawKg ?? 0} {tCommon("units.kg")} @{" "}
+                                {batch.sourcingPhase?.pricePerKg
+                                  ? currency(batch.sourcingPhase.pricePerKg)
+                                  : "—"}
+                                /{tCommon("units.kg")})
+                              </span>
+                            </div>
 
-                        <div>
-                          <strong>Salt used:</strong>{" "}
-                          {batch.curingPhase?.saltAmountInGrams
-                            ? `${batch.curingPhase.saltAmountInGrams / 1000} kg`
-                            : "—"}
-                        </div>
+                            <div>
+                              <strong>{tProduction("batches.list.cost.salt")}:</strong>{" "}
+                              {batch.curingPhase?.saltAmountInGrams
+                                ? `${
+                                    batch.curingPhase.saltAmountInGrams / 1000
+                                  } ${tCommon("units.kg")}`
+                                : "—"}
+                            </div>
 
-                        <div>
-                          <strong>Spices</strong>{" "}
-                          <span className="text-sm text-secondary/70">
-                            ({seasoningEntries.length} entries)
-                          </span>
-                          <div className="mt-2 ml-3">
-                            {seasoningEntries.length === 0 && (
-                              <div className="text-secondary/60">
-                                No spices recorded
-                              </div>
-                            )}
-                            {seasoningEntries.map((e, i) => {
-                              const { cost, name } = computeEntrySpiceCost(e);
-                              return (
-                                <div key={i} className="flex justify-between">
-                                  <div className="truncate text-sm">
-                                    {name} — {e.spiceAmountUsed ?? 0} g
+                            <div>
+                              <strong>{tProduction("batches.list.cost.spices")}:</strong>{" "}
+                              <span className="text-sm text-secondary/70">
+                                ({seasoningEntries.length} entries)
+                              </span>
+                              <div className="mt-2 ml-3">
+                                {seasoningEntries.length === 0 && (
+                                  <div className="text-secondary/60">
+                                    {tProduction("batches.list.cost.noSpices")}
                                   </div>
-                                  <div className="text-sm">
-                                    {currency(cost)}
+                                )}
+                                {seasoningEntries.map((e, i) => {
+                                  const { cost, name } =
+                                    computeEntrySpiceCost(e);
+                                  return (
+                                    <div
+                                      key={i}
+                                      className="flex justify-between"
+                                    >
+                                      <div className="truncate text-sm">
+                                        {name} — {e.spiceAmountUsed ?? 0} {tCommon("units.g")}
+                                      </div>
+                                      <div className="text-sm">
+                                        {currency(cost)}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                                {seasoningEntries.length > 0 && (
+                                  <div className="mt-2 border-t pt-2">
+                                    <strong>{tProduction("batches.list.cost.totalSpice")}</strong>{" "}
+                                    {currency(spiceCost)}
                                   </div>
-                                </div>
-                              );
-                            })}
-                            {seasoningEntries.length > 0 && (
-                              <div className="mt-2 border-t pt-2">
-                                <strong>Total spices:</strong>{" "}
-                                {currency(spiceCost)}
+                                )}
                               </div>
-                            )}
+                            </div>
+
+                            <div>
+                              <strong>{tProduction("batches.list.cost.paperTowel")}:</strong>{" "}
+                              {currency(paperTowelCost)}
+                            </div>
+
+                            <div>
+                              <strong>{tProduction("batches.list.cost.vacuumRolls")}:</strong>{" "}
+                              {currency(vacuumRollCost)}
+                            </div>
+
+                            <div className="mt-3 border-t pt-2">
+                              <strong>{tProduction("batches.list.cost.totalCost")}</strong>{" "}
+                              {currency(computedTotal)}
+                            </div>
                           </div>
-                        </div>
-
-                        <div>
-                          <strong>Paper towels:</strong>{" "}
-                          {currency(paperTowelCost)}
-                        </div>
-
-                        <div>
-                          <strong>Vacuum rolls:</strong>{" "}
-                          {currency(vacuumRollCost)}
-                        </div>
-
-                        <div className="mt-3 border-t pt-2">
-                          <strong>Computed total:</strong>{" "}
-                          {currency(computedTotal)}
-                          <br />
-                          <strong>Cost per kg:</strong>{" "}
-                          {batch.costPerKgDried
-                            ? currency(batch.costPerKgDried)
-                            : "—"}
-                        </div>
-                      </div>
                     </div>
 
                     <div>
                       <h4 className="font-bold text-accent-content text-xl mb-2 text-center">
-                        Details:
-                      </h4>
-                      <p>
-                        <strong>Raw meat:</strong>{" "}
-                        {(batch.sourcingPhase?.amountInGrams ?? 0) / 1000} kg
-                        <br />
-                        <strong>Waste:</strong>{" "}
-                        {(batch.preppingPhase?.wasteInGrams ?? 0) / 1000} kg
-                        <br />
-                        <strong>Cooking cuts:</strong>{" "}
-                        {(batch.preppingPhase?.cookingCutsIngrams ?? 0) / 1000}{" "}
-                        kg
-                      </p>
+                            {tProduction("batches.list.details.title")}
+                          </h4>
+                          <p>
+                            <strong>{tProduction("batches.list.details.rawMeat")}:</strong>{" "}
+                            {(batch.sourcingPhase?.amountInGrams ?? 0) / 1000}{" "}
+                            {tCommon("units.kg")}
+                            <br />
+                            <strong>{tProduction("batches.list.details.wasteMeat")}:</strong>{" "}
+                            {(batch.preppingPhase?.wasteInGrams ?? 0) / 1000} {tCommon("units.kg")}
+                            <br />
+                            <strong>{tProduction("batches.list.details.meatForCooking")}</strong>{" "}
+                            {(batch.preppingPhase?.cookingCutsIngrams ?? 0) /
+                              1000}{" "} {tCommon("units.kg")}                            
+                            <br />
+                            <br />
+                            {batch.curingPhase?.saltAmountInGrams &&
+                            batch.sourcingPhase?.amountKg ? (
+                              <>
+                                <strong>{tProduction("batches.list.details.salt")}</strong>{" "}
+                                {(
+                                  batch.curingPhase.saltAmountInGrams /
+                                  batch.sourcingPhase.amountKg
+                                ).toFixed(1) || 0}{" "}
+                                {tCommon("units.g")}/{tCommon("units.kg")}
+                              </>
+                            ) : null}
+                          </p>
                     </div>
                   </motion.div>
                 )}
